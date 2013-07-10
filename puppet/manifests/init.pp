@@ -1,4 +1,22 @@
+Exec { path => '/bin:/usr/bin:/usr/local/bin:/usr/sbin:/sbin' }
+
 import 'sections/*'
+
+# Upgrade system packages
+stage { 'updates': before => Stage['main'] }
+class { 'updates': stage => updates }
+class updates {
+	exec { 'apt-get update':
+		command => 'apt-get update --quiet --yes',
+		timeout => 0
+	}
+	exec { 'apt-get upgrade':
+		command => 'apt-get upgrade --quiet --yes',
+		timeout => 0,
+		require => Exec['apt-get update']
+	}
+}
+
 
 # Do some setup here
 file { 'www-directory':
@@ -22,7 +40,7 @@ package { 'subversion': ensure => present }
 
 # Checkout core
 exec { "svn co wordpress trunk":
-	command => "/usr/bin/svn co https://core.svn.wordpress.org/trunk wp",
+	command => "svn co https://core.svn.wordpress.org/trunk wp",
 	cwd     => "/vagrant/www",
 	creates => "/vagrant/www/wp",
 	require => Package["subversion"]
