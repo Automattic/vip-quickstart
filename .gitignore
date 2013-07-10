@@ -3,3 +3,6 @@
 
 # WordPress directory
 /www/wp
+
+# WP CLI Directory
+/www/wp-cli
