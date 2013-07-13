@@ -17,7 +17,6 @@ class updates {
 	}
 }
 
-
 # Do some setup here
 file { 'www-directory':
 	ensure => directory,
@@ -33,6 +32,15 @@ file { 'www-directory-sym-link':
 	target  => '/vagrant/www',
 	mode    => 0755,
 	require => File['www-directory'],
+}
+
+file { 'wp-content-directory-sym-link':
+	ensure  => link,
+	path    => '/srv/www/wp/wp-content',
+	target  => '/srv/www/content',
+	mode    => 0775,
+	force   => true,
+	require => Exec['svn co wordpress trunk']
 }
 
 # Install SVN

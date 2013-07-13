@@ -7,9 +7,6 @@
 [submodule "puppet/modules/php"]
 	path = puppet/modules/php
 	url = https://github.com/nodesagency/puppet-php.git
-[submodule "puppet/modules/nginx"]
-	path = puppet/modules/nginx
-	url = https://github.com/jfryman/puppet-nginx.git
 [submodule "puppet/modules/mysql"]
 	path = puppet/modules/mysql
 	url = https://github.com/example42/puppet-mysql.git

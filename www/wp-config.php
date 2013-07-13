@@ -14,10 +14,6 @@
  * @package WordPress
  */
 
-// Custom content directory
-define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/content' );
-define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/content' );
-
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
 define('DB_NAME', 'wordpress');
@@ -90,7 +86,7 @@ define('JETPACK_DEV_DEBUG', true);
 
 /** Absolute path to the WordPress directory. */
 if ( !defined( 'ABSPATH' ) )
-	define( 'ABSPATH', dirname( __FILE__ ) . '/wp/' );
+	define( 'ABSPATH', dirname( __FILE__ ) );
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
