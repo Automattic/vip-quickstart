@@ -5,7 +5,8 @@ nginx::vhost { 'wp.dev':
 	template => 'nginx/wp.dev.erb'
 }
 
-file { '/etc/nginx/sites-available/default':
+file { '/etc/nginx/sites-enabled/default':
 	ensure => absent,
+	force => true,
 	require => Package['nginx']
 }
