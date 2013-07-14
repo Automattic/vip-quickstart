@@ -26,9 +26,9 @@ class {
 	'php::extension::gd':
 		package => 'php5-gd',
 		provider => 'apt';
-	'php::extension::apc':
-		package => 'php-apc',
-		provider => 'apt';
+	# 'php::extension::apc':
+	# 	package => 'php-apc',
+	# 	provider => 'apt';
 }
 
 php::fpm::conf { 'www': user => 'vagrant' }

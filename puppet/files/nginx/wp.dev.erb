@@ -1,0 +1,27 @@
+# File Managed by Puppet
+
+server {
+  listen <%= @port %>; 
+  root  <%= @docroot %>;
+  server_name <%= @name %> <%= @serveraliases %>;
+  index index.html index.php;
+
+  access_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= @name %>.access.log;
+  error_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= @name %>.error.log;
+
+  # WordPress single blog rules
+  # Designed to be included in any server {} block.
+  # This order might seem weird — this is attempted to match last if rules below fail.
+  # http://wiki.nginx.org/HttpCoreModule
+  location / {
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+  location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_split_path_info ^(.+.php)(/.+)$;
+    fastcgi_pass 127.0.0.1:9000;
+    fastcgi_index index.php;
+    include fastcgi_params;
+  }
+}

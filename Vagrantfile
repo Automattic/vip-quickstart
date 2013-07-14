@@ -24,6 +24,7 @@ Vagrant.configure("2") do |config|
     puppet.module_path = "puppet/modules"
     puppet.manifests_path = "puppet/manifests"
     puppet.manifest_file  = "init.pp"
+    puppet.options = ['--templatedir', '/vagrant/puppet/files']
   end
 
 end
