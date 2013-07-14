@@ -4,5 +4,8 @@
 # WordPress directory
 /www/wp
 
+# wp-content directory
+/www/content/plugins
+
 # WP CLI Directory
 /www/wp-cli
