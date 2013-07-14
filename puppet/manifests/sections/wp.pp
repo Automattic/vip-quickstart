@@ -19,3 +19,12 @@ exec { "svn up":
 	cwd     => "/vagrant/www/wp",
 	require => Exec["svn co wordpress trunk"]
 }
+
+file { 'wp-content-sym-link':
+	ensure  => link,
+	path    => '/vagrant/www/wp/wp-content',
+	target  => '/vagrant/www/content',
+	mode    => 0755,
+	force   => true,
+	require => Exec['svn co wordpress trunk']
+}
