@@ -6,5 +6,6 @@ nginx::vhost { 'wp.dev':
 }
 
 file { '/etc/nginx/sites-available/default':
-	ensure => absent
+	ensure => absent,
+	require => Package['nginx']
 }

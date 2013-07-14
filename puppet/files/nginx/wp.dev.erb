@@ -9,6 +9,14 @@ server {
   access_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= @name %>.access.log;
   error_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= @name %>.error.log;
 
+  location ^~ /blogs.dir {
+    internal;
+    alias /var/www/betz.mx/wp-content/blogs.dir;
+    access_log off;
+    log_not_found off;
+    expires max;
+  }
+
   # WordPress single blog rules
   # Designed to be included in any server {} block.
   # This order might seem weird — this is attempted to match last if rules below fail.
