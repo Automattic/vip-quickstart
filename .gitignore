@@ -5,7 +5,7 @@
 /www/wp
 
 # wp-content directory
-/www/content/plugins
+/www/wp-content/plugins
 
 # WP CLI Directory
 /www/wp-cli

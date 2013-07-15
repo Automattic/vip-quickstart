@@ -82,17 +82,8 @@ define('WP_DEBUG', true);
 define('SAVEQUERIES', true);
 define('JETPACK_DEV_DEBUG', true);
 
-/* Multisite */
-define('WP_ALLOW_MULTISITE', true);
-define('MULTISITE', true);
-define('SUBDOMAIN_INSTALL', false);
-define('DOMAIN_CURRENT_SITE', 'wp.dev');
-define('PATH_CURRENT_SITE', '/');
-define('SITE_ID_CURRENT_SITE', 1);
-define('BLOG_ID_CURRENT_SITE', 1);
-
 /* Content Directory */
-define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/content' );
+define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
 
 /* That's all, stop editing! Happy blogging. */
 

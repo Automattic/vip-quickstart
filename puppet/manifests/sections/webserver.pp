@@ -8,5 +8,6 @@ nginx::vhost { 'wp.dev':
 file { '/etc/nginx/sites-enabled/default':
 	ensure => absent,
 	force => true,
+	notify => Service['nginx'],
 	require => Package['nginx']
 }
