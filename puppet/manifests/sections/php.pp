@@ -11,9 +11,9 @@ class {
 	'php::extension::imagick':
 		package => 'php5-imagick',
 		provider => 'apt';
-	'php::extension::xdebug':
-		package => 'php5-xdebug',
-		provider => 'apt';
+	# 'php::extension::xdebug':
+	# 	package => 'php5-xdebug',
+	# 	provider => 'apt';
 	'php::extension::mcrypt':
 		package => 'php5-mcrypt',
 		provider => 'apt';

@@ -1,7 +1,7 @@
 include nginx
 
 nginx::vhost { 'wp.dev':
-	docroot => '/vagrant/www/wp',
+	docroot => '/vagrant/www',
 	template => 'nginx/wp.dev.erb'
 }
 

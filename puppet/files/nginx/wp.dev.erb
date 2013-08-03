@@ -11,7 +11,7 @@ server {
 
   location ^~ /blogs.dir {
     internal;
-    alias /var/www/betz.mx/wp-content/blogs.dir;
+    alias /vagrant/www/wp-content/blogs.dir;
     access_log off;
     log_not_found off;
     expires max;
@@ -22,7 +22,7 @@ server {
   # This order might seem weird — this is attempted to match last if rules below fail.
   # http://wiki.nginx.org/HttpCoreModule
   location / {
-    try_files $uri $uri/ /index.php?$args;
+    try_files $uri $uri/ /index.php?q=$uri&$args;
   }
 
   location ~ \.php$ {

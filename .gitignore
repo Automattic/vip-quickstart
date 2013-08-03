@@ -1,3 +1,6 @@
+# Because WordPress is SVN and this is git
+.svn
+
 # Because this really is a working directory, ignore vagrant's files
 /.vagrant
 
@@ -6,6 +9,8 @@
 
 # wp-content directory
 /www/wp-content/plugins
+/www/wp-content/themes
+/www/wp-content/uploads
 
 # WP CLI Directory
 /www/wp-cli

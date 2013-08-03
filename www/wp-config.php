@@ -82,14 +82,30 @@ define('WP_DEBUG', true);
 define('SAVEQUERIES', true);
 define('JETPACK_DEV_DEBUG', true);
 
+/**
+ * Disable file editing and WordPress updates
+ *
+ * Ideally we're keeping stuff up to date with version control. To
+ * update WordPress, run `svn up` from /vagrant/www/wp or run
+ * `vagrant provision` from the VIP Quickstart root. You can also
+ * install plugins from the plugin repository with the wp-cli
+ * `wp plugin install <plugin-name>` command.
+ */
+define('DISALLOW_FILE_MODS', true);
+
 /* Content Directory */
 define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
+define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/wp-content' );
+
+/* Put WordPress in a subdirectory */
+define('WP_SITEURL', 'http://wp.dev/wp');
+define('WP_HOME', 'http://wp.dev');
 
 /* That's all, stop editing! Happy blogging. */
 
 /** Absolute path to the WordPress directory. */
 if ( !defined( 'ABSPATH' ) )
-	define( 'ABSPATH', dirname( __FILE__ ) );
+	define( 'ABSPATH', dirname( __FILE__ ) . '/wp/' );
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
