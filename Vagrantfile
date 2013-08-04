@@ -19,6 +19,9 @@ Vagrant.configure("2") do |config|
   # See http://stackoverflow.com/questions/10894661/augeas-support-on-my-vagrant-machine
   config.vm.provision :shell, :inline => "if dpkg --compare-versions `puppet --version` 'lt' '2.7.20'; then sudo apt-get update --quiet --yes && sudo apt-get install puppet --yes; fi"
 
+  # Automatically set up submodules
+  config.vm.provision :shell, :inline => "cd /vagrant; sudo apt-get install git-core --quiet --yes && git submodule init && git submodule update"
+
   # Provision everything we need with Puppet
   config.vm.provision :puppet do |puppet|
     puppet.module_path = "puppet/modules"
