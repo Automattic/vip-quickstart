@@ -43,11 +43,9 @@ wp::plugin { 'developer':
 	location    => '/vagrant/www/wp',
 	networkwide => true
 }
-wp::plugin { 'jetpack':
-	location    => '/vagrant/www/wp',
-	networkwide => true
-}
-wp::plugin { 'mp6':
-	location    => '/vagrant/www/wp',
-	networkwide => true
+
+wp::command { 'developer install-plugins':
+	command  => 'developer install-plugins --type=wpcom-vip',
+	location => '/vagrant/www/wp',
+	require  => Wp::Plugin['developer']
 }
