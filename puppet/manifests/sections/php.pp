@@ -35,6 +35,7 @@ php::fpm::conf { 'www': user => 'vagrant' }
 
 package { 'memcached': ensure => present }
 package { 'php5-memcache': ensure => present }
+package { 'phpmyadmin': ensure => present }
 
 # Turn on html_errors
 exec { 'html_errors = On':
