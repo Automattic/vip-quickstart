@@ -97,15 +97,10 @@ define('DISALLOW_FILE_MODS', true);
 define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
 define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/wp-content' );
 
-/* Put WordPress in a subdirectory */
-define('WP_SITEURL', 'http://wp.dev/wp');
-define('WP_HOME', 'http://wp.dev');
-
 define('MULTISITE', true);
 define('SUBDOMAIN_INSTALL', false);
-$base = '/';
 define('DOMAIN_CURRENT_SITE', 'wp.dev');
-define('PATH_CURRENT_SITE', '/');
+define('PATH_CURRENT_SITE', '/wp/');
 define('SITE_ID_CURRENT_SITE', 1);
 define('BLOG_ID_CURRENT_SITE', 1);
 
@@ -113,7 +108,7 @@ define('BLOG_ID_CURRENT_SITE', 1);
 
 /** Absolute path to the WordPress directory. */
 if ( !defined( 'ABSPATH' ) )
-	define( 'ABSPATH', dirname( __FILE__ ) . '/wp/' );
+	define( 'ABSPATH', dirname( __FILE__ ) . '/' );
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');

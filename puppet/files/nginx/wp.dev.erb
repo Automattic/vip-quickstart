@@ -1,35 +1,51 @@
 # File Managed by Puppet
 
+# site path: /var/www/wp.dev/
+# wp path:   /var/www/wp.dev/core/
+ 
+# site url: http://wp.dev/core/
+# wp url:   http://wp.dev/core/
+ 
+upstream php {
+  server 127.0.0.1:9000;
+}
+ 
 server {
-  listen <%= @port %>; 
-  root  <%= @docroot %>;
+  listen <%= @port %>;
   server_name <%= @name %> <%= @serveraliases %>;
-  index index.html index.php;
-
+ 
+  root <%= @docroot %>;
+ 
   access_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= @name %>.access.log;
   error_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= @name %>.error.log;
-
-  location ^~ /blogs.dir {
-    internal;
-    alias /vagrant/www/wp-content/blogs.dir;
-    access_log off;
-    log_not_found off;
-    expires max;
-  }
-
-  # WordPress single blog rules
-  # Designed to be included in any server {} block.
-  # This order might seem weird — this is attempted to match last if rules below fail.
-  # http://wiki.nginx.org/HttpCoreModule
+ 
+  index index.html index.php;
+ 
+  rewrite ^/wp/([_0-9a-zA-Z-]+)/(xmlrpc\.php|wp-[0-9a-z-]+\.php) /wp/$2;
+  rewrite ^/wp/([_0-9a-zA-Z-]+)/(wp-(admin|content|includes).*) /wp/$2;
+ 
   location / {
-    try_files $uri $uri/ /index.php?q=$uri&$args;
+    try_files $uri $uri/ /index.php;
+  }
+ 
+  location ~ \.php {
+    include /etc/nginx/fastcgi_params;
+    fastcgi_pass php;
   }
 
-  location ~ \.php$ {
-    try_files $uri =404;
-    fastcgi_split_path_info ^(.+.php)(/.+)$;
-    fastcgi_pass 127.0.0.1:9000;
-    fastcgi_index index.php;
-    include fastcgi_params;
+  location /phpmyadmin {
+    root /usr/share/;
+    index index.php index.html index.htm;
+    location ~ ^/phpmyadmin/(.+\.php)$ {
+      try_files $uri =404;
+      root /usr/share/;
+      fastcgi_pass 127.0.0.1:9000;
+      fastcgi_index index.php;
+      fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+      include /etc/nginx/fastcgi_params;
+    }
+    location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ {
+    root /usr/share/;
+    }
   }
 }
