@@ -82,6 +82,9 @@ define('WP_DEBUG', true);
 define('SAVEQUERIES', true);
 define('JETPACK_DEV_DEBUG', true);
 
+// Disable unfiltered_html; this is a default in MS, but we should extra enforce it
+define( 'DISALLOW_UNFILTERED_HTML', true );
+
 /**
  * Disable file editing and WordPress updates
  *
