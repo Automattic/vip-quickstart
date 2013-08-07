@@ -1,14 +1,4 @@
 # File Managed by Puppet
-
-# site path: /var/www/wp.dev/
-# wp path:   /var/www/wp.dev/core/
- 
-# site url: http://wp.dev/core/
-# wp url:   http://wp.dev/core/
- 
-upstream php {
-  server 127.0.0.1:9000;
-}
  
 server {
   listen <%= @port %>;
@@ -21,16 +11,25 @@ server {
  
   index index.html index.php;
  
-  rewrite ^/wp/([_0-9a-zA-Z-]+)/(xmlrpc\.php|wp-[0-9a-z-]+\.php) /wp/$2;
-  rewrite ^/wp/([_0-9a-zA-Z-]+)/(wp-(admin|content|includes).*) /wp/$2;
- 
   location / {
-    try_files $uri $uri/ /index.php;
+    try_files $uri $uri/ /index.php?$args;
   }
- 
-  location ~ \.php {
-    include /etc/nginx/fastcgi_params;
-    fastcgi_pass php;
+
+  # Add trailing slash to */wp-admin requests.
+  rewrite /wp-admin$ $scheme://$host$uri/ permanent;
+
+  # WordPress in a subdirectory rewrite rules
+  rewrite ^/([_0-9a-zA-Z-]+/)?(wp-.*) /wp/$2 break;
+  rewrite ^/([_0-9a-zA-Z-]+/)?(.*\.php)$ /wp/$2 break;
+
+  # Pass all .php files onto a php-fpm/php-fcgi server.
+  location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    include fastcgi_params;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_pass 127.0.0.1:9000;
   }
 
   location /phpmyadmin {
