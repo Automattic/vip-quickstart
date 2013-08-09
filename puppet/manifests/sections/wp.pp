@@ -40,6 +40,12 @@ wp::site { '/vagrant/www/wp':
 	require        => Exec['svn co wordpress trunk']
 }
 
+wp::command { 'plugin update-all':
+	command  => 'plugin update-all',
+	location => '/vagrant/www/wp',
+	require  => Wp::Site['/vagrant/www/wp']
+}
+
 wp::plugin { 'developer':
 	location    => '/vagrant/www/wp',
 	networkwide => true
