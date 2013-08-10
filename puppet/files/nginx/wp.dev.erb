@@ -19,7 +19,7 @@ server {
   rewrite /wp-admin$ $scheme://$host$uri/ permanent;
 
   # WordPress in a subdirectory rewrite rules
-  rewrite ^/([_0-9a-zA-Z-]+/)?(wp-.*) /wp/$2 break;
+  rewrite ^/([_0-9a-zA-Z-]+/)?(wp-(includes|admin).*) /wp/$2 break;
   rewrite ^/([_0-9a-zA-Z-]+/)?(.*\.php)$ /wp/$2 break;
 
   # Pass all .php files onto a php-fpm/php-fcgi server.
