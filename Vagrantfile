@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
   config.vm.box_url = "http://files.vagrantup.com/precise32.box"
 
   config.vm.hostname = "precise32-dev"
-  config.vm.network :private_network, ip: "192.168.50.4"
+  config.vm.network :private_network, ip: "10.86.73.80"
 
   # Address a bug in an older version of Puppet
   #
