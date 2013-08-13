@@ -1,3 +1,4 @@
 #!/bin/bash
 
-vagrant ssh -c "cd /vagrant/www/wp; /usr/bin/wp $argv"
+ARGS="$@"
+vagrant ssh -c "cd /vagrant/www/wp; /usr/bin/wp $ARGS"
