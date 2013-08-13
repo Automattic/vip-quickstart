@@ -2,8 +2,13 @@
 
 VIP_PLUGIN_REPO="https://vip-svn.wordpress.com/plugins/"
 
+# Automatically set up submodules
+git submodule init && git submodule update
+
+# Start the VM
 vagrant up
 
+# Checkout the VIP shared plugins repo
 if [ -d "www/wp-content/themes/vip" ]; then
 	svn up www/wp-content/themes/vip/plugins
 else
