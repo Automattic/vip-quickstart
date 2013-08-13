@@ -18,11 +18,11 @@
 ## Usernames and Passwords
 
 ### MySQL
-root:blank
-wordpress:wordpress
+* root:blank
+* wordpress:wordpress
 
 ### WordPress
-wordpress:wordpress
+* wordpress:wordpress
 
 ## Submodules
 
