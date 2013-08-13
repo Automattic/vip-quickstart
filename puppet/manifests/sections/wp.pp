@@ -36,7 +36,6 @@ wp::site { '/vagrant/www/wp':
 	admin_email    => 'wordpress@wp.dev',
 	network        => true,
 	subdomains     => false,
-	base           => '/wp/',
 	require        => Exec['svn co wordpress trunk']
 }
 
