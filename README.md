@@ -12,8 +12,9 @@
 ## Tips
 
 * There are scripts in the bin directory, run them with `./bin/<script-name>` or add "./bin" to your system PATH
-* If you don't want to check out the VIP shared plugins repository and VIP helper code, you can just run `vagrant up` to start the virtual machine instead of using the `vip-init` script
+* You can use `vagrant up` to start the virtual machine instead of `vip-init`, but you'll have to manually clone the submodules with `git submodule init && git submodule update`
 * You can use the `wp` script in the bin directory to run simple WP-CLI scripts without needing to SSH into the virtual machine
+* Run `vagrant help` to see a list of commands
 
 ## Usernames and Passwords
 
