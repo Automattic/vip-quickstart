@@ -2,6 +2,11 @@
 
 VIP_PLUGIN_REPO="https://vip-svn.wordpress.com/plugins/"
 
-vagrant provision || vagrant up;
-[ -d "www/wp-content/themes/vip" ] || mkdir -p www/wp-content/themes/vip
-svn co "$VIP_PLUGIN_REPO" www/wp-content/themes/vip/plugins
+vagrant up
+
+if [ -d "www/wp-content/themes/vip" ]; then
+	svn up www/wp-content/themes/vip/plugins
+else
+	mkdir -p www/wp-content/themes/vip
+	svn co "$VIP_PLUGIN_REPO" www/wp-content/themes/vip/plugins
+fi
