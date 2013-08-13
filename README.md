@@ -2,18 +2,18 @@
 
 ##Setup
 
-1. Clone the repository
-2. `vagrant up`
-3. Add "192.168.50.4 wp.dev" to your hosts file
-4. Build awesome stuff
+1. Download and install the latest version of Vagrant from http://downloads.vagrantup.com/
+2. Clone this repository
+3. Navigate to the repo in a terminal
+4. Run `./bin/vip-init`
+5. Add "10.86.73.80 wp.dev" to your hosts file
+6. Go to http://wp.dev in your browser
 
-##Scripts
+##Tips
 
-There are some scripts in the bin directory. If you add `./bin` to your system path you can use these scripts by name. Otherwise, `./bin/wp-init` will run the init script, for example.
-
-* `aliases.bash` is a set of bash aliases to help you interact with the virtual machine. Notably, the `wp` command tunnels a wp-cli command through the `vagrant ssh -c` command to let you run wp-cli commands quickly without the need to log into the machine
-* `wp-init` sets up the virtual machine and checks out the VIP shared plugins repo. It will ask for your WordPress.com login information to checkout the shared plugins
-* `wp-pc` is a set of pre-commit checks to make sure your theme is able to be committed to SVN.
+* There are scripts in the bin directory, run them with `./bin/<script-name>` or add "./bin" to your system PATH
+* If you don't want to check out the VIP shared plugins repository and VIP helper code, you can just run `vagrant up` to start the virtual machine instead of using the `vip-init` script
+* You can use the `wp` script in the bin directory to run simple WP-CLI scripts without needing to SSH into the virtual machine
 
 ##Submodules
 
