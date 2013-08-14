@@ -1,32 +1,55 @@
 #!/bin/bash
 VIP_PLUGIN_REPO="https://vip-svn.wordpress.com/plugins/"
 
-echo "Welcome to VIP Quickstart!"
-echo "This script will set up your VIP development environment."
+# =====================================
+# VIP Quickstart
+# =====================================
+echo '
+ _   __(_)___     ____ ___  __(_)____/ /_______/ /_____ ______/ /_
+| | / / / __ \   / __ `/ / / / / ___/ //_/ ___/ __/ __ `/ ___/ __/
+| |/ / / /_/ /  / /_/ / /_/ / / /__/ ,< (__  ) /_/ /_/ / /  / /_  
+|___/_/ .___/   \__, /\__,_/_/\___/_/|_/____/\__/\__,_/_/   \__/  
+     /_/          /_/                                             
 
+'
+
+# =====================================
 # Give ourselves root access for the rest of the script
+# =====================================
 sudo -p "Enter your password to continue:" whoami 1>/dev/null || exit
 echo ""
 
+
+# =====================================
 # Automatically update the repo
+# =====================================
 echo "Updating repository..."
 git pull
 echo ""
 
+
+# =====================================
 # Automatically set up submodules
+# =====================================
 echo "Cloning dependencies..."
 git submodule init && git submodule update
 echo ""
 
+
+# =====================================
 # Start the VM (always provision, even if it's already running)
+# =====================================
 echo "===--===--==--==--==--=="
-echo "=== Starting the VM"
+echo "=== Setting up the VM"
 echo "===--===--==--==--==--=="
 
 vagrant up --no-provision && vagrant provision
 echo ""
 
+
+# =====================================
 # Add vip.dev entry to hosts file
+# =====================================
 echo "===--===--==--==--==--=="
 echo "=== Configuring the hosts file"
 echo "===--===--==--==--==--=="
@@ -34,7 +57,10 @@ echo "===--===--==--==--==--=="
 cat /etc/hosts | grep vip.dev || sudo echo "10.86.73.80 vip.dev" | sudo tee -a /etc/hosts
 echo ""
 
+
+# =====================================
 # Checkout the VIP shared plugins repo
+# =====================================
 echo "===--===--==--==--==--=="
 echo "=== Setting up VIP Shared plugins"
 echo "===--===--==--==--==--=="
@@ -47,12 +73,18 @@ else
 fi
 echo ""
 
+
+# =====================================
 # Outro/next steps
+# =====================================
 echo "===--===--==--==--==--=="
 echo "=== Next Steps"
 echo "===--===--==--==--==--=="
 echo "* Go to http://vip.dev in your browser"
 echo ""
 
+
+# =====================================
 # Kill sudo timestamp
+# =====================================
 sudo -k
