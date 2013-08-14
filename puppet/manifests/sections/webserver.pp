@@ -11,3 +11,9 @@ file { '/etc/nginx/sites-enabled/default':
 	notify => Service['nginx'],
 	require => Package['nginx']
 }
+
+file { '/vagrant/www/phpmyadmin':
+	ensure => 'link',
+	target => '/usr/share/phpmyadmin',
+	require => Package['phpmyadmin']
+}
