@@ -2,7 +2,7 @@
 
 ## Setup
 
-1. Download and install the latest version of Vagrant from http://downloads.vagrantup.com/
+1. Download and install the latest version of [VirtualBox](https://www.virtualbox.org/wiki/Downloads) and [Vagrant](http://downloads.vagrantup.com/)
 2. Clone this repository
 3. Navigate to the repo in a terminal
 4. Run `./bin/vip-init`
