@@ -109,6 +109,12 @@ define('BLOG_ID_CURRENT_SITE', 1);
 
 /* That's all, stop editing! Happy blogging. */
 
+if ( file_exists( 'local-config.php' ) )
+	require 'local-config.php';
+
+if ( file_exists( 'vip-config.php' ) )
+	require 'vip-config.php';
+
 /** Absolute path to the WordPress directory. */
 if ( !defined( 'ABSPATH' ) )
 	define( 'ABSPATH', dirname( __FILE__ ) . '/' );
