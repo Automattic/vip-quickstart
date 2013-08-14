@@ -9,6 +9,12 @@
 5. Add "10.86.73.80 wp.dev" to your hosts file
 6. Go to http://wp.dev in your browser, login with username: wordpress, password: wordpress
 
+If you're not able to run a bash script, there are a couple extra steps to complete everything that the `vip-init` script does.
+
+1. `git submodule init && git submodule update`
+2. `vagrant up`
+3. `svn co https://vip-svn.wordpress.com/plugins/ www/wp-content/themes/vip/plugins`
+
 ## Tips
 
 * There are scripts in the bin directory, run them with `./bin/<script-name>` or add "./bin" to your system PATH
