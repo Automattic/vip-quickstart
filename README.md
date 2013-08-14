@@ -34,3 +34,17 @@ If you're not able to run a bash script, there are a couple extra steps to compl
 ## Submodules
 
 The puppet modules are all set up as submodules in `puppet/modules`. In general, you shouldn't have to worry about this because the Vagrantfile will update the submodules with a bash script when you provision. Just noting here for documentation purposes at this point.
+
+## Acknowledgements
+
+Thanks to the following projects that VIP Quickstart is built on:
+
+* [Vagrant](http://vagrantup.com/)
+* [Puppet](http://puppetlabs.com/)
+* [Varying Vagrant Vagrants](https://github.com/10up/varying-vagrant-vagrants)
+* [WP-CLI](http://wp-cli.org)
+* [puppet-mysql](https://github.com/example42/puppet-mysql)
+* [puppet-nginx](https://github.com/example42/puppet-nginx)
+* [puppet-php](https://github.com/jippi/puppet-php)
+* [puppi](https://github.com/example42/puppi)
+* [puppet-wp](https://github.com/rmccue/puppet-wp)
