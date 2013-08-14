@@ -9,6 +9,11 @@ sudo -p "Enter your password to continue:" whoami 1>/dev/null || exit
 echo ""
 
 # Automatically set up submodules
+echo "Updating repository..."
+git pull
+echo ""
+
+# Automatically set up submodules
 echo "Cloning dependencies..."
 git submodule init && git submodule update
 echo ""
