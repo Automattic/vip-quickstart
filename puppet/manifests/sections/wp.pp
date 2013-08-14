@@ -29,11 +29,11 @@ exec { "rsync wp-content":
 
 # Install WordPress
 wp::site { '/vagrant/www/wp':
-	url            => 'wp.dev',
-	sitename       => 'wp.dev',
+	url            => 'vip.dev',
+	sitename       => 'vip.dev',
 	admin_user     => 'wordpress',
 	admin_password => 'wordpress',
-	admin_email    => 'wordpress@wp.dev',
+	admin_email    => 'wordpress@vip.dev',
 	network        => true,
 	subdomains     => false,
 	require        => Exec['svn co wordpress trunk']

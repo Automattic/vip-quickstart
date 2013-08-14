@@ -8,9 +8,9 @@ git submodule init && git submodule update
 # Start the VM
 vagrant up
 
-# Add wp.dev entry to hosts file
+# Add vip.dev entry to hosts file
 echo "Configuring hosts file"
-cat /etc/hosts | grep wp.dev || sudo echo "10.86.73.80 wp.dev" | sudo tee -a /etc/hosts
+cat /etc/hosts | grep vip.dev || sudo echo "10.86.73.80 vip.dev" | sudo tee -a /etc/hosts
 
 # Checkout the VIP shared plugins repo
 if [ -d "www/wp-content/themes/vip" ]; then
