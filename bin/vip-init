@@ -8,7 +8,7 @@ echo "This script will set up your VIP development environment."
 sudo -p "Enter your password to continue:" whoami 1>/dev/null || exit
 echo ""
 
-# Automatically set up submodules
+# Automatically update the repo
 echo "Updating repository..."
 git pull
 echo ""
