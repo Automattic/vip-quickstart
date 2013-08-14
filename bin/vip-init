@@ -1,21 +1,53 @@
 #!/bin/bash
-
 VIP_PLUGIN_REPO="https://vip-svn.wordpress.com/plugins/"
 
-# Automatically set up submodules
-git submodule init && git submodule update
+echo "Welcome to VIP Quickstart!"
+echo "This script will set up your VIP development environment."
 
-# Start the VM
-vagrant up
+# Give ourselves root access for the rest of the script
+sudo -p "Enter your password to continue:" whoami 1>/dev/null || exit
+echo ""
+
+# Automatically set up submodules
+echo "Cloning dependencies..."
+git submodule init && git submodule update
+echo ""
+
+# Start the VM (always provision, even if it's already running)
+echo "===--===--==--==--==--=="
+echo "=== Starting the VM"
+echo "===--===--==--==--==--=="
+
+vagrant up --no-provision && vagrant provision
+echo ""
 
 # Add vip.dev entry to hosts file
-echo "Configuring hosts file"
+echo "===--===--==--==--==--=="
+echo "=== Configuring the hosts file"
+echo "===--===--==--==--==--=="
+
 cat /etc/hosts | grep vip.dev || sudo echo "10.86.73.80 vip.dev" | sudo tee -a /etc/hosts
+echo ""
 
 # Checkout the VIP shared plugins repo
+echo "===--===--==--==--==--=="
+echo "=== Setting up VIP Shared plugins"
+echo "===--===--==--==--==--=="
+
 if [ -d "www/wp-content/themes/vip" ]; then
 	svn up www/wp-content/themes/vip/plugins
 else
 	mkdir -p www/wp-content/themes/vip
 	svn co "$VIP_PLUGIN_REPO" www/wp-content/themes/vip/plugins
 fi
+echo ""
+
+# Outro/next steps
+echo "===--===--==--==--==--=="
+echo "=== Next Steps"
+echo "===--===--==--==--==--=="
+echo "* Go to http://vip.dev in your browser"
+echo ""
+
+# Kill sudo timestamp
+sudo -k
