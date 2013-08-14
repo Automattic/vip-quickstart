@@ -6,14 +6,14 @@
 2. Clone this repository
 3. Navigate to the repo in a terminal
 4. Run `./bin/vip-init`
-5. Go to http://wp.dev in your browser, login with username: wordpress, password: wordpress
+5. Go to http://vip.dev in your browser, login with username: wordpress, password: wordpress
 
 If you're not able to run a bash script, there are a couple extra steps to complete everything that the `vip-init` script does.
 
 1. `git submodule init && git submodule update`
 2. `vagrant up`
 3. `svn co https://vip-svn.wordpress.com/plugins/ www/wp-content/themes/vip/plugins`
-4. Add "10.86.73.80 wp.dev" to your hosts file
+4. Add "10.86.73.80 vip.dev" to your hosts file
 
 ## Tips
 

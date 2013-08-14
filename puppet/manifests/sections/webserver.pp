@@ -1,8 +1,8 @@
 include nginx
 
-nginx::vhost { 'wp.dev':
+nginx::vhost { 'vip.dev':
 	docroot => '/vagrant/www',
-	template => 'nginx/wp.dev.erb'
+	template => 'nginx/vip.dev.erb'
 }
 
 file { '/etc/nginx/sites-enabled/default':
