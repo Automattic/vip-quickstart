@@ -27,6 +27,11 @@ exec { "rsync wp-content":
 	refreshonly => true
 }
 
+file { 'local-config.php':
+	ensure => present,
+	path   => '/vagrant/www/local-config.php'
+}
+
 # Install WordPress
 wp::site { '/vagrant/www/wp':
 	url            => 'vip.dev',
