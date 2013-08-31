@@ -33,7 +33,7 @@ If you're not able to run a bash script, there are a couple extra steps to compl
 
 ## Submodules
 
-The puppet modules are all set up as submodules in `puppet/modules`. In general, you shouldn't have to worry about this because the Vagrantfile will update the submodules with a bash script when you provision. Just noting here for documentation purposes at this point.
+The puppet modules are all set up as submodules in `puppet/modules`. In general, you shouldn't have to worry about this because the `vip-init` script will update the submodules automatically. Just noting here for documentation purposes at this point.
 
 ## Acknowledgements
 
