@@ -33,21 +33,16 @@ file { 'local-config.php':
 }
 
 # Install WordPress
-wp::site { '/vagrant/www/wp':
-	url            => 'vip.dev',
-	sitename       => 'vip.dev',
-	admin_user     => 'wordpress',
-	admin_password => 'wordpress',
-	admin_email    => 'wordpress@vip.dev',
-	network        => true,
-	subdomains     => false,
-	require        => Exec['svn co wordpress trunk']
+exec {"wp install /vagrant/www/wp":
+	command => "/usr/bin/wp core multisite-install --base='vip.dev' --title='vip.dev' --admin_email='wordpress@vip.dev' --admin_name='wordpress' --admin_password='wordpress'",
+	cwd => '/vagrant/www/wp',
+	require => [ Class['wp::cli'], Exec['svn co wordpress trunk'] ]
 }
 
 wp::command { 'plugin update-all':
 	command  => 'plugin update-all',
 	location => '/vagrant/www/wp',
-	require  => Wp::Site['/vagrant/www/wp']
+	require => Exec['wp install /vagrant/www/wp']
 }
 
 wp::plugin { 'developer':
