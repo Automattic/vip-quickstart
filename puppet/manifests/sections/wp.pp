@@ -47,7 +47,8 @@ wp::command { 'plugin update-all':
 
 wp::plugin { 'developer':
 	location    => '/vagrant/www/wp',
-	networkwide => true
+	networkwide => true,
+	require => Exec['wp install /vagrant/www/wp']
 }
 
 wp::command { 'developer install-plugins':
