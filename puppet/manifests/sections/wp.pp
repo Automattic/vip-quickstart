@@ -5,7 +5,7 @@ class { wp::cli:
 
 exec { "rsync wp-content":
 	command => "rsync -a /vagrant/www/wp/wp-content/ /vagrant/www/wp-content",
-	unless => "/usr/bin/test -d /vagrant/www/wp-content"
+	onlyif => "/usr/bin/test -d /vagrant/www/wp-content"
 }
 
 exec { 'rm -rf /vagrant/www/wp/wp-content':
