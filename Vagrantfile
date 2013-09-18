@@ -14,10 +14,8 @@ Vagrant.configure("2") do |config|
   config.vm.network :private_network, ip: "10.86.73.80"
 
   # Address a bug in an older version of Puppet
-  #
-  # Once precise32 ships with Puppet 2.7.20+, we can safely remove
   # See http://stackoverflow.com/questions/10894661/augeas-support-on-my-vagrant-machine
-  config.vm.provision :shell, :inline => "if dpkg --compare-versions `puppet --version` 'lt' '2.7.20'; then sudo apt-get update --quiet --yes && sudo apt-get install puppet --yes; fi"
+  config.vm.provision :shell, :inline => "if ! dpkg -s puppet > /dev/null; then sudo apt-get update --quiet --yes && sudo apt-get install puppet --quiet --yes; fi"
 
   # Provision everything we need with Puppet
   config.vm.provision :puppet do |puppet|
