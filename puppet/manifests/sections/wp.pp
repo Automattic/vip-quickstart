@@ -25,8 +25,8 @@ exec {"wp install /vagrant/www/wp":
 	require => Class['wp::cli']
 }
 
-wp::command { 'plugin update-all':
-	command  => 'plugin update-all',
+wp::command { 'plugin update --all':
+	command  => 'plugin update --all',
 	location => '/vagrant/www/wp',
 	require => Exec['wp install /vagrant/www/wp']
 }
