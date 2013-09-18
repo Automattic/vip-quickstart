@@ -3,28 +3,14 @@ class { wp::cli:
 	install_path => '/vagrant/www/wp-cli'
 }
 
-# Install SVN
-package { 'subversion': ensure => present }
-
-# Checkout core
-exec { "svn co wordpress trunk":
-	command => "svn co https://core.svn.wordpress.org/trunk wp",
-	cwd     => "/vagrant/www",
-	creates => "/vagrant/www/wp",
-	require => Package["subversion"],
-	notify  => Exec['rsync wp-content']
-}
-
-# svn up
-exec { "svn up":
-	cwd     => "/vagrant/www/wp",
-	require => Exec["svn co wordpress trunk"],
-	notify  => Exec['rsync wp-content']
-}
-
 exec { "rsync wp-content":
 	command => "rsync -a /vagrant/www/wp/wp-content/ /vagrant/www/wp-content",
-	refreshonly => true
+	unless => "/usr/bin/test -d /vagrant/www/wp-content"
+}
+
+exec { 'rm -rf /vagrant/www/wp/wp-content':
+	require => Exec['rsync wp-content'],
+	onlyif => '/usr/bin/test -d /vagrant/www/wp/wp-content'
 }
 
 file { 'local-config.php':
@@ -36,7 +22,7 @@ file { 'local-config.php':
 exec {"wp install /vagrant/www/wp":
 	command => "/usr/bin/wp core multisite-install --base='vip.dev' --title='vip.dev' --admin_email='wordpress@vip.dev' --admin_name='wordpress' --admin_password='wordpress'",
 	cwd => '/vagrant/www/wp',
-	require => [ Class['wp::cli'], Exec['svn co wordpress trunk'] ]
+	require => Class['wp::cli']
 }
 
 wp::command { 'plugin update-all':
