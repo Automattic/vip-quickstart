@@ -1,26 +1,41 @@
 # VIP Quickstart
 
-## Setup
+## What You Get
 
-1. Download and install the latest version of [VirtualBox](https://www.virtualbox.org/wiki/Downloads) and [Vagrant](http://downloads.vagrantup.com/)
-2. Clone this repository
-3. Navigate to the repo in a terminal
-4. Run `./bin/vip-init`
-5. Go to http://vip.dev in your browser, login with username: wordpress, password: wordpress
+*   Ubuntu 12.04
+*   WordPress trunk
+*   WordPress.com VIP Shared Plugins repository
+*   WordPress multisite
+*   WordPress Developer Plugin and all VIP recommended plugins
+*   Custom WordPress.com modifications
+*   WP-CLI
+*   MySQL
+*   PHP
+*   Nginx
 
-If you're not able to run a bash script, there are a couple extra steps to complete everything that the `vip-init` script does.
+## Getting Started
 
-1. `git submodule init && git submodule update`
-2. `vagrant up`
-3. `svn co https://vip-svn.wordpress.com/plugins/ www/wp-content/themes/vip/plugins`
-4. Add "10.86.73.80 vip.dev" to your hosts file
+First you’ll need to make sure you have the requirements for VIP Quickstart, which include [VirtualBox](https://www.virtualbox.org/wiki/Downloads) and [Vagrant](http://downloads.vagrantup.com/).
 
-## Tips
+The first time you run the init script will be the slowest. It’s also the most dependent on the speed of your internet connection. This is because it has to download the virtual machine image, Ubuntu package updates, the full checkout of WordPress trunk, and the full VIP Plugins repository. Subsequent runs will only update this base.
 
-* There are scripts in the bin directory, run them with `./bin/<script-name>` or add "./bin" to your system PATH
-* You can use `vagrant up` to start the virtual machine instead of `vip-init`, but you'll have to manually clone the submodules with `git submodule init && git submodule update`
-* You can use the `wp` script in the bin directory to run simple WP-CLI scripts without needing to SSH into the virtual machine
-* Run `vagrant help` to see a list of commands
+If you’re on a Unix-based machine with a Bash shell, the rest is easy.
+
+1.  Clone the [VIP Quickstart Github repo](https://github.com/Automattic/vip-quickstart)
+2.  Navigate to the repository with your Bash shell
+3.  Run the VIP init script: `./bin/vip-init`
+4.  Go to http://vip.dev in your browser, login with username: wordpress, password: wordpress
+The init script is setup such that you can run it multiple times and nothing will break. This means that you can also use it to update your environment in the future. If parts of the system are already up-to-date it will just skip those parts of the installer. So if you manually keep WordPress trunk up-to-date by running `svn up`, the init script will just show a message that the WordPress install is already at the latest changeset.
+
+If you’re on a Windows machine, the setup is a little more complicated for the moment. Since the VIP init script won’t work in that environment, you’ll have to complete the following tasks manually:
+
+1.  Clone the [VIP Quickstart Github repo](https://github.com/Automattic/vip-quickstart)
+2.  Set up the submodules with `git submodule init` and `git submodule update`
+3.  Check out WordPress trunk (http://core.svn.wordpress.org/trunk/) to `www/wp`
+4.  Check out a copy of the Shared Plugins Repository (https://vip-svn.wordpress.com/plugins/) to `www/wp-content/themes/vip/plugins`
+5.  Start the vagrant box: `vagrant up`
+6.  Add a hosts file entry for: “10.86.73.80 vip.dev”
+7.  Go to http://vip.dev in your browser
 
 ## Usernames and Passwords
 
