@@ -13,19 +13,25 @@
 *   PHP
 *   Nginx
 
+## Requirements
+
+* [VirtualBox])(https://www.virtualbox.org/wiki/Downloads)
+* [Vagrant](http://downloads.vagrantup.com/)
+* [Git](http://git-scm.com/downloads)
+
 ## Getting Started
 
-First you’ll need to make sure you have the requirements for VIP Quickstart, which include [VirtualBox](https://www.virtualbox.org/wiki/Downloads) and [Vagrant](http://downloads.vagrantup.com/).
+### Unix
 
-The first time you run the init script will be the slowest. It’s also the most dependent on the speed of your internet connection. This is because it has to download the virtual machine image, Ubuntu package updates, the full checkout of WordPress trunk, and the full VIP Plugins repository. Subsequent runs will only update this base.
-
-If you’re on a Unix-based machine with a Bash shell, the rest is easy.
+If you’re on a Unix-based machine with a Bash shell, setup is pretty easy:
 
 1.  Clone the [VIP Quickstart Github repo](https://github.com/Automattic/vip-quickstart)
-2.  Navigate to the repository with your Bash shell
-3.  Run the VIP init script: `./bin/vip-init`
-4.  Go to http://vip.dev in your browser, login with username: wordpress, password: wordpress
+2.  Run the VIP init script: `./bin/vip-init`
+3.  Go to http://vip.dev in your browser, login with username: wordpress, password: wordpress
+
 The init script is setup such that you can run it multiple times and nothing will break. This means that you can also use it to update your environment in the future. If parts of the system are already up-to-date it will just skip those parts of the installer. So if you manually keep WordPress trunk up-to-date by running `svn up`, the init script will just show a message that the WordPress install is already at the latest changeset.
+
+### Windows
 
 If you’re on a Windows machine, the setup is a little more complicated for the moment. Since the VIP init script won’t work in that environment, you’ll have to complete the following tasks manually:
 
@@ -36,6 +42,8 @@ If you’re on a Windows machine, the setup is a little more complicated for the
 5.  Start the vagrant box: `vagrant up`
 6.  Add a hosts file entry for: “10.86.73.80 vip.dev”
 7.  Go to http://vip.dev in your browser
+
+Note: The first time you run the init script will be the slowest. It’s also the most dependent on the speed of your internet connection. This is because it has to download the virtual machine image, Ubuntu package updates, the full checkout of WordPress trunk, and the full VIP Plugins repository. Subsequent runs will only update this base.
 
 ## Usernames and Passwords
 
