@@ -15,13 +15,28 @@ server {
     try_files $uri $uri/ /index.php?$args;
   }
 
+  # PHPMyAdmin
+  location /phpmyadmin {
+    root /usr/share/;
+    index index.php index.html index.htm;
+    location ~ ^/phpmyadmin/(.+\.php)$ {
+      try_files $uri =404;
+      root /usr/share/;
+      include fastcgi_params;
+      fastcgi_intercept_errors on;
+      fastcgi_pass 127.0.0.1:9000;
+    }
+    location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ {
+      root /usr/share/;
+    }
+  }
+
   if (!-e $request_filename) {
     # Add trailing slash to */wp-admin requests.
     rewrite /wp-admin$ $scheme://$host$uri/ permanent;
 
     # WordPress in a subdirectory rewrite rules
-    rewrite ^/([_0-9a-zA-Z-]+/)?(wp-.*) /wp/$2 break;
-    rewrite ^/([_0-9a-zA-Z-]+/)?(.*\.php)$ /wp/$2 break;
+    rewrite ^/([_0-9a-zA-Z-]+/)?(wp-.*|xmlrpc.php) /wp/$2 break;
   }
 
   # Pass all .php files onto a php-fpm/php-fcgi server.
