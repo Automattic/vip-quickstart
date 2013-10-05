@@ -85,7 +85,7 @@ echo "===--===--==--==--==--=="
 echo "=== Configuring the hosts file"
 echo "===--===--==--==--==--=="
 
-cat /etc/hosts | grep vip.dev || sudo echo "10.86.73.80 vip.dev" | sudo tee -a /etc/hosts
+cat /etc/hosts | grep vip.dev || sudo printf "\n10.86.73.80 vip.dev" | sudo tee -a /etc/hosts
 echo ""
 
 
