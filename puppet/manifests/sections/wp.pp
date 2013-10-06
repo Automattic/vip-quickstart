@@ -1,6 +1,7 @@
 class { wp::cli:
 	ensure => installed,
-	install_path => '/vagrant/www/wp-cli'
+	install_path => '/vagrant/www/wp-cli',
+	version => '0.12.0'
 }
 
 exec { "rsync wp-content":
