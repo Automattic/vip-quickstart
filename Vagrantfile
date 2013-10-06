@@ -1,17 +1,16 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.configure("2") do |config|
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
 
-  # Default Ubuntu Box
-  #
-  # This box is provided by Vagrant at vagrantup.com and is a nicely sized (290MB)
-  # box containing the Unbuntu 12.0.4 Precise 32 bit release.
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
   config.vm.box = "std-precise32"
-  config.vm.box_url = "http://files.vagrantup.com/precise32.box"
-
-  config.vm.hostname = "precise32-dev"
   config.vm.network :private_network, ip: "10.86.73.80"
+
+  # Map MySQL to local port 3306
+  config.vm.network :forwarded_port, guest: 3306, host: 3306
 
   # Address a bug in an older version of Puppet
   # See http://stackoverflow.com/questions/10894661/augeas-support-on-my-vagrant-machine
