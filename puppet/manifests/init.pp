@@ -11,3 +11,5 @@ class updates {
 		timeout => 0
 	}
 }
+
+package { 'postfix': ensure => present }
