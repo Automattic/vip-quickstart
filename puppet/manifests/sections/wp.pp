@@ -38,6 +38,12 @@ wp::plugin { 'developer':
 	require => Exec['wp install /vagrant/www/wp']
 }
 
+wp::plugin { 'jetpack':
+	location    => '/vagrant/www/wp',
+	networkwide => true,
+	require => Exec['wp install /vagrant/www/wp']
+}
+
 wp::command { 'developer install-plugins':
 	command  => 'developer install-plugins --type=wpcom-vip',
 	location => '/vagrant/www/wp',

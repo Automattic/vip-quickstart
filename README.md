@@ -1,5 +1,9 @@
 # VIP Quickstart
 
+## Overview
+
+VIP Quickstart is a local development environment for WordPress.com VIP developers. The goal is to provide developers with an environment that closely mirrors WordPress.com along with all the tools we recommend developers use.
+
 ## What You Get
 
 *   Ubuntu 12.04
@@ -52,6 +56,19 @@ Note: When you run the Git installer, make sure to install Git to your system PA
 
 ### WordPress
 * wordpress:wordpress
+
+## Vagrant Primer
+
+The [Vagrant CLI documentation](http://docs.vagrantup.com/v2/cli/index.html) will be useful for developers that haven't used Vagrant before. Since VIP Quickstart is built on top of Vagrant, the Vagrant CLI commands will also work.
+
+Some useful commands:
+
+* `vagrant up` - Start and provisions the VM
+* `vagrant halt` - Stops the VM
+* `vagrant reload` - Restarts and provisions the VM
+* `vagrant provision` - Provisions the VM
+* `vagrant ssh` - Logs into the VM with ssh
+* `vagrant destroy` - Deletes the VM
 
 ## Submodules
 
