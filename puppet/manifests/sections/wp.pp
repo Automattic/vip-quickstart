@@ -16,7 +16,7 @@ wp::plugin { $plugins:
 
 # Install VIP recommended developer plugins
 wp::command { 'developer install-plugins':
-	command  => 'developer install-plugins --type=wpcom-vip',
+	command  => 'developer install-plugins --type=wpcom-vip --activate',
 	location => '/vagrant/www/wp',
 	require  => Wp::Plugin['developer']
 }
