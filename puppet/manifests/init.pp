@@ -14,3 +14,9 @@ import 'sections/*'
 
 # Additional packages
 package { 'postfix': ensure => present }
+
+# Set vip.dev in hosts file:
+exec { 'setup hosts':
+	command => 'sudo printf "\n# VIP Quickstart\n127.0.0.1 vip.dev\n" | sudo tee -a /etc/hosts',
+	unless => 'cat /etc/hosts | grep vip.dev'
+}
