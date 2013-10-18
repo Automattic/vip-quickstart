@@ -1,8 +1,6 @@
 Exec { path => '/bin:/usr/bin:/usr/local/bin:/usr/sbin:/sbin' }
 
-import 'sections/*'
-
-# Upgrade system packages
+# Make sure apt-get is up-to-date before we do anything else
 stage { 'updates': before => Stage['main'] }
 class { 'updates': stage => updates }
 class updates {
@@ -12,4 +10,7 @@ class updates {
 	}
 }
 
+import 'sections/*'
+
+# Additional packages
 package { 'postfix': ensure => present }
