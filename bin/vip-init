@@ -52,7 +52,7 @@ echo ""
 # Checkout the VIP shared plugins repo
 # =====================================
 echo "=================================="
-echo "= Setting up VIP Shared plugins"
+echo "= Updating VIP Shared plugins"
 echo "=================================="
 
 if [ -d "www/wp-content/themes/vip" ]; then
