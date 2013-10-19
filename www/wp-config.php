@@ -95,11 +95,22 @@ define('BLOG_ID_CURRENT_SITE', 1);
 
 /* That's all, stop editing! Happy blogging. */
 
-if ( file_exists( __DIR__.'/local-config.php' ) )
-	require __DIR__.'/local-config.php';
+/**
+ * Local mods
+ */
+if ( file_exists( __DIR__ . '/local-config.php' ) )
+	require __DIR__ . '/local-config.php';
 
-if ( file_exists( __DIR__.'/vip-config.php' ) )
-	require __DIR__.'/vip-config.php';
+// Use the latest Jetpack user-agent detection if we have it
+if ( file_exists( __DIR__ . '/wp-content/plugins/jetpack/class.jetpack-user-agent.php' ) ) {
+	require_once( __DIR__ . '/wp-content/plugins/jetpack/class.jetpack-user-agent.php' );
+} else {
+	require __DIR__ . '/config/is-mobile.php';
+}
+
+require __DIR__ . '/config/batcache-config.php';
+require __DIR__ . '/config/roles.php';
+require __DIR__ . '/config/vip-config.php';
 
 /** Absolute path to the WordPress directory. */
 if ( !defined( 'ABSPATH' ) )
