@@ -32,7 +32,7 @@ wp::command { 'plugin update --all':
 class { wp::cli:
 	ensure => installed,
 	install_path => '/vagrant/www/wp-cli',
-	version => '0.12.0'
+	version => '0.12.1'
 }
 
 # Sync wp-content
