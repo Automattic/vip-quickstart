@@ -43,6 +43,7 @@ if [ -d "www/wp" ]; then
 else
 	mkdir -p www/wp
 	svn co http://core.svn.wordpress.org/trunk/ www/wp
+	svn rm --keep-local www/wp/wp-content
 fi
 echo ""
 

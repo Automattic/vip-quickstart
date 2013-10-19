@@ -38,7 +38,7 @@ class { wp::cli:
 # Sync wp-content
 exec { "rsync wp-content":
 	command => "rsync -a /vagrant/www/wp/wp-content/ /vagrant/www/wp-content",
-	onlyif => "/usr/bin/test -d /vagrant/www/wp-content"
+	onlyif => "/usr/bin/test -d /vagrant/www/wp/wp-content"
 }
 
 # Remove wp-content from wp root
