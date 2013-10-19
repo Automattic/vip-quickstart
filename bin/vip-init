@@ -6,9 +6,9 @@
 echo '
  _   __(_)___     ____ ___  __(_)____/ /_______/ /_____ ______/ /_
 | | / / / __ \   / __ `/ / / / / ___/ //_/ ___/ __/ __ `/ ___/ __/
-| |/ / / /_/ /  / /_/ / /_/ / / /__/ ,< (__  ) /_/ /_/ / /  / /_  
-|___/_/ .___/   \__, /\__,_/_/\___/_/|_/____/\__/\__,_/_/   \__/  
-     /_/          /_/                                             
+| |/ / / /_/ /  / /_/ / /_/ / / /__/ ,< (__  ) /_/ /_/ / /  / /_
+|___/_/ .___/   \__, /\__,_/_/\___/_/|_/____/\__/\__,_/_/   \__/
+     /_/          /_/
 
 '
 
@@ -23,15 +23,10 @@ echo ""
 # =====================================
 # Automatically update the repo
 # =====================================
-echo "Updating repository..."
+echo "=================================="
+echo "= Updating VIP Quickstart"
+echo "=================================="
 git pull
-echo ""
-
-
-# =====================================
-# Automatically set up submodules
-# =====================================
-echo "Cloning dependencies..."
 git submodule init && git submodule update
 echo ""
 
@@ -39,9 +34,9 @@ echo ""
 # =====================================
 # Checkout core
 # =====================================
-echo "===--===--==--==--==--=="
-echo "=== Checking out latest WordPress"
-echo "===--===--==--==--==--=="
+echo "=================================="
+echo "= Updating WordPress"
+echo "=================================="
 
 if [ -d "www/wp" ]; then
 	svn up www/wp
@@ -55,9 +50,9 @@ echo ""
 # =====================================
 # Checkout the VIP shared plugins repo
 # =====================================
-echo "===--===--==--==--==--=="
-echo "=== Setting up VIP Shared plugins"
-echo "===--===--==--==--==--=="
+echo "=================================="
+echo "= Setting up VIP Shared plugins"
+echo "=================================="
 
 if [ -d "www/wp-content/themes/vip" ]; then
 	svn up www/wp-content/themes/vip/plugins
@@ -71,9 +66,9 @@ echo ""
 # =====================================
 # Start the VM (always provision, even if it's already running)
 # =====================================
-echo "===--===--==--==--==--=="
-echo "=== Setting up the VM"
-echo "===--===--==--==--==--=="
+echo "=================================="
+echo "= Provisioning the VM"
+echo "=================================="
 
 vagrant up --no-provision && vagrant provision
 echo ""
@@ -82,9 +77,9 @@ echo ""
 # =====================================
 # Add vip.dev entry to hosts file
 # =====================================
-echo "===--===--==--==--==--=="
-echo "=== Configuring the hosts file"
-echo "===--===--==--==--==--=="
+echo "=================================="
+echo "= Configuring the hosts file"
+echo "=================================="
 
 cat /etc/hosts | grep vip.dev || sudo printf "\n# VIP Quickstart\n10.86.73.80 vip.dev\n" | sudo tee -a /etc/hosts
 echo ""
@@ -93,9 +88,9 @@ echo ""
 # =====================================
 # Outro/next steps
 # =====================================
-echo "===--===--==--==--==--=="
-echo "=== Next Steps"
-echo "===--===--==--==--==--=="
+echo "=================================="
+echo "= Next Steps"
+echo "=================================="
 echo "* Go to http://vip.dev in your browser"
 echo ""
 
