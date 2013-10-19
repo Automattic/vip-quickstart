@@ -10,6 +10,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box_url = "http://files.vagrantup.com/precise32.box"
   config.vm.network :private_network, ip: "10.86.73.80"
 
+  # Map log directory
+  config.vm.synced_folder "logs", "/var/log", owner: "vagrant"
+
   # Map MySQL to local port 3306
   config.vm.network :forwarded_port, guest: 3306, host: 3306
 
