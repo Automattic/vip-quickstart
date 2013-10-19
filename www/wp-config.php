@@ -82,20 +82,6 @@ define('WP_DEBUG', true);
 define('SAVEQUERIES', true);
 define('JETPACK_DEV_DEBUG', true);
 
-// Disable unfiltered_html; this is a default in MS, but we should extra enforce it
-define( 'DISALLOW_UNFILTERED_HTML', true );
-
-/**
- * Disable file editing and WordPress updates
- *
- * Ideally we're keeping stuff up to date with version control. To
- * update WordPress, run `svn up` from /vagrant/www/wp or run
- * `vagrant provision` from the VIP Quickstart root. You can also
- * install plugins from the plugin repository with the wp-cli
- * `wp plugin install <plugin-name>` command.
- */
-define('DISALLOW_FILE_MODS', true);
-
 /* Content Directory */
 define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
 define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/wp-content' );
