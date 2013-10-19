@@ -1,0 +1,1 @@
+alias wp='wp --config=/vagrant/www/wp-cli.yml'
