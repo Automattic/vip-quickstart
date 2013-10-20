@@ -14,3 +14,8 @@ add_action( 'admin_menu', function() {
 add_action( 'do_meta_boxes', function() {
 	remove_meta_box( 'postcustom', get_post_type(), 'normal' );
 });
+
+// Upload size limit is 1GB
+add_filter( 'upload_size_limit', function() {
+	return 1073741824; // pow( 2, 30 )
+});
