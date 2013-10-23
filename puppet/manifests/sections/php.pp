@@ -37,7 +37,7 @@ php::fpm::conf { 'www': user => 'vagrant' }
 package { 'php5-xdebug': ensure => 'present' }
 exec { 'configure php5-xdebug':
 	command => 'echo "zend_extension=`sudo find / -name \'xdebug.so\' | head -1`" | sudo tee -a /etc/php5/conf.d/xdebug.ini',
-	unless => 'test -f /etc/php5/conf.d/xdebug && cat /etc/php5/conf.d/xdebug.ini | grep zend_extension',
+	unless => 'test -f /etc/php5/conf.d/xdebug.ini && cat /etc/php5/conf.d/xdebug.ini | grep zend_extension',
 	notify => Service['php5-fpm'],
 	require => Package['php5-xdebug']
 }
