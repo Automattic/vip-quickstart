@@ -1,0 +1,32 @@
+# File Managed by Puppet 
+user <%= scope.lookupvar('nginx::process_user') %>;
+worker_processes <%= @processorcount %>;
+
+error_log  <%= scope.lookupvar('nginx::log_dir')%>/error.log;
+pid        <%= scope.lookupvar('nginx::pid_file')%>;
+
+events {
+  worker_connections <%= scope.lookupvar('nginx::worker_connections')%>;
+  <% if scope.lookupvar('nginx::nx_multi_accept') == 'on' %>multi_accept on;<% end %>
+}
+
+http {
+  server_tokens off;
+  include       <%= scope.lookupvar('nginx::config_dir')%>/mime.types;
+  default_type  application/octet-stream;
+
+  access_log  <%= scope.lookupvar('nginx::log_dir')%>/access.log;
+
+  sendfile    off;
+  tcp_nopush  on;
+  tcp_nodelay on;
+  
+  client_max_body_size <%= scope.lookupvar('nginx::client_max_body_size')%>;
+  keepalive_timeout    <%= scope.lookupvar('nginx::keepalive_timeout')%>;
+  types_hash_max_size  <%= scope.lookupvar('nginx::types_hash_max_size') %>;
+
+  gzip         <%= scope.lookupvar('nginx::real_gzip')%>;
+  gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+
+  include <%= scope.lookupvar('nginx::vdir')%>/*.conf;
+}
