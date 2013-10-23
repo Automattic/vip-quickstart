@@ -33,6 +33,15 @@ class {
 
 php::fpm::conf { 'www': user => 'vagrant' }
 
+# TODO: Make this not gross
+package { 'php5-xdebug': ensure => 'present' }
+exec { 'configure php5-xdebug':
+	command => 'echo "zend_extension=`sudo find / -name \'xdebug.so\' | head -1`" | sudo tee -a /etc/php5/conf.d/xdebug.ini',
+	unless => 'test -f /etc/php5/conf.d/xdebug && cat /etc/php5/conf.d/xdebug.ini | grep zend_extension',
+	notify => Service['php5-fpm'],
+	require => Package['php5-xdebug']
+}
+
 package { 'memcached': ensure => present }
 package { 'php5-memcache': ensure => present }
 package { 'phpmyadmin':
