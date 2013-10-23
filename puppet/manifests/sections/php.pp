@@ -49,10 +49,10 @@ package { 'phpmyadmin':
 	require => Package['nginx']
 }
 
-# Turn on html_errors
-# exec { 'html_errors = On':
-#   command => 'sed -i "s/html_errors = Off/html_errors = On/g" /etc/php5/fpm/php.ini',
-#   unless => 'cat /etc/php5/fpm/php.ini | grep "html_errors = On"',
-#   user => root,
-#   notify => Service['php5-fpm']
-# }
+Turn on html_errors
+exec { 'html_errors = On':
+	command => 'sed -i "s/html_errors = Off/html_errors = On/g" /etc/php5/fpm/php.ini',
+	unless => 'cat /etc/php5/fpm/php.ini | grep "html_errors = On"',
+	user => root,
+	notify => Service['php5-fpm']
+}
