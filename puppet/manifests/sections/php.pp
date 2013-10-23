@@ -33,6 +33,13 @@ class {
 
 php::fpm::conf { 'www': user => 'vagrant' }
 
+package { 'memcached': ensure => present }
+package { 'php5-memcache': ensure => present }
+package { 'phpmyadmin':
+	ensure => present,
+	require => Package['nginx']
+}
+
 # TODO: Make this not gross
 package { 'php5-xdebug': ensure => 'present' }
 exec { 'configure php5-xdebug':
@@ -42,14 +49,7 @@ exec { 'configure php5-xdebug':
 	require => Package['php5-xdebug']
 }
 
-package { 'memcached': ensure => present }
-package { 'php5-memcache': ensure => present }
-package { 'phpmyadmin':
-	ensure => present,
-	require => Package['nginx']
-}
-
-Turn on html_errors
+# Turn on html_errors
 exec { 'html_errors = On':
 	command => 'sed -i "s/html_errors = Off/html_errors = On/g" /etc/php5/fpm/php.ini',
 	unless => 'cat /etc/php5/fpm/php.ini | grep "html_errors = On"',
