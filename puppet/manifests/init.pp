@@ -14,6 +14,7 @@ import 'sections/*'
 
 # Additional packages
 package { 'postfix': ensure => present }
+service { 'postfix': ensure => running }
 
 # Set vip.dev in hosts file:
 exec { 'setup hosts':
@@ -25,4 +26,13 @@ exec { 'setup hosts':
 file { '/home/vagrant/.bash_aliases':
    ensure => 'link',
    target => '/vagrant/bin/dotfiles/quickstart_aliases',
+}
+
+
+# Configure postfix
+exec { 'configure postfix hostname':
+	command => 'sed -i "s/precise32/vip.dev/g" /etc/postfix/main.cf',
+	onlyif => 'cat /etc/postfix/main.cf | grep "precise32"',
+	user => root,
+	notify => Service['postfix']
 }
