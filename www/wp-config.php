@@ -81,6 +81,7 @@ define('WPLANG', '');
 define('WP_DEBUG', true);
 define('SAVEQUERIES', true);
 define('JETPACK_DEV_DEBUG', true);
+define('MP6_STYLE_GUIDE', true);
 
 /* Content Directory */
 define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
