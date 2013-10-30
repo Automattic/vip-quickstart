@@ -27,6 +27,8 @@ class {
 		package => 'php5-gd',
 		provider => 'apt';
 	'php::extension::apc':
+		ensure => absent,
+		notify => Service['php5-fpm'],
 		package => 'php-apc',
 		provider => 'apt';
 }
