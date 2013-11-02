@@ -17,12 +17,12 @@ package { 'postfix': ensure => present }
 service { 'postfix': ensure => running }
 
 # Install / update ClamAV for use w/ VIP Scanner
-package { 'clamav': ensure => present }
+# package { 'clamav': ensure => present }
 
-exec { 'update clamav db':
-	command => 'sudo freshclam',
-	require => Package['clamav']
-}
+# exec { 'update clamav db':
+# 	command => 'sudo freshclam',
+# 	require => Package['clamav']
+# }
 
 # Set vip.dev in hosts file:
 exec { 'setup hosts':
