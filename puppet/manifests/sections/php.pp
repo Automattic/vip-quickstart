@@ -35,6 +35,8 @@ class {
 
 php::fpm::conf { 'www': user => 'vagrant' }
 
+file { '/etc/php5/conf.d/apc.ini': ensure => absent }
+
 package { 'memcached': ensure => present }
 package { 'php5-memcache': ensure => present }
 package { 'phpmyadmin':
