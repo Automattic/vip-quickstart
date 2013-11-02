@@ -24,6 +24,7 @@ echo ""
 # Get SVN info
 # =====================================
 if [ ! `which svn` ]; then
+    # TODO: Verify username and password are correct before continuing
     echo -n "Enter your WordPress.com username: "
     read username
     echo -n "Enter your WordPress.com password: "
