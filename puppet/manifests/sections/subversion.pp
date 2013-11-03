@@ -4,14 +4,17 @@ class svn-upgrade {
 	line { 'deb svn':
 		file => "/etc/apt/sources.list",
 		line => "deb http://ppa.launchpad.net/svn/ppa/ubuntu precise main",
+		notify => Exec['apt-get update svn']
 	}
 	line { 'deb-src svn':
 		file => "/etc/apt/sources.list",
 		line => "deb-src http://ppa.launchpad.net/svn/ppa/ubuntu precise main ",
+		notify => Exec['apt-get update svn']
 	}
 
 	exec { 'apt-get update svn':
 		command => 'sudo apt-get update',
+		refreshonly => true,
 		require => [
 			Line['deb svn'],
 			Line['deb-src svn']
