@@ -1,5 +1,6 @@
 @echo off
 cd /d %~dp0
+cd ..
 CLS 
 ECHO.
 ECHO =============================
@@ -31,5 +32,5 @@ setlocal & pushd .
 
 REM Run shell as admin (example) - put here code as you like
 @powershell -command "Set-ExecutionPolicy RemoteSigned"
-powershell -command ".\vip-init.ps1"
+powershell -command ".\wbin\vip-init.ps1"
 cmd /k
