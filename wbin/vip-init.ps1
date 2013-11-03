@@ -13,26 +13,21 @@ if ( (-Not (Get-Command git -errorAction SilentlyContinue)) -or (-Not (Get-Comma
 # =====================================
 # Automatically update the repo
 # =====================================
-echo "Updating repository..."
+echo "=================================="
+echo "= Updating VIP Quickstart"
+echo "=================================="
+
 git pull
-echo ""
-
-
-# =====================================
-# Automatically set up submodules
-# =====================================
-echo "Cloning dependencies..."
-git submodule init
-git submodule update
+git submodule update --init --recursive
 echo ""
 
 if ( Get-Command svn -errorAction SilentlyContinue ) {
 	# =====================================
 	# Checking out latest WordPress
 	# =====================================
-	echo "===--===--==--==--==--=="
-	echo "=== Checking out latest WordPress"
-	echo "===--===--==--==--==--=="
+	echo "=================================="
+	echo "= Updating WordPress"
+	echo "=================================="
 
 	if ( Test-Path "www/wp" ) {
 		svn up www/wp
@@ -46,9 +41,9 @@ if ( Get-Command svn -errorAction SilentlyContinue ) {
 	# =====================================
 	# Checkout the VIP shared plugins repo
 	# =====================================
-	echo "===--===--==--==--==--=="
-	echo "=== Setting up VIP Shared plugins"
-	echo "===--===--==--==--==--=="
+	echo "=================================="
+	echo "= Updating VIP Shared plugins"
+	echo "=================================="
 
 	if ( Test-Path "www/wp-content/themes/vip" ) {
 		svn up www/wp-content/themes/vip/plugins
@@ -60,7 +55,7 @@ if ( Get-Command svn -errorAction SilentlyContinue ) {
 } else {
 	$username = Read-Host 'Enter your WordPress.com username'
 	$password = Read-Host 'Enter your WordPress.com password' -AsSecureString
-	
+
 	$env:SVN_USERNAME = $username
 	$env:SVN_PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($password));
 
@@ -71,10 +66,9 @@ if ( Get-Command svn -errorAction SilentlyContinue ) {
 # =====================================
 # Start the VM (always provision, even if it's already running)
 # =====================================
-echo "===--===--==--==--==--=="
-echo "=== Setting up the VM"
-echo "===--===--==--==--==--=="
-
+echo "=================================="
+echo "= Provisioning the VM"
+echo "=================================="
 
 vagrant up --no-provision
 vagrant provision
@@ -84,9 +78,9 @@ echo ""
 # =====================================
 # Add vip.dev entry to hosts file
 # =====================================
-echo "===--===--==--==--==--=="
-echo "=== Configuring the hosts file"
-echo "===--===--==--==--==--=="
+echo "=================================="
+echo "= Configuring the hosts file"
+echo "=================================="
 
 $file = Join-Path -Path $env:WINDIR -ChildPath "system32\drivers\etc\hosts"
 
@@ -103,8 +97,9 @@ echo ""
 # =====================================
 # Outro/next steps
 # =====================================
-echo "===--===--==--==--==--=="
-echo "=== Next Steps"
-echo "===--===--==--==--==--=="
+echo "=================================="
+echo "= Next Steps"
+echo "=================================="
+
 echo "* Go to http://vip.dev in your browser"
 echo ""
