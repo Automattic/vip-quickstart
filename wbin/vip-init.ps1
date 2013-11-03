@@ -1,4 +1,3 @@
-cd ..
 
 # =====================================
 # Automatically update the repo
@@ -16,37 +15,46 @@ git submodule init
 git submodule update
 echo ""
 
+if ( Get-Command svn -errorAction SilentlyContinue ) {
+	# =====================================
+	# Checking out latest WordPress
+	# =====================================
+	echo "===--===--==--==--==--=="
+	echo "=== Checking out latest WordPress"
+	echo "===--===--==--==--==--=="
 
-# =====================================
-# Checking out latest WordPress
-# =====================================
-echo "===--===--==--==--==--=="
-echo "=== Checking out latest WordPress"
-echo "===--===--==--==--==--=="
+	if ( Test-Path "www/wp" ) {
+		svn up www/wp
+	} else {
+		mkdir -p www/wp
+		svn co http://core.svn.wordpress.org/trunk/ www/wp
+	}
+	echo ""
 
-if ( Test-Path "www/wp" ) {
-	svn up www/wp
+
+	# =====================================
+	# Checkout the VIP shared plugins repo
+	# =====================================
+	echo "===--===--==--==--==--=="
+	echo "=== Setting up VIP Shared plugins"
+	echo "===--===--==--==--==--=="
+
+	if ( Test-Path "www/wp-content/themes/vip" ) {
+		svn up www/wp-content/themes/vip/plugins
+	} else {
+		mkdir -p www/wp-content/themes/vip
+		svn co https://vip-svn.wordpress.com/plugins/ www/wp-content/themes/vip/plugins
+	}
+	echo ""
 } else {
-	mkdir -p www/wp
-	svn co http://core.svn.wordpress.org/trunk/ www/wp
+	$username = Read-Host 'Enter your WordPress.com username'
+	$password = Read-Host 'Enter your WordPress.com password' -AsSecureString
+	
+	$env:SVN_USERNAME = $username
+	$env:SVN_PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($password));
+
+	echo ""
 }
-echo ""
-
-
-# =====================================
-# Checkout the VIP shared plugins repo
-# =====================================
-echo "===--===--==--==--==--=="
-echo "=== Setting up VIP Shared plugins"
-echo "===--===--==--==--==--=="
-
-if ( Test-Path "www/wp-content/themes/vip" ) {
-	svn up www/wp-content/themes/vip/plugins
-} else {
-	mkdir -p www/wp-content/themes/vip
-	svn co https://vip-svn.wordpress.com/plugins/ www/wp-content/themes/vip/plugins
-}
-echo ""
 
 
 # =====================================
@@ -55,6 +63,7 @@ echo ""
 echo "===--===--==--==--==--=="
 echo "=== Setting up the VM"
 echo "===--===--==--==--==--=="
+
 
 vagrant up --no-provision
 vagrant provision
