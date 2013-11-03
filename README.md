@@ -25,6 +25,8 @@ VIP Quickstart is a local development environment for WordPress.com VIP develope
 
 ## Getting Started
 
+The first time you run the installer will be the slowest. It’s also the most dependent on the speed of your internet connection. This is because it has to download the virtual machine image, Ubuntu package updates, the full checkout of WordPress trunk, and the full VIP Plugins repository. Subsequent runs will only update this base.
+
 ### Unix
 
 If you’re on a Unix-based machine with a Bash shell, setup is pretty easy:
@@ -37,17 +39,13 @@ The init script is setup such that you can run it multiple times and nothing wil
 
 ### Windows
 
-If you’re on a Windows machine, the setup is a little more complicated for the moment. Since the VIP init script won’t work in that environment, you’ll have to complete the following tasks manually:
+After installing all the requirements, complete the following steps to install VIP Quickstart.
+
+Note: When you run the Git installer, make sure to install Git to your system PATH as the VIP Quickstart installer requires it. Subversion also needs to be installed to your system PATH, but that should happen automatically when you run the installer.
 
 1.  Clone the [VIP Quickstart Github repo](https://github.com/Automattic/vip-quickstart)
-2.  Set up the submodules with `git submodule init` and `git submodule update`
-3.  Check out WordPress trunk (http://core.svn.wordpress.org/trunk/) to `www/wp`
-4.  Check out a copy of the Shared Plugins Repository (https://vip-svn.wordpress.com/plugins/) to `www/wp-content/themes/vip/plugins`
-5.  Start the vagrant box: `vagrant up`
-6.  Add a hosts file entry for: “10.86.73.80 vip.dev”
-7.  Go to http://vip.dev in your browser
-
-Note: The first time you run the init script will be the slowest. It’s also the most dependent on the speed of your internet connection. This is because it has to download the virtual machine image, Ubuntu package updates, the full checkout of WordPress trunk, and the full VIP Plugins repository. Subsequent runs will only update this base.
+2.  Run the `vip-init.bat` file in `wbin`
+3.  Go to http://vip.dev in your browser
 
 ## Usernames and Passwords
 
