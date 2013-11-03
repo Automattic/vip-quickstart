@@ -13,6 +13,17 @@ echo '
 '
 
 # =====================================
+# Check for requirements
+# =====================================
+if [[ ! `which git` || ! `which vagrant` || ! `which VBoxManage` ]]; then
+    echo "Please install the requirements"
+    echo "* Git"
+    echo "* Vagrant"
+    echo "* VirtualBox"
+    exit 1
+fi
+
+# =====================================
 # Give ourselves root access for the rest of the script
 # =====================================
 sudo -k
