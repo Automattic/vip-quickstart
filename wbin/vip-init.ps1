@@ -1,3 +1,14 @@
+# =====================================
+# Check for requirements
+# =====================================
+if ( (-Not (Get-Command git -errorAction SilentlyContinue)) -or (-Not (Get-Command vagrant -errorAction SilentlyContinue)) -or (-Not (Get-WmiObject -Class Win32_Product | Select-Object -Property Name | Select-string "VirtualBox")) ) {
+	echo "Please install requirements"
+	echo "* Git"
+	echo "* Vagrant"
+	echo "* VirtualBox"
+	exit
+}
+
 
 # =====================================
 # Automatically update the repo
