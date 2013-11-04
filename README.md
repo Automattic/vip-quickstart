@@ -50,7 +50,7 @@ Note: When you run the Git installer, make sure to install Git to your system PA
 ## Usernames and Passwords
 
 ### MySQL
-* root:blank
+* root:(blank)
 * wordpress:wordpress
 
 ### WordPress
@@ -68,6 +68,14 @@ Some useful commands:
 * `vagrant provision` - Provisions the VM
 * `vagrant ssh` - Logs into the VM with ssh
 * `vagrant destroy` - Deletes the VM
+
+## Customize
+
+If you want to add custom packages, install custom dotfiles, or make any other customizations, there are a few methods.
+
+First, you can add a [Vagrantfile](http://docs.vagrantup.com/v2/vagrantfile/index.html) to the `~/.vagrant.d` directory. Vagrant loads this before the Vagrantfile for the project so you can do things like install text editors or other tools, sync local directories to the VM, or anything else you might want to do to customize the environment. You can even add a [shell provisioner](http://docs.vagrantup.com/v2/provisioning/shell.html) to run your own shell script. One of the great parts about this method is that it will run on every Vagrant machine you used so all of your projects can benefit from it.
+
+Another method is to add new manifests to `puppet/manifests/sections` and they'll be automatically loaded. You'll probably want to add them to your `.gitignore` file so they don't interfere with other git operations.
 
 ## Submodules
 
