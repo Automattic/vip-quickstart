@@ -5,6 +5,9 @@ define( 'WP_CACHE', true );
 // utility variables that are use a bunch of times
 $_batcache_script_name = basename( $_SERVER['SCRIPT_NAME'] );
 
+// VIP Quickstart: Fix module activation
+$_module = $_GET['module'];
+
 $__batcacheignore_args = array(); // which query params to ignore
 $__batcacheignore_args2 = array(); // which query params to ignore
 if ( isset( $_SERVER['QUERY_STRING'] ) && $_SERVER['QUERY_STRING'] ) {
@@ -151,6 +154,9 @@ if ( isset( $_COOKIE['tix_view_token'] ) )
 $batcache['headers']['X-nananana'] = 'Batcache';
 
 unset( $_batcache_script_name );
+
+// VIP Quickstart: Fix module activation
+$_GET['module'] = $_module;
 
 // UNCOMMENT THIS LINE TO DISABLE batcache -- KEEP THIS LAST
 // $batcache['max_age'] = 0;
