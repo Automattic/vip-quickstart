@@ -82,20 +82,12 @@ if [ `which svn` ]; then
     echo "= Updating VIP mobile themes"
     echo "=================================="
 
-    if [ -d "www/wp-content/themes/pub/wp-mobile" ]; then
-    	svn up www/wp-content/themes/pub/wp-mobile
-    else
-    	mkdir -p www/wp-content/themes/pub/wp-mobile
-    	svn co https://wpcom-themes.svn.automattic.com/wp-mobile/ www/wp-content/themes/pub/wp-mobile
-    fi
-
     if [ -d "www/wp-content/themes/pub/minileven" ]; then
     	svn up www/wp-content/themes/pub/minileven
     else
     	mkdir -p www/wp-content/themes/pub/minileven
     	svn co https://wpcom-themes.svn.automattic.com/minileven/ www/wp-content/themes/pub/minileven
     fi
-
     echo ""
 else
      # TODO: Verify username and password are correct before continuing
