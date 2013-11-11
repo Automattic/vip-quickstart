@@ -36,21 +36,6 @@ if ( Get-Command svn -errorAction SilentlyContinue ) {
 		svn co https://vip-svn.wordpress.com/plugins/ www/wp-content/themes/vip/plugins
 	}
 	echo ""
-
-    # =====================================
-    # Checkout mobile themes
-    # =====================================
-    echo "=================================="
-    echo "= Updating VIP mobile themes"
-    echo "=================================="
-
-	if ( Test-Path "www/wp-content/themes/pub/minileven" ) {
-    	svn up www/wp-content/themes/pub/minileven
-    } else {
-    	mkdir -p www/wp-content/themes/pub/minileven
-    	svn co https://wpcom-themes.svn.automattic.com/minileven/ www/wp-content/themes/pub/minileven
-    }
-    echo ""
 } else {
 	$username = Read-Host 'Enter your WordPress.com username'
 	$password = Read-Host 'Enter your WordPress.com password' -AsSecureString
