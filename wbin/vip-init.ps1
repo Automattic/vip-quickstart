@@ -23,22 +23,6 @@ echo ""
 
 if ( Get-Command svn -errorAction SilentlyContinue ) {
 	# =====================================
-	# Checking out latest WordPress
-	# =====================================
-	echo "=================================="
-	echo "= Updating WordPress"
-	echo "=================================="
-
-	if ( Test-Path "www/wp" ) {
-		svn up www/wp
-	} else {
-		mkdir -p www/wp
-		svn co http://core.svn.wordpress.org/trunk/ www/wp
-	}
-	echo ""
-
-
-	# =====================================
 	# Checkout the VIP shared plugins repo
 	# =====================================
 	echo "=================================="

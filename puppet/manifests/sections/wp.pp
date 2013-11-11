@@ -68,6 +68,20 @@ class svn {
 		onlyif => 'svn info',
 		require => Exec['checkout plugins']
 	}
+
+	# SVN checkout Minileven
+	exec { 'checkout Minileven':
+		command => 'svn co https://wpcom-themes.svn.automattic.com/minileven/ /vagrant/www/wp-content/themes/pub/minileven',
+		unless => 'test -d /vagrant/www/wp-content/themes/pub/minileven && ls -A /vagrant/www/wp-content/themes/pub/minileven',
+		require => Package['subversion']
+	}
+
+	exec { 'svn up Minileven':
+		cwd => '/vagrant/www/wp-content/themes/pub/minileven',
+		command => 'svn up',
+		onlyif => 'svn info',
+		require => Exec['checkout Minileven']
+	}
 }
 
 # Sync wp-content
