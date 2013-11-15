@@ -6,7 +6,7 @@ define( 'WP_CACHE', true );
 $_batcache_script_name = basename( $_SERVER['SCRIPT_NAME'] );
 
 // VIP Quickstart: Fix module activation
-$_module = $_GET['module'];
+$_module = isset( $_GET['module'] ) ? $_GET['module'] : null;
 
 $__batcacheignore_args = array(); // which query params to ignore
 $__batcacheignore_args2 = array(); // which query params to ignore
