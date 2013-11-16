@@ -1,4 +1,11 @@
 <?php
+
+/**
+ * Local mods
+ */
+if ( file_exists( __DIR__ . '/local-config.php' ) )
+    require __DIR__ . '/local-config.php';
+
 /**
  * The base configurations of the WordPress.
  *
@@ -33,24 +40,6 @@ define('DB_CHARSET', 'utf8');
 /** The Database Collate type. Don't change this if in doubt. */
 define('DB_COLLATE', '');
 
-/**#@+
- * Authentication Unique Keys and Salts.
- *
- * Change these to different unique phrases!
- * You can generate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
- * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
- *
- * @since 2.6.0
- */
-define('AUTH_KEY',         'put your unique phrase here');
-define('SECURE_AUTH_KEY',  'put your unique phrase here');
-define('LOGGED_IN_KEY',    'put your unique phrase here');
-define('NONCE_KEY',        'put your unique phrase here');
-define('AUTH_SALT',        'put your unique phrase here');
-define('SECURE_AUTH_SALT', 'put your unique phrase here');
-define('LOGGED_IN_SALT',   'put your unique phrase here');
-define('NONCE_SALT',       'put your unique phrase here');
-
 /**#@-*/
 
 /**
@@ -69,7 +58,8 @@ $table_prefix  = 'wp_';
  * de_DE.mo to wp-content/languages and set WPLANG to 'de_DE' to enable German
  * language support.
  */
-define('WPLANG', '');
+if ( ! defined( 'WPLANG' ) )
+    define('WPLANG', '');
 
 /**
  * For developers: WordPress debugging mode.
@@ -80,27 +70,27 @@ define('WPLANG', '');
  */
 define('WP_DEBUG', true);
 define('SAVEQUERIES', true);
-define('JETPACK_DEV_DEBUG', true);
-define('MP6_STYLE_GUIDE', true);
+
+if ( ! defined( 'JETPACK_DEV_DEBUG' ) )
+    define('JETPACK_DEV_DEBUG', true);
+
+if ( ! defined( 'MP6_STYLE_GUIDE' ) )
+    define('MP6_STYLE_GUIDE', true);
 
 /* Content Directory */
 define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
 define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/wp-content' );
 
 define('MULTISITE', true);
-define('SUBDOMAIN_INSTALL', false);
 define('DOMAIN_CURRENT_SITE', 'vip.dev');
 define('PATH_CURRENT_SITE', '/');
 define('SITE_ID_CURRENT_SITE', 1);
 define('BLOG_ID_CURRENT_SITE', 1);
 
-/* That's all, stop editing! Happy blogging. */
+if ( ! defined( 'SUBDOMAIN_INSTALL' ) )
+    define('SUBDOMAIN_INSTALL', false);
 
-/**
- * Local mods
- */
-if ( file_exists( __DIR__ . '/local-config.php' ) )
-	require __DIR__ . '/local-config.php';
+/* That's all, stop editing! Happy blogging. */
 
 // Use the latest Jetpack user-agent detection if we have it
 if ( file_exists( __DIR__ . '/wp-content/plugins/jetpack/class.jetpack-user-agent.php' ) ) {
