@@ -8,8 +8,7 @@ exec { 'setup hosts':
 	unless => 'cat /etc/hosts | grep vip.dev'
 }
 
-# Setup bash aliases
-file { '/home/vagrant/.bash_aliases':
-   ensure => 'link',
-   target => '/vagrant/bin/dotfiles/quickstart_aliases',
+# Setup environment vars
+file { "/etc/environment":
+    content => inline_template('WP_CLI_CONFIG_PATH="/vagrant/www/wp-cli.yml"')
 }
