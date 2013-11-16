@@ -12,6 +12,7 @@
 /www/wp-content/plugins
 /www/wp-content/themes
 /www/wp-content/uploads
+/www/wp-content/local-sunrise.php
 
 # WP CLI Directory
 /www/wp-cli
