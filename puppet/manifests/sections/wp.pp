@@ -54,21 +54,6 @@ class svn {
 		require => Exec['checkout WordPress']
 	}
 
-	# SVN checkout VIP plugins
-	exec { 'checkout plugins':
-		command => "svn co https://vip-svn.wordpress.com/plugins/ /vagrant/www/wp-content/themes/vip/plugins --username='${svn_username}' --password='${svn_password}' --non-interactive",
-		unless => "test -d/vagrant/www/wp-content/themes/vip/plugins && ls -A /vagrant/www/wp-content/themes/vip/plugins || test -z '${svn_username}' || test -z '${svn_password}'",
-		require => Package['subversion']
-	}
-
-	exec { 'svn up VIP plugins':
-		cwd => '/vagrant/www/wp-content/themes/vip/plugins',
-		command => "svn up --username='${svn_username}' --password='${svn_password}' --non-interactive",
-		unless => "test -z '${svn_username}' || test -z '${svn_password}'",
-		onlyif => 'svn info',
-		require => Exec['checkout plugins']
-	}
-
 	# SVN checkout Minileven
 	exec { 'checkout Minileven':
 		command => 'svn co https://wpcom-themes.svn.automattic.com/minileven/ /vagrant/www/wp-content/themes/pub/minileven',
