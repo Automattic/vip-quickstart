@@ -99,5 +99,11 @@ exec { 'rm -rf /vagrant/www/wp/wp-content':
 # Create a local config
 file { 'local-config.php':
 	ensure => present,
-	path   => '/vagrant/www/local-config.php'
+	path   => '/vagrant/www/local-config.php',
+	notify => Exec['generate salts']
+}
+
+exec { 'generate salts':
+	command => 'printf "<?php\n" > /vagrant/www/local-config.php; curl https://api.wordpress.org/secret-key/1.1/salt/ >> /vagrant/www/local-config.php',
+	refreshonly => true
 }
