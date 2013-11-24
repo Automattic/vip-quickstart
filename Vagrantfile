@@ -11,9 +11,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.hostname = "vip.dev"
   config.vm.network :private_network, ip: "10.86.73.80"
 
-  # Map log directory
-  config.vm.synced_folder "logs", "/var/log", owner: "vagrant"
-
   # Map MySQL to local port 3306
   config.vm.network :forwarded_port, guest: 3306, host: 3306
 
