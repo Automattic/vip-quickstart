@@ -10,5 +10,5 @@ exec { 'setup hosts':
 
 # Setup environment vars
 file { "/etc/environment":
-    content => inline_template('WP_CLI_CONFIG_PATH="/vagrant/www/wp-cli.yml"')
+    content => inline_template('WP_CLI_CONFIG_PATH="/srv/www/wp-cli.yml"')
 }
