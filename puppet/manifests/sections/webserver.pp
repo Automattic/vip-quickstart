@@ -5,6 +5,6 @@ class { "nginx":
 }
 
 nginx::vhost { 'vip.dev':
-	docroot => '/vagrant/www',
+	docroot => '/srv/www',
 	template => 'nginx/vip.dev.erb'
 }
