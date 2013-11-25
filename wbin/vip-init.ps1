@@ -32,7 +32,7 @@ if ( Get-Command svn -errorAction SilentlyContinue ) {
 	if ( Test-Path "www/wp-content/themes/vip" ) {
 		svn up www/wp-content/themes/vip/plugins
 	} else {
-		mkdir -p www/wp-content/themes/vip
+		mkdir -Force www/wp-content/themes/vip
 		svn co https://vip-svn.wordpress.com/plugins/ www/wp-content/themes/vip/plugins
 	}
 	echo ""

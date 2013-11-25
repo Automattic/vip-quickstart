@@ -75,6 +75,7 @@ echo "=================================="
 echo "= Provisioning the VM"
 echo "=================================="
 
+vagrant reload --no-provision
 vagrant up --no-provision
 SVN_USERNAME="$username" SVN_PASSWORD="$password" vagrant provision
 echo ""
