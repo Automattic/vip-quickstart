@@ -23,7 +23,7 @@ define pmc::setup-site {
 		"create-site $slug":
 		command => "/usr/bin/wp --path=/vagrant/www/wp site create --slug=$slug --title=$slug --email=admin@vip.dev",
 		unless  => "/usr/bin/wp --path=/vagrant/www/wp site list | grep $slug -q",
-		require => [ Exec['wp install /vagrant/www/wp'], Exec["clone-theme $theme"] ]
+		require => [ Exec['wp install /srv/www/wp'], Exec["clone-theme $theme"] ]
 	}
 	exec {
 		"activate-theme $theme":
@@ -46,7 +46,7 @@ pmc::clone-theme {
 
 pmc::setup-site { 
 	$pmc_sites: 
-	require => [ Exec['checkout plugins'], Exec['wp install /vagrant/www/wp'], Exec['bitbucket-key'] ]
+	require => [ Exec['checkout plugins'], Exec['wp install /srv/www/wp'], Exec['bitbucket-key'] ]
 }
 
 
