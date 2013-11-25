@@ -43,7 +43,7 @@ class svn {
 	# SVN checkout WordPress
 	exec { 'checkout WordPress':
 		command => 'svn co http://core.svn.wordpress.org/trunk/ /srv/www/wp; svn rm --keep-local /srv/www/wp/wp-content',
-		unless => 'test -d /srv/www/wp && ls -A /srv/www/wp',
+		unless => 'svn info /srv/www/wp',
 		require => Package['subversion']
 	}
 
@@ -57,7 +57,7 @@ class svn {
 	# SVN checkout VIP plugins
 	exec { 'checkout plugins':
 		command => "svn co https://vip-svn.wordpress.com/plugins/ /srv/www/wp-content/themes/vip/plugins --username='${svn_username}' --password='${svn_password}' --non-interactive",
-		unless => "test -d/srv/www/wp-content/themes/vip/plugins && ls -A /srv/www/wp-content/themes/vip/plugins || test -z '${svn_username}' || test -z '${svn_password}'",
+		unless => "svn info /srv/www/wp-content/themes/vip/plugins || test -z '${svn_username}' || test -z '${svn_password}'",
 		require => Package['subversion']
 	}
 
