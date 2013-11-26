@@ -4,6 +4,7 @@ $pmc_sites = [
 	{ slug => 'variety',       theme => 'pmc-variety' },
 	{ slug => 'tvline',        theme => 'pmc-tvline' },
 	{ slug => 'awardsline',    theme => 'pmc-awardsline' },
+	{ slug => 'movieline',     theme => 'pmc-movieline' },
 	{ slug => 'variety411',    theme => 'pmc-411' },
 	{ slug => 'hollywoodlife', theme => 'pmc-hollywoodlife' },
 ]
@@ -13,7 +14,7 @@ define pmc::clone-theme {
 		command => "/usr/bin/git clone git@bitbucket.org:penskemediacorp/$name.git /srv/www/wp-content/themes/vip/$name",
 		user => "vagrant",
 		unless  => "/usr/bin/test -d /srv/www/wp-content/themes/vip/$name",
-		require => Exec['bitbucket-key']
+		onlyif => "/usr/bin/test -f /home/srv/.ssh/bitbucket.org_id_rsa",
 	}
 }
 
@@ -30,16 +31,10 @@ define pmc::setup-site {
 		"activate-theme $theme":
 		command => "/usr/bin/wp --path=/srv/www/wp --url=vip.dev/$slug theme activate vip/$theme",
 		onlyif  => "/usr/bin/wp --path=/srv/www/wp --url=vip.dev/$slug/ theme status | grep 'I vip/$theme'",
-		require => Exec["clone-theme $theme"],
+		require => Exec["create-site $slug"]
 	}
 }
 		
-exec {
-	'bitbucket-key':
-	command => '/usr/bin/test -f /home/srv/.ssh/bitbucket.org_id_rsa',
-	unless  => '/usr/bin/test -f /home/srv/.ssh/bitbucket.org_id_rsa'
-}
-
 pmc::clone-theme { 
 	$pmc_themes:
 	require => Exec['checkout plugins']
