@@ -53,7 +53,7 @@ if ( Get-Command svn -errorAction SilentlyContinue ) {
 	echo "= Updating VIP Shared plugins"
 	echo "=================================="
 
-	if ( Test-Path "www/wp-content/themes/vip" ) {
+	if ( Test-Path "www/wp-content/themes/vip/plugins" ) {
 		svn up www/wp-content/themes/vip/plugins
 	} else {
 		mkdir -Force www/wp-content/themes/vip
