@@ -1,14 +1,38 @@
 # =====================================
 # Check for requirements
 # =====================================
-if ( (-Not (Get-Command git -errorAction SilentlyContinue)) -or (-Not (Get-Command vagrant -errorAction SilentlyContinue)) -or (-Not (Get-WmiObject -Class Win32_Product | Select-Object -Property Name | Select-string "VirtualBox")) ) {
+
+$has_git = (Get-Command git -errorAction SilentlyContinue)
+$has_vagrant = (Get-Command vagrant -errorAction SilentlyContinue)
+
+try {
+	$has_vbox = New-Object -ComObject "VirtualBox.VirtualBox"
+}
+catch {
+}
+
+if ( (-Not ($has_git)) -or (-Not ($has_vagrant)) -or (-Not ($has_vbox)) ) {
 	echo "Please install requirements"
-	echo "* Git"
-	echo "* Vagrant"
-	echo "* VirtualBox"
+	if (-Not ($has_git)) {
+		echo "* Git"
+	}
+	if (-Not ($has_vagrant)) {
+		echo "* Vagrant"
+	}
+	if (-Not ($has_vbox)) {
+		echo "* VirtualBox"
+	}
 	exit
 }
 
+$ps_script_root = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
+
+# =========================================
+# Include custom local script if available
+# =========================================
+if ( Test-Path ($ps_script_root + "\local-init.ps1") ) {
+	.( $ps_script_root + "\local-init.ps1" )
+}
 
 # =====================================
 # Automatically update the repo
@@ -29,7 +53,7 @@ if ( Get-Command svn -errorAction SilentlyContinue ) {
 	echo "= Updating VIP Shared plugins"
 	echo "=================================="
 
-	if ( Test-Path "www/wp-content/themes/vip" ) {
+	if ( Test-Path "www/wp-content/themes/vip/plugins" ) {
 		svn up www/wp-content/themes/vip/plugins
 	} else {
 		mkdir -Force www/wp-content/themes/vip

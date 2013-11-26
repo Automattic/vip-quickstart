@@ -1,0 +1,25 @@
+#!/bin/bash
+
+PMC_THEMES=(
+	"bgr"
+	"pmc-411"
+	"pmc-awardsline"
+	"pmc-deadline"
+	"pmc-hollywoodlife"
+	"pmc-tvline"
+	"pmc-variety"
+	"pmc-movieline"
+	"pmc-tvline-mobile"
+	"pmc-movieline-mobile"
+	)
+	
+BIN_PATH=`dirname "$(readlink -f "$0")"`
+VIP_THEME_PATH="`dirname $BIN_PATH`/www/wp-content/themes/vip"
+
+for THEME in "${PMC_THEMES[@]}"
+do
+	if [ ! -d "$VIP_THEME_PATH/$THEME" ]
+	then
+		git clone "git@bitbucket.org:penskemediacorp/$THEME.git" "$VIP_THEME_PATH/$THEME"
+	fi
+done
