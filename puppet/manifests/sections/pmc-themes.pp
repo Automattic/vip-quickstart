@@ -12,7 +12,8 @@ define pmc::clone-theme {
 	exec { "clone-theme $name":
 		command => "/usr/bin/git clone git@bitbucket.org:penskemediacorp/$name.git /srv/www/wp-content/themes/vip/$name",
 		user => "vagrant",
-		unless  => "/usr/bin/test -d /srv/www/wp-content/themes/vip/$name"
+		unless  => "/usr/bin/test -d /srv/www/wp-content/themes/vip/$name",
+		require => Exec['bitbucket-key']
 	}
 }
 
@@ -41,12 +42,12 @@ exec {
 
 pmc::clone-theme { 
 	$pmc_themes:
-	require => [ Exec['checkout plugins'], Exec['bitbucket-key'] ]
+	require => Exec['checkout plugins']
 }
 
 pmc::setup-site { 
 	$pmc_sites: 
-	require => [ Exec['checkout plugins'], Exec['wp install /srv/www/wp'], Exec['bitbucket-key'] ]
+	require => [ Exec['checkout plugins'], Exec['wp install /srv/www/wp'] ]
 }
 
 
