@@ -1,5 +1,5 @@
+$pmc_themes = ['pmc-plugins']
 
-$pmc_themes = ['pmc-plugins', 'pmc-variety', 'pmc-tvline', 'pmc-hollywoodlife', 'pmc-awardsline', 'pmc-411']
 $pmc_sites = [
 	{ slug => 'variety',       theme => 'pmc-variety' },
 	{ slug => 'tvline',        theme => 'pmc-tvline' },
@@ -21,6 +21,9 @@ define pmc::clone-theme {
 define pmc::setup-site {
 	$slug = $name['slug']
 	$theme = $name['theme']
+	pmc::clone-theme { 
+		$theme:
+	}
 	exec {
 		"create-site $slug":
 		command => "/usr/bin/wp --path=/srv/www/wp site create --slug=$slug --title=$slug --email=admin@vip.dev",
