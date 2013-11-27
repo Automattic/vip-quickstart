@@ -30,6 +30,13 @@ sudo -k
 sudo -p "Enter your password to continue:" whoami 1>/dev/null || exit
 echo ""
 
+# =========================================
+# Include custom local script if available
+# =========================================
+BIN_PATH=`dirname "$(readlink -f "$0")"`
+if [ -f "$BIN_PATH/local-init" ]; then
+	/bin/bash $BIN_PATH/local-init
+fi
 
 # =====================================
 # Automatically update the repo
