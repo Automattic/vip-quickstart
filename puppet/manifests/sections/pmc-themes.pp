@@ -28,7 +28,8 @@ define pmc::setup-site {
 		"create-site $slug":
 		command => "/usr/bin/wp --path=/srv/www/wp site create --slug=$slug --title=$slug --email=admin@vip.dev",
 		unless  => "/usr/bin/wp --path=/srv/www/wp site list | grep $slug -q",
-		require => [ Exec['wp install /srv/www/wp'], Exec["clone-theme $theme"] ]
+		onlyif  => "/usr/bin/test -d /srv/www/wp-content/themes/vip/$theme",
+		require => Exec['wp install /srv/www/wp'],
 	}
 	exec {
 		"activate-theme $theme":
@@ -47,5 +48,3 @@ pmc::setup-site {
 	$pmc_sites: 
 	require => [ Exec['checkout plugins'], Exec['wp install /srv/www/wp'] ]
 }
-
-

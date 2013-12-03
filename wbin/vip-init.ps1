@@ -27,13 +27,6 @@ if ( (-Not ($has_git)) -or (-Not ($has_vagrant)) -or (-Not ($has_vbox)) ) {
 
 $ps_script_root = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
-# =========================================
-# Include custom local script if available
-# =========================================
-if ( Test-Path ($ps_script_root + "\local-init.ps1") ) {
-	.( $ps_script_root + "\local-init.ps1" )
-}
-
 # =====================================
 # Automatically update the repo
 # =====================================

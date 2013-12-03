@@ -1,0 +1,60 @@
+#!/bin/bash
+
+clear
+
+echo "   ___  __  ________       _                  _     __        __           __"
+echo "  / _ \/  |/  / ___/ _  __(_)__    ___ ___ __(_)___/ /__ ___ / /____ _____/ /_"
+echo " / ___/ /|_/ / /__  | |/ / / _ \  / _ \`/ // / / __/  '_/(_-</ __/ _ \`/ __/ __/"
+echo "/_/  /_/  /_/\___/  |___/_/ .__/  \_, /\_,_/_/\__/_/\_\/___/\__/\_,_/_/  \__/ "
+echo "                         /_/       /_/                                        "
+echo ""
+
+echo "==================================="
+echo "= Setting up PMC Themes source code"
+echo "==================================="
+
+HAS_GIT=`which git`
+if [ ! $HAS_GIT ]
+then
+	echo "Please install the requirements"
+	if [ ! $HAS_GIT ]; then
+			echo "* Git"
+	fi
+	exit
+fi
+
+PMC_THEMES=(
+	"bgr"
+	"pmc-411"
+	"pmc-awardsline"
+	"pmc-deadline"
+	"pmc-hollywoodlife"
+	"pmc-tvline"
+	"pmc-variety"
+	"pmc-movieline"
+	"pmc-tvline-mobile"
+	"pmc-movieline-mobile"
+	)
+	
+BIN_PATH=`dirname "$(readlink -f "$0")"`
+VIP_THEME_PATH="`dirname $BIN_PATH`/www/wp-content/themes/vip"
+
+if [ ! -d $VIP_THEME_PATH ]
+then
+	mkdir -p $VIP_THEME_PATH
+fi
+
+for THEME in "${PMC_THEMES[@]}"
+do
+	if [ ! -d "$VIP_THEME_PATH/$THEME" ]
+	then
+		echo "Cloning theme folder: $THEME"
+		git clone "git@bitbucket.org:penskemediacorp/$THEME.git" "$VIP_THEME_PATH/$THEME"
+	else
+		echo "Theme folder already exist: $THEME"
+	fi
+done
+
+echo ""
+
+/bin/bash $BIN_PATH/vip-init
