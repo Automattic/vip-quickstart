@@ -18,3 +18,6 @@
 
 # phpMyAdmin
 /www/phpmyadmin
+
+# OS X
+.DS_Store
