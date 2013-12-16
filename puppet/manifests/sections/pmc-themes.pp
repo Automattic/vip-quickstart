@@ -7,6 +7,7 @@ $pmc_sites = [
 	{ slug => 'movieline',     theme => 'pmc-movieline' },
 	{ slug => 'variety411',    theme => 'pmc-411' },
 	{ slug => 'hollywoodlife', theme => 'pmc-hollywoodlife' },
+	{ slug => 'varietylatino', theme => 'pmc-variety-latino' },
 ]
 
 define pmc::clone-theme {

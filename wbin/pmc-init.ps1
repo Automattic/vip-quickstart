@@ -17,7 +17,7 @@ if ( -NOT ( Test-Path $vip_theme_path ) ) {
 	mkdir -Force $vip_theme_path
 }
 
-foreach ( $theme in @( 'bgr', 'pmc-deadline', 'pmc-plugins', 'pmc-variety', 'pmc-tvline', 'pmc-hollywoodlife', 'pmc-awardsline', 'pmc-411', 'pmc-movieline', 'pmc-tvline-mobile', 'pmc-movieline-mobile' ) ) {
+foreach ( $theme in @( 'bgr', 'pmc-deadline', 'pmc-plugins', 'pmc-variety', 'pmc-variety-latino', 'pmc-tvline', 'pmc-hollywoodlife', 'pmc-awardsline', 'pmc-411', 'pmc-movieline', 'pmc-tvline-mobile', 'pmc-movieline-mobile' ) ) {
 	if ( -NOT ( Test-Path ( $vip_theme_path + "\" + $theme  ) ) ) {
 		echo ("Cloning theme folder: " + $theme)
 		mkdir -Force ( $vip_theme_path + "\" + $theme )
