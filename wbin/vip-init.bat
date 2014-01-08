@@ -1,2 +1,2 @@
 @echo off
-powershell -command "%~dp0\2vip-init.ps1"
+powershell -command "%~dp0\vip-init.ps1"
