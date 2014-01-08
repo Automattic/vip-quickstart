@@ -96,29 +96,40 @@ if ( -not ( Get-Content $file | Select-String vip.dev ) ) {
 }
 '@
 
+$exitCode = -1;
+
 $pinfo = New-Object System.Diagnostics.ProcessStartInfo "PowerShell"
 $pinfo.Verb = "runas"
 $pinfo.Arguments = "-command $command"
 
 $p = New-Object System.Diagnostics.Process
 $p.StartInfo = $pinfo
-$p.Start() | Out-Null
-$p.WaitForExit()
+
+try { # Start() may throw an error if the user declines the UAC prompt
+	$p.Start() | Out-Null
+	$p.WaitForExit()
+	$exitCode = $p.ExitCode
+} catch {
+	# User declined UAC prompt, set exit code to prompt failed
+	$exitCode = 1
+}
 
 $hostFileSuccess = $false;
-if ( $p.ExitCode -eq 0 ) {
+if ( $exitCode -eq 0 ) {
 	$hostFileSuccess = $true;
 	echo "* hosts file successfully configured"
-} elseif ( $p.ExitCode -eq 1 ) {
+} elseif ( $exitCode -eq 1 ) {
 	$file = Join-Path -Path $env:WINDIR -ChildPath "system32\drivers\etc\hosts"
 	echo "* The hosts file wasn't updated because it requires admin permission"
 	echo "* Please set vip.dev to 10.86.73.80 in $file or re-run this script with administrator permissions"
-} elseif ( $p.ExitCode -eq 2 ) {
+} elseif ( $exitCode -eq 2 ) {
 	$hostFileSuccess = $true;
 	echo "* No update needed for hosts file"
 } else {
 	echo "* Unknown error updating hosts file"
 }
+
+
 
 echo ""
 
