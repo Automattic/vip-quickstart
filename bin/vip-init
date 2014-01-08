@@ -39,6 +39,7 @@ echo "= Updating VIP Quickstart"
 echo "=================================="
 
 git pull
+git submodule sync
 git submodule update --init --recursive
 echo ""
 

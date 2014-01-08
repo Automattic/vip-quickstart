@@ -15,7 +15,7 @@
 	url = https://github.com/example42/puppet-nginx.git
 [submodule "puppet/modules/wp"]
 	path = puppet/modules/wp
-	url = https://github.com/rmccue/puppet-wp.git
+	url = https://github.com/joshbetz/puppet-wp.git
 [submodule "puppet/modules/ufw"]
 	path = puppet/modules/ufw
 	url = https://github.com/anl/puppet-ufw
