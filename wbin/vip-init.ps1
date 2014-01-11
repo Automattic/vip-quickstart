@@ -1,31 +1,32 @@
+cls
+
+@'
+
+ _   __(_)___     ____ ___  __(_)____/ /_______/ /_____ ______/ /_
+| | / / / __ \   / __ `/ / / / / ___/ //_/ ___/ __/ __ `/ ___/ __/
+| |/ / / /_/ /  / /_/ / /_/ / / /__/ ,< (__  ) /_/ /_/ / /  / /_
+|___/_/ .___/   \__, /\__,_/_/\___/_/|_/____/\__/\__,_/_/   \__/
+     /_/          /_/
+	 
+'@
+
+# =====================================
+# Change to the VIP Quickstart dir
+# =====================================
+$dir = Split-Path $MyInvocation.MyCommand.Path
+cd $dir
+cd ..
+
 # =====================================
 # Check for requirements
 # =====================================
-
-$has_git = (Get-Command git -errorAction SilentlyContinue)
-$has_vagrant = (Get-Command vagrant -errorAction SilentlyContinue)
-
-try {
-	$has_vbox = New-Object -ComObject "VirtualBox.VirtualBox"
-}
-catch {
-}
-
-if ( (-Not ($has_git)) -or (-Not ($has_vagrant)) -or (-Not ($has_vbox)) ) {
+if ( (-Not (Get-Command git -errorAction SilentlyContinue)) -or (-Not (Get-Command vagrant -errorAction SilentlyContinue)) -or (-Not (Get-WmiObject -Class Win32_Product | Select-Object -Property Name | Select-string "VirtualBox")) ) {
 	echo "Please install requirements"
-	if (-Not ($has_git)) {
-		echo "* Git"
-	}
-	if (-Not ($has_vagrant)) {
-		echo "* Vagrant"
-	}
-	if (-Not ($has_vbox)) {
-		echo "* VirtualBox"
-	}
+	echo "* Git"
+	echo "* Vagrant"
+	echo "* VirtualBox"
 	exit
 }
-
-$ps_script_root = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
 # =====================================
 # Automatically update the repo
@@ -46,7 +47,7 @@ if ( Get-Command svn -errorAction SilentlyContinue ) {
 	echo "= Updating VIP Shared plugins"
 	echo "=================================="
 
-	if ( Test-Path "www/wp-content/themes/vip/plugins" ) {
+	if ( Test-Path "www/wp-content/themes/vip" ) {
 		svn up www/wp-content/themes/vip/plugins
 	} else {
 		mkdir -Force www/wp-content/themes/vip
@@ -83,17 +84,43 @@ echo "=================================="
 echo "= Configuring the hosts file"
 echo "=================================="
 
-$file = Join-Path -Path $env:WINDIR -ChildPath "system32\drivers\etc\hosts"
+$command = @'
+$file = Join-Path -Path $env:WINDIR -ChildPath "system32\drivers\etc\hosts";
 
 if ( -not ( Get-Content $file | Select-String vip.dev ) ) {
-	$data = Get-Content $file
-	$data += ""
-	$data += "# VIP Quickstart"
-	$data += "10.86.73.80 vip.dev"
-	Set-Content -Value $data -Path $file -Force -Encoding ASCII
+	$data = Get-Content $file;
+	$data += '';
+	$data += '# VIP Quickstart';
+	$data += '10.86.73.80 vip.dev';
+	Set-Content -Value $data -Path $file -Force -Encoding ASCII;
 }
-echo ""
+'@
 
+$pinfo = New-Object System.Diagnostics.ProcessStartInfo "PowerShell"
+$pinfo.Verb = "runas"
+$pinfo.Arguments = "-command $command"
+
+$p = New-Object System.Diagnostics.Process
+$p.StartInfo = $pinfo
+$p.Start() | Out-Null
+$p.WaitForExit()
+
+$hostFileSuccess = $false;
+if ( $p.ExitCode -eq 0 ) {
+	$hostFileSuccess = $true;
+	echo "* hosts file successfully configured"
+} elseif ( $p.ExitCode -eq 1 ) {
+	$file = Join-Path -Path $env:WINDIR -ChildPath "system32\drivers\etc\hosts"
+	echo "* The hosts file wasn't updated because it requires admin permission"
+	echo "* Please set vip.dev to 10.86.73.80 in $file or re-run this script with administrator permissions"
+} elseif ( $p.ExitCode -eq 2 ) {
+	$hostFileSuccess = $true;
+	echo "* No update needed for hosts file"
+} else {
+	echo "* Unknown error updating hosts file"
+}
+
+echo ""
 
 # =====================================
 # Outro/next steps
@@ -102,5 +129,11 @@ echo "=================================="
 echo "= Next Steps"
 echo "=================================="
 
-echo "* Go to http://vip.dev in your browser"
-echo ""
+if ( $hostFileSuccess ) {
+	echo "* Go to http://vip.dev in your browser"
+	echo ""
+	Start-Process "http://vip.dev"
+} else {
+	echo "* Please fix the hosts file then go to http://vip.dev in your browser"
+	echo ""
+}
