@@ -18,3 +18,7 @@
 
 # phpMyAdmin
 /www/phpmyadmin
+
+# IDEs
+/nbproject
+/.idea
