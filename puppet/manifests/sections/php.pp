@@ -60,3 +60,10 @@ exec { 'html_errors = On':
 	user => root,
 	notify => Service['php5-fpm']
 }
+
+# Install phpunit
+exec { 'install phpunit':
+    command => 'wget -O /usr/local/bin/phpunit https://phar.phpunit.de/phpunit.phar && chmod +x /usr/local/bin/phpunit',
+    unless  => 'which phpunit',
+    user    => 'root'
+}

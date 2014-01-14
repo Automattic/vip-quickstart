@@ -82,6 +82,21 @@ class svn {
 		onlyif => 'svn info',
 		require => Exec['checkout Minileven']
 	}
+
+    # SVN checkout WordPress-Tests
+    exec { 'checkout WordPress-Tests':
+        command => 'svn co http://develop.svn.wordpress.org/trunk/ /srv/www/wp-tests; svn rm --keep-local /srv/www/wp-tests/src',
+        unless  => 'svn info /srv/www/wp-tests',
+        require => Package['subversion'],
+        timeout => 600
+    }
+
+    exec { 'svn up WordPress-Tests':
+        cwd     => '/srv/www/wp-tests',
+        command => 'svn up',
+        onlyif  => 'svn info',
+        require => Exec['checkout WordPress-Tests']
+    }
 }
 
 # Sync wp-content
