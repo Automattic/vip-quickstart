@@ -11,11 +11,13 @@ VIP Quickstart is a local development environment for WordPress.com VIP develope
 *   WordPress.com VIP Shared Plugins repository
 *   WordPress multisite
 *   WordPress Developer Plugin and all VIP recommended plugins
+*   WordPress unit tests
 *   Custom WordPress.com modifications
 *   WP-CLI
 *   MySQL
 *   PHP
 *   Nginx
+*   PHPUnit
 
 ## Requirements
 
@@ -70,6 +72,22 @@ Some useful commands:
 * `vagrant provision` - Provisions the VM
 * `vagrant ssh` - Logs into the VM with ssh
 * `vagrant destroy` - Deletes the VM
+ 
+## Unit Testing
+
+VIP Quickstart comes with a checkout of the [WordPress-Tests automated testing framework](http://make.wordpress.org/core/handbook/automated-testing/). You can use this to run the unit tests for WordPress itself or for any plugin or theme that has phpunit tests defined.
+
+#### To run the WordPress unit tests
+
+1. CD to `/vagrant/www/wp-tests` from within the VM.
+2. Run `phpunit`
+
+#### To create unit tests for your plugin/theme
+
+1. Navigate to your theme or plugin within the VM. (eg. `/vagrant/www/wp-content/plugins/my-plugin`)
+2. Use WP CLI to the generate the plugin test files. Eg. `/srv/www/wp-cli/bin/wp scaffold plugin-tests my-plugin`
+3. Run `phpunit` inside your theme or plugin directory.
+4. Start building your tests within the newly created `tests` directory.
 
 ## Customize
 
