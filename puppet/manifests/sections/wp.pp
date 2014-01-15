@@ -69,18 +69,19 @@ class svn {
 		require => Exec['checkout plugins']
 	}
 
-	# SVN checkout Minileven
-	exec { 'checkout Minileven':
-		command => 'svn co https://wpcom-themes.svn.automattic.com/minileven/ /srv/www/wp-content/themes/pub/minileven',
-		unless => 'test -d /srv/www/wp-content/themes/pub/minileven && ls -A /srv/www/wp-content/themes/pub/minileven',
+	# SVN checkout Public themes
+	exec { 'checkout Public Themes':
+		command => 'svn co https://wpcom-themes.svn.automattic.com/ /srv/www/wp-content/themes/pub',
+		unless => 'test -d /srv/www/wp-content/themes/pub && ls -A /srv/www/wp-content/themes/pub',
+		timeout => 0,
 		require => Package['subversion']
 	}
 
-	exec { 'svn up Minileven':
-		cwd => '/srv/www/wp-content/themes/pub/minileven',
+	exec { 'svn up Public Themes':
+		cwd => '/srv/www/wp-content/themes/pub',
 		command => 'svn up',
 		onlyif => 'svn info',
-		require => Exec['checkout Minileven']
+		require => Exec['checkout Public Themes']
 	}
 
 	# SVN checkout WordPress-Tests
