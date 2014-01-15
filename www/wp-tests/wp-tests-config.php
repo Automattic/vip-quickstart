@@ -1,9 +1,8 @@
 <?php
 
 /* Path to the WordPress codebase you'd like to test. Add a backslash in the end. */
-$vagrant_www_dir = '/vagrant/www';
-define( 'ABSPATH', "$vagrant_www_dir/wp/" );
-define( 'WP_CONTENT_DIR', "$vagrant_www_dir/wp-content" );
+define( 'ABSPATH', "/srv/www/wp" );
+define( 'WP_CONTENT_DIR', "/srv/www/wp-content" );
 
 // Test with multisite enabled.
 define( 'WP_TESTS_MULTISITE', true );
