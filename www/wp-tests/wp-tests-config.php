@@ -1,7 +1,7 @@
 <?php
 
 /* Path to the WordPress codebase you'd like to test. Add a backslash in the end. */
-define( 'ABSPATH', "/srv/www/wp" );
+define( 'ABSPATH', "/srv/www/wp/" );
 define( 'WP_CONTENT_DIR', "/srv/www/wp-content" );
 
 // Test with multisite enabled.
