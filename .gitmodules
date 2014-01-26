@@ -19,3 +19,6 @@
 [submodule "puppet/modules/ufw"]
 	path = puppet/modules/ufw
 	url = https://github.com/anl/puppet-ufw
+[submodule "puppet/modules/vcsrepo"]
+	path = puppet/modules/vcsrepo
+	url = https://github.com/puppetlabs/puppetlabs-vcsrepo.git

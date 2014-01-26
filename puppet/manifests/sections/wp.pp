@@ -4,7 +4,10 @@ $plugins = ['developer', 'jetpack', 'mrss']
 exec {"wp install /srv/www/wp":
 	command => "/usr/bin/wp core multisite-install --base='vip.dev' --title='vip.dev' --admin_email='wordpress@vip.dev' --admin_name='wordpress' --admin_password='wordpress'",
 	cwd => '/srv/www/wp',
-	require => Class['wp::cli']
+	require => [
+		Vcsrepo['/srv/www/wp'],
+		Class['wp::cli'],
+	]
 }
 
 # Install plugins
@@ -35,69 +38,29 @@ class { wp::cli:
 	version => '0.12.1'
 }
 
-stage { 'svn': before => Stage['main'] }
-class { 'svn': stage => svn }
-class svn {
-	package { 'subversion': ensure => present }
+# VCS Checkout
+vcsrepo { '/srv/www/wp':
+	ensure   => 'present',
+	source   => 'http://core.svn.wordpress.org/trunk/',
+	provider => svn,
+}
 
-	# SVN checkout WordPress
-	exec { 'checkout WordPress':
-		command => 'svn co http://core.svn.wordpress.org/trunk/ /srv/www/wp; svn rm --keep-local /srv/www/wp/wp-content',
-		unless => 'svn info /srv/www/wp',
-		require => Package['subversion']
-	}
+vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
+	ensure   => 'present',
+	source   => 'https://vip-svn.wordpress.com/plugins/',
+	provider => svn,
+}
 
-	exec { 'svn up WordPress':
-		cwd => '/srv/www/wp',
-		command => 'svn up',
-		onlyif => 'svn info',
-		require => Exec['checkout WordPress']
-	}
+vcsrepo { '/srv/www/wp-content/themes/pub':
+	ensure   => 'present',
+	source   => 'https://wpcom-themes.svn.automattic.com/',
+	provider => svn,
+}
 
-	# SVN checkout VIP plugins
-	exec { 'checkout plugins':
-		command => "svn co https://vip-svn.wordpress.com/plugins/ /srv/www/wp-content/themes/vip/plugins --username='${svn_username}' --password='${svn_password}' --non-interactive",
-		unless => "svn info /srv/www/wp-content/themes/vip/plugins || test -z '${svn_username}' || test -z '${svn_password}'",
-		require => Package['subversion']
-	}
-
-	exec { 'svn up VIP plugins':
-		cwd => '/srv/www/wp-content/themes/vip/plugins',
-		command => "svn up --username='${svn_username}' --password='${svn_password}' --non-interactive",
-		unless => "test -z '${svn_username}' || test -z '${svn_password}'",
-		onlyif => 'svn info',
-		require => Exec['checkout plugins']
-	}
-
-	# SVN checkout Public themes
-	exec { 'checkout Public Themes':
-		command => 'svn co https://wpcom-themes.svn.automattic.com/ /srv/www/wp-content/themes/pub',
-		unless => 'test -d /srv/www/wp-content/themes/pub && ls -A /srv/www/wp-content/themes/pub',
-		timeout => 0,
-		require => Package['subversion']
-	}
-
-	exec { 'svn up Public Themes':
-		cwd => '/srv/www/wp-content/themes/pub',
-		command => 'svn up',
-		onlyif => 'svn info',
-		require => Exec['checkout Public Themes']
-	}
-
-	# SVN checkout WordPress-Tests
-	exec { 'checkout WordPress-Tests':
-		command => 'svn co http://develop.svn.wordpress.org/trunk/ /srv/www/wp-tests; svn rm --keep-local /srv/www/wp-tests/src',
-		unless  => 'svn info /srv/www/wp-tests',
-		require => Package['subversion'],
-		timeout => 600
-	}
-
-	exec { 'svn up WordPress-Tests':
-		cwd     => '/srv/www/wp-tests',
-		command => 'svn up',
-		onlyif  => 'svn info',
-		require => Exec['checkout WordPress-Tests']
-	}
+vcsrepo { '/srv/www/wp-tests':
+	ensure   => 'present',
+	source   => 'http://develop.svn.wordpress.org/trunk/',
+	provider => svn,
 }
 
 # Sync wp-content
