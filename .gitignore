@@ -13,6 +13,9 @@
 /www/wp-content/themes
 /www/wp-content/uploads
 
+# tests
+/www/wp-tests
+
 # WP CLI Directory
 /www/wp-cli
 
