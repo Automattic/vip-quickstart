@@ -17,6 +17,12 @@ wp::plugin { $plugins:
 	require => Exec['wp install /srv/www/wp']
 }
 
+# Install default theme
+exec { '/usr/bin/wp theme install twentyfourteen':
+	unless => '/usr/bin/wp theme is-installed twentyfourteen',
+	require => Class['wp::cli'],
+}
+
 # Install VIP recommended developer plugins
 wp::command { 'developer install-plugins':
 	command  => 'developer install-plugins --type=wpcom-vip --activate',
@@ -61,18 +67,6 @@ vcsrepo { '/srv/www/wp-tests':
 	ensure   => 'present',
 	source   => 'http://develop.svn.wordpress.org/trunk/',
 	provider => svn,
-}
-
-# Sync wp-content
-exec { "rsync wp-content":
-	command => "rsync -a /srv/www/wp/wp-content/ /srv/www/wp-content",
-	onlyif => "/usr/bin/test -d /srv/www/wp/wp-content"
-}
-
-# Remove wp-content from wp root
-exec { 'rm -rf /srv/www/wp/wp-content':
-	require => Exec['rsync wp-content'],
-	onlyif => '/usr/bin/test -d /srv/www/wp/wp-content'
 }
 
 # Create a local config
