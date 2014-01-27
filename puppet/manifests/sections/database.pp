@@ -13,3 +13,8 @@ mysql::grant { 'wptests':
 	mysql_user       => 'wptests',
 	mysql_host       => 'localhost',
 }
+
+package { 'phpmyadmin':
+	ensure => present,
+	require => Package['nginx']
+}
