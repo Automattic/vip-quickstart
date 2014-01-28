@@ -63,7 +63,10 @@ for i in {1..3}; do
 done
 
 if [[ 401 -eq $response ]]; then
-    echo "Login failed. Max attempts."
+    echo ""
+    echo "Login Failed. Max Attempts."
+    echo "---------------------------"
+    echo "Looks like you might not have access to our VIP Shared Plugins repo. Just send an email to vip-support@wordpress.com andd let us know what project you're working on and we'll set things up for you!"
 fi
 
 echo ""
