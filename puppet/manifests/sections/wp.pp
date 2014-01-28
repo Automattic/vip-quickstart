@@ -55,6 +55,8 @@ vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
 	ensure   => 'present',
 	source   => 'https://vip-svn.wordpress.com/plugins/',
 	provider => svn,
+	basic_auth_username => $svn_username,
+	basic_auth_password => $svn_password,
 }
 
 vcsrepo { '/srv/www/wp-content/themes/pub':
