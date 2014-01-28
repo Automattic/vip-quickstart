@@ -1,6 +1,6 @@
 Exec { path => '/bin:/usr/bin:/usr/local/bin:/usr/sbin:/sbin' }
 
-import 'defines/*'
+import 'helpers/*'
 import 'sections/*'
 
 # Make sure apt-get is up-to-date before we do anything else
