@@ -78,7 +78,7 @@ echo "=================================="
 
 vagrant reload --no-provision
 vagrant up --no-provision
-SVN_USERNAME="$username" SVN_PASSWORD="$password" vagrant provision
+QUICKSTART_DOMAIN="vip.dev" SVN_USERNAME="$username" SVN_PASSWORD="$password" vagrant provision
 echo ""
 
 
