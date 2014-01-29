@@ -32,6 +32,16 @@ echo ""
 
 
 # =====================================
+# Collect domain info for the vm
+# =====================================
+echo "=================================="
+echo "= Domain Setup"
+echo "=================================="
+
+read -e -p "What domain would you like to use? [vip.dev]:" QUICKSTART_DOMAIN
+QUICKSTART_DOMAIN="${QUICKSTART_DOMAIN:-vip.dev}"
+echo ""
+
 # Automatically update the repo
 # =====================================
 echo "=================================="
@@ -89,7 +99,7 @@ echo "=================================="
 echo "= Configuring the hosts file"
 echo "=================================="
 
-cat /etc/hosts | grep vip.dev || sudo printf "\n# VIP Quickstart\n10.86.73.80 vip.dev\n" | sudo tee -a /etc/hosts
+cat /etc/hosts | grep $QUICKSTART_DOMAIN || sudo printf "\n# VIP Quickstart\n10.86.73.80 $QUICKSTART_DOMAIN\n" | sudo tee -a /etc/hosts
 echo ""
 
 
@@ -100,7 +110,7 @@ echo "=================================="
 echo "= Next Steps"
 echo "=================================="
 
-echo "* Go to http://vip.dev in your browser"
+echo "* Go to http://$quickstart_host in your browser"
 echo ""
 
 
