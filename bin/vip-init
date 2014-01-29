@@ -88,7 +88,7 @@ echo "=================================="
 
 vagrant reload --no-provision
 vagrant up --no-provision
-QUICKSTART_DOMAIN="vip.dev" SVN_USERNAME="$username" SVN_PASSWORD="$password" vagrant provision
+QUICKSTART_DOMAIN="$QUICKSTART_DOMAIN" SVN_USERNAME="$username" SVN_PASSWORD="$password" vagrant provision
 echo ""
 
 
@@ -110,7 +110,7 @@ echo "=================================="
 echo "= Next Steps"
 echo "=================================="
 
-echo "* Go to http://$quickstart_host in your browser"
+echo "* Go to http://$QUICKSTART_DOMAIN in your browser"
 echo ""
 
 
