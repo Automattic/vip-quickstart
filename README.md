@@ -51,6 +51,8 @@ Note: When you run the Git installer, make sure to install Git to your system PA
 2.  Run the `vip-init.bat` file in `wbin`
 3.  Go to http://vip.dev in your browser
 
+If you receive a File cannot be loaded because the execution of scripts is disabled on this system error. Make sure you're using a PowerShell interface. Use tools -> options to manage your default shell. (Right click on the repository and choose "Open a shell here")
+
 ## Usernames and Passwords
 
 ### MySQL
