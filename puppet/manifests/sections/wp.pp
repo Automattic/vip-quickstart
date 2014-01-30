@@ -21,7 +21,7 @@ wp::plugin { $plugins:
 # Install default theme
 exec { '/usr/bin/wp theme install twentyfourteen':
 	unless => '/usr/bin/wp theme is-installed twentyfourteen',
-	require => Class['wp::cli'],
+	require => Exec['wp install /srv/www/wp'],
 }
 
 # Install VIP recommended developer plugins
