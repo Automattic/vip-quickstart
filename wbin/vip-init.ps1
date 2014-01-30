@@ -29,6 +29,23 @@ if ( (-Not (Get-Command git -errorAction SilentlyContinue)) -or (-Not (Get-Comma
 }
 
 # =====================================
+# Collect domain info for the vm
+# =====================================
+echo "=================================="
+echo "= Domain Setup"
+echo "=================================="
+
+$quickstart_domain = Read-Host 'What domain would you like to use? [vip.dev]'
+
+if (-Not $quickstart_domain) {
+	$quickstart_domain = 'vip.dev'
+}
+
+$env:QUICKSTART_DOMAIN = $quickstart_domain
+
+echo ""
+
+# =====================================
 # Automatically update the repo
 # =====================================
 echo "=================================="
@@ -85,14 +102,14 @@ echo "=================================="
 echo "= Configuring the hosts file"
 echo "=================================="
 
-$command = @'
+$command = '$quickstart_domain = ' + "'$quickstart_domain';" + @'
 $file = Join-Path -Path $env:WINDIR -ChildPath "system32\drivers\etc\hosts";
 
-if ( -not ( Get-Content $file | Select-String vip.dev ) ) {
+if ( -not ( Get-Content $file | Select-String $quickstart_domain ) ) {
 	$data = Get-Content $file;
 	$data += '';
 	$data += '# VIP Quickstart';
-	$data += '10.86.73.80 vip.dev';
+	$data += '10.86.73.80 ' + $quickstart_domain;
 	Set-Content -Value $data -Path $file -Force -Encoding ASCII;
 }
 '@
@@ -122,7 +139,7 @@ if ( $exitCode -eq 0 ) {
 } elseif ( $exitCode -eq 1 ) {
 	$file = Join-Path -Path $env:WINDIR -ChildPath "system32\drivers\etc\hosts"
 	echo "* The hosts file wasn't updated because it requires admin permission"
-	echo "* Please set vip.dev to 10.86.73.80 in $file or re-run this script with administrator permissions"
+	echo "* Please set $quickstart_domain to 10.86.73.80 in $file or re-run this script with administrator permissions"
 } elseif ( $exitCode -eq 2 ) {
 	$hostFileSuccess = $true;
 	echo "* No update needed for hosts file"
@@ -142,10 +159,10 @@ echo "= Next Steps"
 echo "=================================="
 
 if ( $hostFileSuccess ) {
-	echo "* Go to http://vip.dev in your browser"
+	echo "* Go to http://$quickstart_domain in your browser"
 	echo ""
-	Start-Process "http://vip.dev"
+	Start-Process "http://$quickstart_domain"
 } else {
-	echo "* Please fix the hosts file then go to http://vip.dev in your browser"
+	echo "* Please fix the hosts file then go to http://$quickstart_domain in your browser"
 	echo ""
 }
