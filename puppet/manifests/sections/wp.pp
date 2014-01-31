@@ -8,6 +8,7 @@ exec {"wp install /srv/www/wp":
 	require => [
 		Vcsrepo['/srv/www/wp'],
 		Class['wp::cli'],
+		Line['path:/srv/www/wp'],
 	]
 }
 
@@ -79,17 +80,17 @@ file { 'local-config.php':
 	notify => Exec['generate salts']
 }
 
+# Add default path to local WP-CLI config
+line { "path:/srv/www/wp":
+	line => "path:/srv/www/wp",
+	file => '/srv/www/wp-cli.yml',
+}
+
 # Add default domain to local WP-CLI config
 line { "url:$quickstart_domain":
 	line => "url:$quickstart_domain",
-	file => '/srv/www/wp-cli.local.yml',
+	file => '/srv/www/wp-cli.yml',
 	onlyif => "test -n '$quickstart_domain'",
-}
-
-# Symlink local WP-CLI config to user's home
-file { "$home_root/$user/wp-cli.local.yml":
-	ensure => 'link',
-	target => '/srv/www/wp-cli.local.yml'
 }
 
 exec { 'generate salts':
