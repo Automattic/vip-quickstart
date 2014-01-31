@@ -25,3 +25,6 @@
 [submodule "puppet/modules/apt"]
 	path = puppet/modules/apt
 	url = https://github.com/puppetlabs/puppetlabs-apt
+[submodule "puppet/modules/ssh"]
+	path = puppet/modules/ssh
+	url = https://github.com/attachmentgenie/puppet-module-ssh.git
