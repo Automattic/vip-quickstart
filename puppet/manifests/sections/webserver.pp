@@ -4,7 +4,7 @@ class { "nginx":
 	client_max_body_size => '1024m'
 }
 
-nginx::vhost { 'vip.dev':
+nginx::vhost { "_":
 	docroot => '/srv/www',
 	template => 'nginx/vip.dev.erb'
 }
