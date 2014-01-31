@@ -1,5 +1,24 @@
 #!/usr/bin/env sh
 
+# Setup command line flags
+SERVER=false
+
+for i in "$@"
+do
+case $i in
+    --server)
+        SERVER=true
+    ;;
+    --domain=*)
+        QUICKSTART_DOMAIN=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+    *)
+        # unknown option
+    ;;
+esac
+done
+
+
 # =====================================
 # VIP Quickstart
 # =====================================
@@ -15,12 +34,20 @@ echo '
 # =====================================
 # Check for requirements
 # =====================================
-if [[ ! `which git` || ! `which vagrant` || ! `which VBoxManage` ]]; then
-    echo "Please install the requirements"
-    echo "* Git"
-    echo "* Vagrant"
-    echo "* VirtualBox"
-    exit 1
+if [ false == $SERVER ]; then
+    if [[ ! `which git` || ! `which vagrant` || ! `which VBoxManage` ]]; then
+        echo "Please install the requirements"
+        echo "* Git"
+        echo "* Vagrant"
+        echo "* VirtualBox"
+        exit 1
+    fi
+else
+    if [[ ! `which git` || ! `which puppet` ]]; then
+        echo "Please install the requirements"
+        echo "* Git"
+        echo "* Puppet"
+    fi
 fi
 
 # =====================================
@@ -32,16 +59,20 @@ echo ""
 
 
 # =====================================
-# Collect domain info for the vm
+# Ask for domain
 # =====================================
-echo "=================================="
-echo "= Domain Setup"
-echo "=================================="
+if [ -z "$QUICKSTART_DOMAIN" ]; then
+    echo "=================================="
+    echo "= Domain Setup"
+    echo "=================================="
 
-read -e -p "What domain would you like to use? [vip.dev]:" QUICKSTART_DOMAIN
-QUICKSTART_DOMAIN="${QUICKSTART_DOMAIN:-vip.dev}"
-echo ""
+    read -e -p "What domain would you like to use? [vip.dev]:" QUICKSTART_DOMAIN
+    QUICKSTART_DOMAIN="${QUICKSTART_DOMAIN:-vip.dev}"
+    echo ""
+fi
 
+
+# =====================================
 # Automatically update the repo
 # =====================================
 echo "=================================="
@@ -82,20 +113,29 @@ fi
 # =====================================
 # Start the VM (always provision, even if it's already running)
 # =====================================
-echo "=================================="
-echo "= Provisioning the VM"
-echo "=================================="
+if [ false == $SERVER ]; then
+    echo "=================================="
+    echo "= Provisioning the VM"
+    echo "=================================="
 
-vagrant reload --no-provision
-vagrant up --no-provision
-QUICKSTART_DOMAIN="$QUICKSTART_DOMAIN" SVN_USERNAME="$username" SVN_PASSWORD="$password" vagrant provision
-echo ""
+    vagrant reload --no-provision
+    vagrant up --no-provision
+    QUICKSTART_DOMAIN="$QUICKSTART_DOMAIN" SVN_USERNAME="$username" SVN_PASSWORD="$password" vagrant provision
+    echo ""
+elif [[ -n "$QUICKSTART_DOMAIN" ]]; then
+    export FACTER_svn_username="$username"
+    export FACTER_svn_password="$password"
+    export FACTER_quickstart_domain="$QUICKSTART_DOMAIN"
+
+    puppet apply --modulepath=/srv/puppet/modules --templatedir=/srv/puppet/files /srv/puppet/manifests/init.pp
+
+fi
 
 
 # =====================================
 # Add vip.dev entry to hosts file
 # =====================================
-if [[ "test -n '$QUICKSTART_DOMAIN'" ]]; then
+if [[ -n '$QUICKSTART_DOMAIN' && false == $SERVER ]]; then
     echo "=================================="
     echo "= Configuring the hosts file"
     echo "=================================="
