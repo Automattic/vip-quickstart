@@ -47,6 +47,7 @@ else
         echo "Please install the requirements"
         echo "* Git"
         echo "* Puppet"
+        exit 1
     fi
 fi
 
