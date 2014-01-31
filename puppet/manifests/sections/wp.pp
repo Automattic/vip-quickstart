@@ -79,6 +79,19 @@ file { 'local-config.php':
 	notify => Exec['generate salts']
 }
 
+# Add default domain to local WP-CLI config
+line { "url:$quickstart_domain":
+	line => "url:$quickstart_domain",
+	file => '/srv/www/wp-cli.local.yml',
+	onlyif => "test -n '$quickstart_domain'",
+}
+
+# Symlink local WP-CLI config to user's home
+file { "$home_root/$user/wp-cli.local.yml":
+	ensure => 'link',
+	target => '/srv/www/wp-cli.local.yml'
+}
+
 exec { 'generate salts':
 	command => 'printf "<?php\n" > /srv/www/local-config.php; curl https://api.wordpress.org/secret-key/1.1/salt/ >> /srv/www/local-config.php',
 	refreshonly => true
