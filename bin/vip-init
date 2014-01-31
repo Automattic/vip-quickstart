@@ -114,23 +114,21 @@ fi
 # =====================================
 # Start the VM (always provision, even if it's already running)
 # =====================================
+echo "=================================="
+echo "= Provisioning"
+echo "=================================="
 if [ false == $SERVER ]; then
-    echo "=================================="
-    echo "= Provisioning the VM"
-    echo "=================================="
-
     vagrant reload --no-provision
     vagrant up --no-provision
     QUICKSTART_DOMAIN="$QUICKSTART_DOMAIN" SVN_USERNAME="$username" SVN_PASSWORD="$password" vagrant provision
-    echo ""
 elif [[ -n "$QUICKSTART_DOMAIN" ]]; then
     export FACTER_svn_username="$username"
     export FACTER_svn_password="$password"
     export FACTER_quickstart_domain="$QUICKSTART_DOMAIN"
 
     puppet apply --modulepath=/srv/puppet/modules --templatedir=/srv/puppet/files /srv/puppet/manifests/init.pp
-
 fi
+echo ""
 
 
 # =====================================
