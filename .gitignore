@@ -18,6 +18,7 @@
 
 # WP CLI Directory
 /www/wp-cli
+/www/wp-cli.local.yml
 
 # phpMyAdmin
 /www/phpmyadmin
