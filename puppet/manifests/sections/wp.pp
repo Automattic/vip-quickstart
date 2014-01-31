@@ -2,8 +2,9 @@ $plugins = ['developer', 'jetpack', 'mrss']
 
 # Install WordPress
 exec {"wp install /srv/www/wp":
-	command => "/usr/bin/wp core multisite-install --base='vip.dev' --title='vip.dev' --admin_email='wordpress@vip.dev' --admin_name='wordpress' --admin_password='wordpress'",
+	command => "/usr/bin/wp core multisite-install --url='$quickstart_domain' --title='$quickstart_domain' --admin_email='wordpress@vip.dev' --admin_name='wordpress' --admin_password='wordpress'",
 	cwd => '/srv/www/wp',
+	unless => "test -z $quickstart_domain",
 	require => [
 		Vcsrepo['/srv/www/wp'],
 		Class['wp::cli'],
@@ -76,6 +77,19 @@ file { 'local-config.php':
 	ensure => present,
 	path   => '/srv/www/local-config.php',
 	notify => Exec['generate salts']
+}
+
+# Add default domain to local WP-CLI config
+line { "url:$quickstart_domain":
+	line => "url:$quickstart_domain",
+	file => '/srv/www/wp-cli.local.yml',
+	onlyif => "test -n '$quickstart_domain'",
+}
+
+# Symlink local WP-CLI config to user's home
+file { "$home_root/$user/wp-cli.local.yml":
+	ensure => 'link',
+	target => '/srv/www/wp-cli.local.yml'
 }
 
 exec { 'generate salts':
