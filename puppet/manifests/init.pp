@@ -14,6 +14,7 @@ class updates {
 }
 
 user { 'vagrant':
+    ensure => 'present',
     system => true,
     notify => Service['php5-fpm'],
 }
