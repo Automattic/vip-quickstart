@@ -19,7 +19,7 @@ user { 'vagrant':
     notify => Service['php5-fpm'],
 }
 
-file { '/srv':
+file { '/srv/www/wp-content':
     ensure  => 'directory',
     owner   => 'vagrant',
     group   => 'vagrant',
