@@ -21,6 +21,7 @@ wp::plugin { $plugins:
 
 # Install default theme
 exec { '/usr/bin/wp theme install twentyfourteen':
+	cwd => '/srv/www/wp',
 	unless => '/usr/bin/wp theme is-installed twentyfourteen',
 	require => Exec['wp install /srv/www/wp'],
 }
