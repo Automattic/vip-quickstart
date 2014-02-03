@@ -2,7 +2,7 @@ $plugins = ['developer', 'jetpack', 'mrss']
 
 # Install WordPress
 exec {"wp install /srv/www/wp":
-	command => "/usr/bin/wp core multisite-install --url='$quickstart_domain' --title='$quickstart_domain' --admin_email='wordpress@vip.dev' --admin_name='wordpress' --admin_password='wordpress'",
+	command => "/usr/bin/wp core multisite-install --url='$quickstart_domain' --title='$quickstart_domain' --admin_email='wordpress@$quickstart_domain' --admin_name='wordpress' --admin_password='wordpress'",
 	cwd => '/srv/www/wp',
 	unless => "test -z $quickstart_domain",
 	require => [
