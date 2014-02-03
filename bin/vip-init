@@ -132,6 +132,17 @@ echo ""
 
 
 # =====================================
+# Chown the web directory to the web user
+# =====================================
+if [[ true == $SERVER ]]; then
+    echo "=================================="
+    echo "= Fixing file ownership"
+    echo "=================================="
+    chown -R vagrant:vagrant /srv/www
+fi
+
+
+# =====================================
 # Add vip.dev entry to hosts file
 # =====================================
 if [[ -n '$QUICKSTART_DOMAIN' && false == $SERVER ]]; then
