@@ -18,12 +18,3 @@ user { 'vagrant':
     system => true,
     notify => Service['php5-fpm'],
 }
-
-file { '/srv/www/wp-content':
-    ensure  => 'directory',
-    owner   => 'vagrant',
-    group   => 'vagrant',
-    recurse => true,
-    require => User['vagrant'],
-    notify  => Service['nginx'],
-}
