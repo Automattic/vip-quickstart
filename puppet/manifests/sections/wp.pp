@@ -16,14 +16,20 @@ exec {"wp install /srv/www/wp":
 wp::plugin { $plugins:
 	location    => '/srv/www/wp',
 	networkwide => true,
-	require => Exec['wp install /srv/www/wp']
+	require => [
+		Exec['wp install /srv/www/wp'],
+		File['/srv/www/wp-content/plugins'],
+	]
 }
 
 # Install default theme
 exec { '/usr/bin/wp theme install twentyfourteen':
 	cwd => '/srv/www/wp',
 	unless => '/usr/bin/wp theme is-installed twentyfourteen',
-	require => Exec['wp install /srv/www/wp'],
+	require => [
+		Exec['wp install /srv/www/wp'],
+		File['/srv/www/wp-content/themes'],
+	]
 }
 
 # Install VIP recommended developer plugins
@@ -46,6 +52,12 @@ class { wp::cli:
 	install_path => '/srv/www/wp-cli',
 	version => '0.12.1'
 }
+
+# Make sure the themes directory exists
+file { '/srv/www/wp-content/themes': ensure => 'directory' }
+
+# Make sure the plugins directory exists
+file { '/srv/www/wp-content/plugins': ensure => 'directory' }
 
 # VCS Checkout
 vcsrepo { '/srv/www/wp':
