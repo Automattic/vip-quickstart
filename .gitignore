@@ -16,10 +16,6 @@
 # tests
 /www/wp-tests
 
-# WP CLI Directory
-/www/wp-cli
-/www/wp-cli.yml
-
 # phpMyAdmin
 /www/phpmyadmin
 
