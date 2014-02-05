@@ -49,7 +49,7 @@ wp::command { 'plugin update --all':
 # Install WP-CLI
 class { wp::cli:
 	ensure => installed,
-	version => '0.12.1'
+	version => '0.13',
 }
 
 # Make sure the themes directory exists
