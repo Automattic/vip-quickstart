@@ -49,7 +49,6 @@ wp::command { 'plugin update --all':
 # Install WP-CLI
 class { wp::cli:
 	ensure => installed,
-	install_path => '/srv/www/wp-cli',
 	version => '0.12.1'
 }
 
