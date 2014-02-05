@@ -85,30 +85,34 @@ git submodule sync
 git submodule update --init --recursive
 echo ""
 
-if [ `which svn` ]; then
-    # =====================================
-    # Checkout the VIP shared plugins repo
-    # =====================================
-    echo "=================================="
-    echo "= Updating VIP Shared plugins"
-    echo "=================================="
+# =====================================
+# Checkout the VIP shared plugins repo
+# =====================================
+for i in {1..3}; do
+    unset response
 
-    if [ -d "www/wp-content/themes/vip/plugins" ]; then
-    	svn up www/wp-content/themes/vip/plugins
-    else
-    	mkdir -p www/wp-content/themes/vip/plugins
-    	svn co https://vip-svn.wordpress.com/plugins/ www/wp-content/themes/vip/plugins
-    fi
-    echo ""
-else
-     # TODO: Verify username and password are correct before continuing
     echo -n "Enter your WordPress.com username: "
     read username
     echo -n "Enter your WordPress.com password: "
     read -s password
+    response=$(curl -u $username:$password --write-out %{http_code} --silent --output /dev/null -I https://vip-svn.wordpress.com/plugins/)
+
+    if [[ 401 -eq $response ]]; then
+        echo "Login failed. Try again."
+    else
+        break
+    fi
+done
+
+if [[ 401 -eq $response ]]; then
     echo ""
-    echo ""
+    echo "Login Failed. Max Attempts."
+    echo "---------------------------"
+    echo "Looks like you might not have access to our VIP Shared Plugins repo. Just send an email to vip-support@wordpress.com and let us know what project you're working on and we'll set things up for you!"
 fi
+
+echo ""
+echo ""
 
 
 # =====================================
