@@ -7,6 +7,7 @@
 # WordPress directory
 /www/wp
 /www/local-config.php
+/www/wp-cli.yml
 
 # wp-content directory
 /www/wp-content/plugins
