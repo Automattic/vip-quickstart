@@ -28,9 +28,10 @@ define( 'DB_COLLATE', '' );
 
 $table_prefix  = 'wptests_';   // Only numbers, letters, and underscores please!
 
-define( 'WP_TESTS_DOMAIN', 'vip.dev' );
-define( 'WP_TESTS_EMAIL', 'admin@vip.dev' );
+define( 'WP_TESTS_DOMAIN', 'viptests.dev' );
+define( 'WP_TESTS_EMAIL', 'admin@viptests.dev' );
 define( 'WP_TESTS_TITLE', 'Fake Blog' );
+define( 'WP_CACHE_KEY_SALT', 'viptest' );
 
 define( 'WP_PHP_BINARY', 'php' );
 
