@@ -109,6 +109,11 @@ line { "path:/srv/www/wp":
 }
 
 # Add default domain to local WP-CLI config
+if ( $quickstart_domain ) {
+	line { "url:$quickstart_domain":
+		line => "url:$quickstart_domain",
+		file => '/srv/www/wp-cli.yml',
+	}
 }
 
 exec { 'generate salts':
