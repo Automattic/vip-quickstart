@@ -1,5 +1,5 @@
 # ClamAV
-# package { 'clamav': ensure => present }
+package { 'clamav': ensure => present }
 
 # exec { 'update clamav db':
 #   command => 'sudo freshclam',
