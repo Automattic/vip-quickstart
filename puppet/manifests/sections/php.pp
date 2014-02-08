@@ -16,12 +16,10 @@ apt::source { 'php54':
 
 class {
 	'php::cli':
-		provider => 'apt',
 		ensure => $php_version,
 		require => Apt::Source['php54'];
 	'php::composer':;
 	'php::dev':
-		provider => 'apt',
 		ensure => $php_version,
 		require => Apt::Source['php54'];
 	'php::fpm':;
@@ -30,22 +28,14 @@ class {
 
 	# Extensions
 	'php::extension::apc':
-		ensure => absent,
-		provider => 'apt';
-	'php::extension::curl':
-		provider => 'apt';
-	'php::extension::gd':
-		provider => 'apt';
-	'php::extension::imagick':
-		provider => 'apt';
-	'php::extension::mcrypt':
-		provider => 'apt';
-	'php::extension::memcache':
-		provider => 'apt';
-	'php::extension::mysql':
-		provider => 'apt';
-	'php::extension::xdebug':
-		provider => 'apt';
+		ensure => absent;
+	'php::extension::curl':;
+	'php::extension::gd':;
+	'php::extension::imagick':;
+	'php::extension::mcrypt':;
+	'php::extension::memcache':;
+	'php::extension::mysql':;
+	'php::extension::xdebug':;
 }
 
 php::fpm::conf { 'www': user => 'vagrant' }
