@@ -1,9 +1,8 @@
-define line($file, $line, $onlyif = 'true', $ensure = 'present') {
+define line($file, $line, $ensure = 'present') {
     case $ensure {
         default : { err ( "unknown ensure value ${ensure}" ) }
         present: {
             exec { "/bin/echo '${line}' >> '${file}'":
-                onlyif => $onlyif,
                 unless => "/bin/grep -qFx '${line}' '${file}'"
             }
         }
