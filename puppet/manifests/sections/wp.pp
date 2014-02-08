@@ -1,4 +1,20 @@
-$plugins = ['developer', 'jetpack', 'mrss']
+$plugins = [
+	'debug-bar',
+	'debug-bar-console',
+	'debug-bar-cron',
+	'debug-bar-extender',
+	'log-deprecated-notices',
+	'log-viewer',
+	'monster-widget',
+	'user-switching',
+	'vip-scanner',
+
+	# WordPress.com
+	'jetpack',
+	'mrss',
+	'polldaddy',
+	'rewrite-rules-inspector',
+]
 
 # Install WordPress
 exec {"wp install /srv/www/wp":
@@ -30,13 +46,6 @@ exec { '/usr/bin/wp theme install twentyfourteen':
 		Exec['wp install /srv/www/wp'],
 		File['/srv/www/wp-content/themes'],
 	]
-}
-
-# Install VIP recommended developer plugins
-wp::command { 'developer install-plugins':
-	command  => 'developer install-plugins --type=wpcom-vip --activate',
-	location => '/srv/www/wp',
-	require  => Wp::Plugin['developer']
 }
 
 # Update all the plugins
