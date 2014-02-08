@@ -3,6 +3,7 @@ $plugins = [
 	'debug-bar-console',
 	'debug-bar-cron',
 	'debug-bar-extender',
+	'debug-bar-slow-actions',
 	'log-deprecated-notices',
 	'log-viewer',
 	'monster-widget',
@@ -108,10 +109,6 @@ line { "path:/srv/www/wp":
 }
 
 # Add default domain to local WP-CLI config
-line { "url:$quickstart_domain":
-	line => "url:$quickstart_domain",
-	file => '/srv/www/wp-cli.yml',
-	onlyif => "test -n '$quickstart_domain'",
 }
 
 exec { 'generate salts':
