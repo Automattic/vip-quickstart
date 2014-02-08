@@ -93,18 +93,21 @@ for i in {1..3}; do
 
     echo -n "Enter your WordPress.com username: "
     read username
-    echo -n "Enter your WordPress.com password: "
-    read -s password
-    response=$(curl -u $username:$password --write-out %{http_code} --silent --output /dev/null -I https://vip-svn.wordpress.com/plugins/)
 
-    if [[ 401 -eq $response ]]; then
-        echo "Login failed. Try again."
-    else
-        break
+    if [[ -n $username ]]; then
+        echo -n "Enter your WordPress.com password: "
+        read -s password
+        response=$(curl -u $username:$password --write-out %{http_code} --silent --output /dev/null -I https://vip-svn.wordpress.com/plugins/)
+
+        if [[ 200 -ne $response ]]; then
+            echo "Login failed. Try again."
+        else
+            break
+        fi
     fi
 done
 
-if [[ 401 -eq $response ]]; then
+if [[ 200 -ne $response ]]; then
     echo ""
     echo "Login Failed. Max Attempts."
     echo "---------------------------"
