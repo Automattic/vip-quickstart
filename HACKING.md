@@ -2,6 +2,10 @@
 
 Here's an introduction to developing VIP Quickstart. If you have any additional questions, feel free to open an issue so we can write the proper documentation.
 
+## Testing
+
+At this point we only only test that the syntax is correct with puppet-lint.
+
 ## Structure
 
 * bin - Scripts
