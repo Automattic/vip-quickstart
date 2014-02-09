@@ -25,7 +25,15 @@ http {
   keepalive_timeout    <%= scope.lookupvar('nginx::keepalive_timeout')%>;
   types_hash_max_size  <%= scope.lookupvar('nginx::types_hash_max_size') %>;
 
-  gzip         <%= scope.lookupvar('nginx::real_gzip')%>;
+  gzip              <%= scope.lookupvar('nginx::real_gzip')%>;
+  gzip_comp_level   2;
+  gzip_http_version 1.0;
+  gzip_proxied      any;
+  gzip_min_length   1100;
+  gzip_buffers      16 8k;
+  gzip_types text/plain text/html text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+  # Disable for IE < 6 because there are known problems
   gzip_disable "MSIE [1-6]\.(?!.*SV1)";
 
   include <%= scope.lookupvar('nginx::vdir')%>/*.conf;
