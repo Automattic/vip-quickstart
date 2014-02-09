@@ -5,12 +5,12 @@ if 'virtualbox' != $virtual {
     # UFW
     include ufw
     ufw::limit { 22: }
-    ufw::allow { "allow-all-http":
+    ufw::allow { 'allow-all-http':
         port => 80,
-        ip => 'any',
+        ip   => 'any',
     }
-    ufw::allow { "allow-dns-over-udp":
-        port => 53,
-        proto => "udp",
+    ufw::allow { 'allow-dns-over-udp':
+        port  => 53,
+        proto => 'udp',
     }
 }
