@@ -21,9 +21,17 @@ VIP Quickstart is a local development environment for WordPress.com VIP develope
 
 ## Requirements
 
+### Local
+
 * [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 * [Vagrant](http://downloads.vagrantup.com/)
 * [Git](http://git-scm.com/downloads)
+
+### Server
+
+* Ubuntu 12.04
+* Git
+* Puppet
 
 ## Getting Started
 
@@ -52,6 +60,17 @@ Note: When you run the Git installer, make sure to install Git to your system PA
 3.  Go to http://vip.dev in your browser
 
 If you receive a File cannot be loaded because the execution of scripts is disabled on this system error. Make sure you're using a PowerShell interface. Use tools -> options to manage your default shell. (Right click on the repository and choose "Open a shell here")
+
+### Server
+
+1. Add user with SSH key
+2. Install Puppet and Git
+3. Clone Quickstart into `/srv`
+4. /srv/bin/vip-init --server [--domain=<domain>]
+
+Since we turn off root logins and password logins via SSH, you'll need to create another use and add an SSH key so you don't get locked out of your server. `ssh-copy-id` is useful for copying ssh keys on Linux. There are similar tools for other platforms.
+
+This has been tested with Ubuntu 12.04.
 
 ## Usernames and Passwords
 
