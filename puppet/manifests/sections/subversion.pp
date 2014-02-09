@@ -1,5 +1,5 @@
 stage { 'svnupgrade': before => Stage['main'] }
-class { 'svnupgrade': stage => svn-upgrade }
+class { 'svnupgrade': stage => svnupgrade }
 
 # svnupgrade
 class svnupgrade {
