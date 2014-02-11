@@ -19,7 +19,7 @@ $github_plugins = {
     'vip-scanner' => 'https://github.com/Automattic/vip-scanner',
 
     # WordPress.com
-    'jetpack' => 'https://github.com/Automattic/jetpack', 
+    'jetpack' => 'https://github.com/Automattic/jetpack',
 }
 
 # Install WordPress
@@ -36,7 +36,9 @@ exec { 'wp install /srv/www/wp':
 
 # Install GitHub Plugins
 $github_plugin_keys = keys( $github_plugins )
-gitplugin { $github_plugin_keys : }
+gitplugin { $github_plugin_keys:
+    git_urls => $github_plugins
+}
 
 # Install plugins
 wp::plugin { $plugins:
