@@ -1,7 +1,7 @@
-define gitplugin {
+define gitplugin ( $slug = $title, $git_urls ) {
     vcsrepo { "/srv/www/wp-content/plugins/${title}" :
         ensure   => 'present',
-        source   => $github_plugins[$title],
+        source   => $git_urls[$title],
         provider => git,
         require => [
             Exec['wp install /srv/www/wp'],
