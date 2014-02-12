@@ -8,14 +8,19 @@ $plugins = [
   'log-viewer',
   'monster-widget',
   'user-switching',
-  'vip-scanner',
 
   # WordPress.com
-  'jetpack',
   'mrss',
   'polldaddy',
   'rewrite-rules-inspector',
 ]
+
+$github_plugins = {
+    'vip-scanner' => 'https://github.com/Automattic/vip-scanner',
+
+    # WordPress.com
+    'jetpack' => 'https://github.com/Automattic/jetpack',
+}
 
 # Install WordPress
 exec { 'wp install /srv/www/wp':
@@ -29,6 +34,12 @@ exec { 'wp install /srv/www/wp':
   ]
 }
 
+# Install GitHub Plugins
+$github_plugin_keys = keys( $github_plugins )
+gitplugin { $github_plugin_keys:
+    git_urls => $github_plugins
+}
+
 # Install plugins
 wp::plugin { $plugins:
   location    => '/srv/www/wp',
@@ -36,6 +47,7 @@ wp::plugin { $plugins:
   require     => [
     Exec['wp install /srv/www/wp'],
     File['/srv/www/wp-content/plugins'],
+    Gitplugin[ $github_plugin_keys ],
   ]
 }
 
