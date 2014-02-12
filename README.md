@@ -135,3 +135,10 @@ Thanks to the following projects that VIP Quickstart is built on:
 * [puppet-php](https://github.com/jippi/puppet-php)
 * [puppi](https://github.com/example42/puppi)
 * [puppet-wp](https://github.com/rmccue/puppet-wp)
+
+If you're not developing for WordPress.com VIP, you might want to check out these other Vagrant/WordPress projects
+
+* [VVV](https://github.com/Varying-Vagrant-Vagrants/VVV)
+* [Salty WordPress](https://github.com/humanmade/Salty-WordPress)
+* [Vagrant Genesis](https://github.com/genesis/wordpress/)
+* [VagrantPress](https://github.com/chad-thompson/vagrantpress)
