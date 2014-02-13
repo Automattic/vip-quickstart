@@ -1,5 +1,5 @@
-# Use PHP 5.4.24 like WordPress.com
-$php_version = '5.4.24-1+sury.org~precise+1'
+# Use PHP 5.4.24 like WordPress.com (except that 5.4.25 is what's available on oldstable)
+$php_version = '5.4.25-1+sury.org~precise+2'
 
 include php
 include apt
