@@ -20,7 +20,8 @@ $github_plugins = {
     'vip-scanner' => 'https://github.com/Automattic/vip-scanner',
 
     # WordPress.com
-    'jetpack' => 'https://github.com/Automattic/jetpack',
+    'jetpack'        => 'https://github.com/Automattic/jetpack',
+    'media-explorer' => 'https://github.com/Automattic/media-explorer',
 }
 
 # Install WordPress
