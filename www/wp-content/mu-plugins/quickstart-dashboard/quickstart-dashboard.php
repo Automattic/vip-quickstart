@@ -35,6 +35,7 @@ class Quickstart_Dashboard {
 	}
 
 	function admin_init() {
+		$this->load_plugins();
 	}
 
 	static function get_instance() {
