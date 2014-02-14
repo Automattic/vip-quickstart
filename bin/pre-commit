@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Script Name: Pre-commit checks
 # Description: Some useful checks to run a brand new theme throw to catch errors before committing
 
@@ -9,15 +8,33 @@ if [ -z $1 ]; then
 fi
 
 THEME_PATH=$1
+FIX=false
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "=== Checking for syntax errors ==="
-find $THEME_PATH -name "*.php" -exec php -l {} \;
+find $THEME_PATH -name "*.php" -exec php -l {} 2>&1 1> /dev/null \;
 echo ""
 
-echo "=== Checking for executable files ==="
-find $THEME_PATH -executable -type f -not -iwholename *svn* 
-#echo "=== Fixing executable permissions ==="
-#find $THEME_PATH -executable -type f -not -iwholename *svn* -exec svn propdel svn:executable {} \;
+if $FIX; then
+	echo "=== Fixing executable permissions ==="
+	find $THEME_PATH -executable -type f -not -iwholename *svn* -exec svn propdel svn:executable {} \;
+else
+	echo "=== Checking for executable files ==="
+	find $THEME_PATH -executable -type f -not -iwholename *svn* -exec echo "Found executable file: " {} \; 
+fi
+echo ""
+
+echo "=== Checking whitespace errors ==="
+find $THEME_PATH -name "*.php" -exec php $DIR/whitespace-check.php {} \;
+echo ""
+
+if $FIX; then
+	echo "=== Fixing line endings ==="
+	find $THEME_PATH -type f | xargs perl -pi -e 's/\r\n/\n/g'
+else
+	echo "=== Checking line endings ==="
+	grep -Ir $'\r' $THEME_PATH/*
+fi
 echo ""
 
 echo "-- That's all folks --"
