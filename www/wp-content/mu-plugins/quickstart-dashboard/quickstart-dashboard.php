@@ -47,6 +47,10 @@ class Quickstart_Dashboard {
 		return self::$instance;
 	}
 
+	function get_plugins() {
+		return $this->plugins;
+	}
+
 	/**
 	 * Loads all of the plugins in the plugins directory.
 	 *
