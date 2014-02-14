@@ -10,6 +10,7 @@ $plugins = [
   'user-switching',
 
   # WordPress.com
+  'keyring',
   'mrss',
   'polldaddy',
   'rewrite-rules-inspector',
