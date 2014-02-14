@@ -53,22 +53,22 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 		WP_CLI::line( 'Scan complete' );
 	}
 
-    /**
-     * Adds a repository to the Repo Monitor.
-     *
-     * ## OPTIONS
-     *
-     * <path>
-     * : The path to the repository to add
+	/**
+	 * Adds a repository to the Repo Monitor.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <path>
+	 * : The path to the repository to add
 	 * <name>
 	 * : The friendly name of the repository
-     *
-     * ## EXAMPLES
-     *
-     *     wp dashboard add_repo --name=Quickstart /srv
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp dashboard add_repo --name=Quickstart /srv
 	 *     wp dashboard add_repo --svn --name=WordPress /srv/www/wp
-     *
-     * @synopsis <path> [--warn] [--svn] [--name=<name>]
+	 *
+	 * @synopsis <path> [--warn] [--svn] [--name=<name>]
 	 */
 	function add_repo( $args, $assoc_args ) {
 		$type = 'git';
