@@ -52,10 +52,7 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
                 // Get the text to show the user
                 $text = $repo_monitor->get_status_text( $results );
 
-                if ( false === $results['diverged'] && false === $results['behind'] ) {
-                    // No action required, say nothing
-                    WP_CLI::success( $text );
-                } else {
+                if ( false !== $results['diverged'] || false !== $results['behind'] ) { {
                     WP_CLI::warning( $text );
                 }
 			}
