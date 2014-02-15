@@ -42,11 +42,22 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 
 		foreach ( $repo_monitor->get_repos() as $repo ) {
 			// Run the command to determine if it needs an update
-			WP_CLI::log( " Scanning {$repo['repo_type']} repo {$repo['repo_friendly_name']}...\n" );
+			WP_CLI::line( "Scanning {$repo['repo_type']} repo {$repo['repo_friendly_name']}..." );
+            
 			if ( 'svn' == $repo['repo_type'] ) {
 				$results = $repo_monitor->scan_svn_repo( $repo['repo_path'] );
 			} elseif ( 'git' == $repo['repo_type'] ) {
 				$results = $repo_monitor->scan_git_repo( $repo['repo_path'] );
+ 
+                // Get the text to show the user
+                $text = $repo_monitor->get_status_text( $results );
+
+                if ( false === $results['diverged'] && false === $results['behind'] ) {
+                    // No action required, say nothing
+                    WP_CLI::success( $text );
+                } else {
+                    WP_CLI::warning( $text );
+                }
 			}
 		}
 
