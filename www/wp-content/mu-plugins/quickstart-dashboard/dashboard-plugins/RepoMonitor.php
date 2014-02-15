@@ -121,9 +121,51 @@ class RepoMonitor extends Dashboard_Plugin {
 				'num_commits' => $matches['numcommits'],
 			);
 		}
+        
+        //'(?<branch>[a-zA-Z\/]+)'(\s|\S)*diverged(\s|\S)*(?<firstcount>[0-9]+)(\s|\S)*(?<secondcount>[0-9]+)
 
+        // Check if branch diverged
+        if ( preg_match( "/'(?<branch>[a-zA-Z\/]+)'(\s|\S)*diverged(\s|\S)*(?<firstcount>[0-9]+)(\s|\S)*(?<secondcount>[0-9]+)/i", $status, $matches ) ) {
+			$status_var['diverged'] = array(
+				'branch'              => $matches['branch'],
+				'local_commit_count'  => $matches['firstcount'],
+                'remote_commit_count' => $matches['secondcount'],
+			);
+		}
+        
 		return $status_var;
 	}
+    
+    /**
+     * Formats a status array into a human-readable string
+     * 
+     * @param array $status A status array from parse_git_status_text().
+     * @return string The textual representation of the repo status
+     */
+    function get_status_text( $status ) {
+        $text = __( sprintf( 'Branch %s ', esc_attr( $status['on_branch'] ) ), 'quickstart-dashboard' );
+        
+        if ( $status['behind'] !== false ) {
+            $text .= __(
+                sprintf( 'behind remote branch %s by %s commits.',
+                    esc_attr( $status['behind']['branch'] ),
+                    number_format( $status['behind']['num_commits'] )
+                ),
+                'quickstart-dashboard'
+            );
+        } elseif ( $status['diverged'] !== false ) {
+            $text .= __(
+                sprintf( '%s commits ahead and %s commits behind remote branch %s.',
+                    number_format( $status['diverged']['local_commit_count'] ),
+                    number_format( $status['diverged']['remote_commit_count'] ),
+                    esc_attr( $status['diverged']['branch'] )
+                ),
+                'quickstart-dashboard'
+            );
+        }
+        
+        return $text;
+    }
 
 	function add_repo( $args ) {
 		$defaults = array(
