@@ -11,4 +11,8 @@ class News extends Dashboard_Plugin {
 	public function name() {
 		return __( 'News', 'quickstart-dashboard' );
 	}
+    
+    public function init() {
+        
+    }
 }
