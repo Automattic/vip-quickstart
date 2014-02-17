@@ -149,10 +149,24 @@ class RepoMonitor extends Dashboard_Plugin {
 		chdir( $repo_path );
 
 		// Start by updating remotes
-		exec( 'git remote update origin', $update_output );
+		exec( 'git remote update origin', $update_output, $return_value );
+        
+        if ( 0 != $return_value ) {
+            return new WP_Error( 
+                $return_value, 
+                sprintf( __( 'Error fetching remote "origin". git returned %s', 'quickstart-dashboard' ), $return_value )
+            );
+        }
 
 		// Now check the repo status
 		exec( 'git status -u no', $output, $return_value );
+        
+        if ( 0 != $return_value ) {
+            return new WP_Error( 
+                $return_value, 
+                sprintf( __( 'Error fetching git status. git returned %s', 'quickstart-dashboard' ), $return_value )
+            );
+        }
 
 		// Go back to the previous working directory
 		chdir( $cwd );
@@ -209,6 +223,10 @@ class RepoMonitor extends Dashboard_Plugin {
      * @return string The textual representation of the repo status
      */
     function get_status_text( $status, $repo_type = 'git' ) {
+        if ( is_wp_error( $status ) ) {
+            return $status->get_error_message();
+        }
+        
         switch ($repo_type) {
             case 'git':
                 $text = __( sprintf( 'Branch %s ', esc_attr( $status['on_branch'] ) ), 'quickstart-dashboard' );
