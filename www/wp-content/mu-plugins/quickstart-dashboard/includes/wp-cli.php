@@ -46,14 +46,16 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
             
 			if ( 'svn' == $repo['repo_type'] ) {
 				$results = $repo_monitor->scan_svn_repo( $repo['repo_path'] );
+                
+                if ( $results['local_revision'] != $results['remote_revision'] ) {
+                    WP_CLI::warning( $repo_monitor->get_status_text( $results, 'svn' ) );
+                }
 			} elseif ( 'git' == $repo['repo_type'] ) {
 				$results = $repo_monitor->scan_git_repo( $repo['repo_path'] );
- 
-                // Get the text to show the user
-                $text = $repo_monitor->get_status_text( $results );
 
-                if ( false !== $results['diverged'] || false !== $results['behind'] ) { {
-                    WP_CLI::warning( $text );
+
+                if ( false !== $results['diverged'] || false !== $results['behind'] ) {
+                    WP_CLI::warning( $repo_monitor->get_status_text( $results, 'git' ) );
                 }
 			}
 		}

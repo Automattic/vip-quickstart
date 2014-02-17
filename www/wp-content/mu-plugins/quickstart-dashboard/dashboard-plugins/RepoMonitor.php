@@ -61,17 +61,67 @@ class RepoMonitor extends Dashboard_Plugin {
 		$output = array();
 		$return_value = -1;
 
-		// Execute command
-		exec( 'svn status -u', $output, $return_value);
-
-		// Check return value
-		echo "	SVN command returned $return_value\n";
-
-		// Echo output
-		print_r( $output );
-
-		return array();
+        // Execute info command to get info about local repo
+        exec( 'svn info', $output, $return_value );
+        
+        $info = $this->parse_svn_info( $output );
+        
+		// Execute status command to get file into
+		exec( 'svn status -u', $output, $return_value );
+        
+        return array_merge( $this->parse_svn_status( $output ), $info );
 	}
+    
+    private function parse_svn_info( $output ) {
+        $status = array(
+            'local_revision' => -1,
+            'repo_url'       => '',
+        );
+        
+        foreach ( $output as $line ) {
+            if ( strpos( $line, 'URL:' ) === 0 ) {
+                $status['repo_url'] = trim( substr( $line, 4 ) );
+            } else if ( strpos( $line, 'Revision:' ) === 0 ) {
+                $status['local_revision'] = intval( trim( substr( $line, 9 ) ) );
+            }
+        }
+        
+        return $status;
+    }
+    
+    private function parse_svn_status( $output ) {
+        $status = array(
+            'files_out_of_date' => array(),
+            'locally_modified'  => array(),
+            'remote_revision'   => -1,
+        );
+        
+        foreach ( $output as $line ) {
+            // Parse line of output from svn status command
+            if ( !preg_match( '/(?<args>(\W|[ACDIMRX?!~CML+SX*]){9})\W*(?<filerev>\d*)\W*(?<filename>(\S)*)/', $line, $matches) ) {
+                // Check if this line shows the remote revision
+                if ( preg_match( '/revision:\W*(?<remote_revision>\d*)/', $line, $matches ) ) {
+                    $status['remote_revision'] = intval( $matches['remote_revision'] );
+                    
+                    // The remote revision line is the last line of meaningful output, exit the loop
+                    break;
+                }
+                continue;
+            }
+            
+            // Check for a locally modified file
+            if ( ( !ctype_space($matches['args'][0]) && 'X' != $matches['args'][0] ) || !ctype_space( $matches['args'][1] ) ) {
+                $status['locally_modified'][] = $matches['filename'];
+            }
+            
+            // Check the ninth column to see if the file is out of date WRT the server
+            if ( !ctype_space( $matches['args'][9] ) ) {
+                $status['files_out_of_date'][] = $matches['filename'];
+            }
+        }
+        
+        return $status;
+    }
 
 	function scan_git_repo( $repo_path ) {
 		$cwd = getcwd();
@@ -140,31 +190,67 @@ class RepoMonitor extends Dashboard_Plugin {
      * Formats a status array into a human-readable string
      * 
      * @param array $status A status array from parse_git_status_text().
+     * @param string $repo_type The type of repo that generate the status text
      * @return string The textual representation of the repo status
      */
-    function get_status_text( $status ) {
-        $text = __( sprintf( 'Branch %s ', esc_attr( $status['on_branch'] ) ), 'quickstart-dashboard' );
-        
-        if ( $status['behind'] !== false ) {
-            $text .= __(
-                sprintf( 'behind remote branch %s by %s commits.',
-                    esc_attr( $status['behind']['branch'] ),
-                    number_format( $status['behind']['num_commits'] )
-                ),
-                'quickstart-dashboard'
-            );
-        } elseif ( $status['diverged'] !== false ) {
-            $text .= __(
-                sprintf( '%s commits ahead and %s commits behind remote branch %s.',
-                    number_format( $status['diverged']['local_commit_count'] ),
-                    number_format( $status['diverged']['remote_commit_count'] ),
-                    esc_attr( $status['diverged']['branch'] )
-                ),
-                'quickstart-dashboard'
-            );
+    function get_status_text( $status, $repo_type = 'git' ) {
+        switch ($repo_type) {
+            case 'git':
+                $text = __( sprintf( 'Branch %s ', esc_attr( $status['on_branch'] ) ), 'quickstart-dashboard' );
+
+                if ( $status['behind'] !== false ) {
+                    $text .= __(
+                        sprintf( 'behind remote branch %s by %s commits.',
+                            esc_attr( $status['behind']['branch'] ),
+                            number_format( $status['behind']['num_commits'] )
+                        ),
+                        'quickstart-dashboard'
+                    );
+                } elseif ( $status['diverged'] !== false ) {
+                    $text .= __(
+                        sprintf( '%s commits ahead and %s commits behind remote branch %s.',
+                            number_format( $status['diverged']['local_commit_count'] ),
+                            number_format( $status['diverged']['remote_commit_count'] ),
+                            esc_attr( $status['diverged']['branch'] )
+                        ),
+                        'quickstart-dashboard'
+                    );
+                }
+
+                return $text;
+                
+            case 'svn':
+                $text = '';
+
+                // Base status text
+                if ( $status['local_revision'] == $status['remote_revision'] ) {
+                    // Revisions are the same
+                    $text .= __( 'Working copy up to date', 'quickstart-dashboard' );
+                } else {
+                    $text .= __( 'Working copy needs update', 'quickstart-dashboard' );
+                }
+
+                // Local file modifications
+                if ( empty( $status['locally_modified'] ) ) {
+                    // No locally modified files
+                    $text .= __( ' with no local changes', 'quickstart-dashboard' );
+                } else {
+                    $text .= sprintf( 
+                        __( ' with %s local changes', 'quickstart-dashboard' ), 
+                        number_format( count( $status['locally_modified'] ) ) 
+                    );
+                }
+
+                // Files needing updates
+                if ( !empty( $status['files_out_of_date'] ) ) {
+                    $text .= sprintf( 
+                        __( ' and %s remote changes', 'quickstart-dashboard' ), 
+                        number_format( count( $status['files_out_of_date'] ) ) 
+                    );
+                }
+
+                return $text;
         }
-        
-        return $text;
     }
 
 	function add_repo( $args ) {
