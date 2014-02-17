@@ -128,13 +128,14 @@ class RepoMonitor extends Dashboard_Plugin {
 
 		// Variables to load output into
 		$output = array();
+        $update_output = array();
 		$return_value = -1;
 
 		// Go to repository directory
 		chdir( $repo_path );
 
 		// Start by updating remotes
-		exec( 'git remote update origin' );
+		exec( 'git remote update origin', $update_output );
 
 		// Now check the repo status
 		exec( 'git status -u no', $output, $return_value );
