@@ -13,8 +13,12 @@ class RepoMonitor extends Dashboard_Plugin {
 	}
 
 	function name() {
-		return 'Repo Monitor';
+		return __( 'Repo Monitor', 'quickstart-dashboard' );
 	}
+    
+    function init() {
+        
+    }
 
 	function scan_repositories() {
 		foreach ( $this->get_repos() as $repo ) {

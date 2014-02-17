@@ -28,6 +28,7 @@ class Quickstart_Dashboard {
 	function __construct() {
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
+        add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		do_action( 'quickstart_dashboard_loaded' );
 	}
 
@@ -36,7 +37,36 @@ class Quickstart_Dashboard {
 
 	function admin_init() {
 		$this->load_plugins();
+        $this->init_plugins();
 	}
+    
+    function admin_menu() {
+        $page = add_menu_page( __( 'VIP Dashboard', 'quickstart-dashboard' ), __( 'VIP', 'quickstart-dashboard' ), 'manage_options', 'vip-dashboard', array( $this, 'vip_admin_page' ), 'dashicons-cloud', 3 );
+        
+        do_action( 'quickstart_dashboard_admin_menu', $page );
+    }
+    
+    function vip_admin_page() {
+        // Include the WP Dashboard API
+        require_once( ABSPATH . 'wp-admin/includes/dashboard.php' );
+        
+        do_action( 'quickstart_dashboard_setup' );
+        
+        settings_errors();
+        
+        ?>
+        <div class="wrap">
+            <div id="icon-vip" class="icon32"><br /></div>
+            <h2><?php _e( 'VIP Quickstart Dashboard', 'quickstart-dashboard' ); ?></h2>
+            <div id="dashboard-widgets-wrap">
+                <?php wp_dashboard(); // Main call that displays the widgets ?>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <?php
+        
+        do_action( 'quickstart_admin_page' );
+    }
 
 	static function get_instance() {
 		if ( ! isset( self::$instance ) ) {
@@ -67,6 +97,12 @@ class Quickstart_Dashboard {
 
 		return $this->plugins;
 	}
+    
+    function init_plugins() {
+        foreach ( $this->plugins as $plugin ) {
+			$plugin->init();
+		}
+    }
 
 	/**
 	 * Scans the plugin directory for quickstart dashboard plugins.
@@ -112,3 +148,6 @@ class Quickstart_Dashboard {
 		return class_exists( $plugin ) && is_subclass_of( $plugin, 'Dashboard_Plugin' ) ;
 	}
 }
+
+// Bootsrap the dashboard
+Quickstart_Dashboard::get_instance();
