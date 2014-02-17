@@ -29,6 +29,13 @@ class Quickstart_Dashboard {
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+        
+        if ( is_admin() ) {
+            // Need to load plugins here instead of admin_init so they have a chance to register submenu pages
+            $this->load_plugins();
+            $this->init_plugins();
+        }
+        
 		do_action( 'quickstart_dashboard_loaded' );
 	}
 
@@ -36,14 +43,12 @@ class Quickstart_Dashboard {
 	}
 
 	function admin_init() {
-		$this->load_plugins();
-        $this->init_plugins();
 	}
     
     function admin_menu() {
-        $page = add_menu_page( __( 'VIP Dashboard', 'quickstart-dashboard' ), __( 'VIP', 'quickstart-dashboard' ), 'manage_options', 'vip-dashboard', array( $this, 'vip_admin_page' ), 'dashicons-cloud', 3 );
+        add_menu_page( __( 'VIP Dashboard', 'quickstart-dashboard' ), __( 'VIP', 'quickstart-dashboard' ), 'manage_options', 'vip-dashboard', array( $this, 'vip_admin_page' ), 'dashicons-cloud', 3 );
         
-        do_action( 'quickstart_dashboard_admin_menu', $page );
+        do_action( 'quickstart_dashboard_admin_menu' );
     }
     
     function vip_admin_page() {
