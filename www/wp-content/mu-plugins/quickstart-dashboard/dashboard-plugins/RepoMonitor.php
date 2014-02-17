@@ -62,12 +62,26 @@ class RepoMonitor extends Dashboard_Plugin {
 		$return_value = -1;
 
         // Execute info command to get info about local repo
-        exec( 'svn info', $output, $return_value );
+        exec( 'svn info --non-interactive', $output, $return_value );
+        
+        if ( 0 != $return_value ) {
+            return new WP_Error( 
+                $return_value, 
+                sprintf( __( 'Error fetching svn info. SVN returned %s', 'quickstart-dashboard' ), $return_value )
+            );
+        }
         
         $info = $this->parse_svn_info( $output );
         
 		// Execute status command to get file into
-		exec( 'svn status -u', $output, $return_value );
+		exec( 'svn status -u --non-interactive', $output, $return_value );
+        
+        if ( 0 != $return_value ) {
+            return new WP_Error( 
+                $return_value, 
+                sprintf( __( 'Error fetching svn status. SVN returned %s', 'quickstart-dashboard' ), $return_value )
+            );
+        }
         
         return array_merge( $this->parse_svn_status( $output ), $info );
 	}
