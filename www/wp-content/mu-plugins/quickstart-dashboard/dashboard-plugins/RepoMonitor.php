@@ -39,6 +39,27 @@ class RepoMonitor extends Dashboard_Plugin {
 		return $this->repos;
 	}
 
+	/**
+	 * Gets the saved status for the given repo.
+	 *
+	 * @param int $repo_id The repo to get the status of
+	 * @return array The repo status
+	 */
+	function get_repo_status( $repo_id ) {
+		return (array) get_post_meta( $repo_id, 'qs_dashboard_repo_status', true );
+	}
+
+	/**
+	 * Saves the status for the given repo.
+	 *
+	 * @param int $repo_id The id of the repo
+	 * @param array $status The status object from a scan
+	 * @return bool True on success or false on failure
+	 */
+	function set_repo_status( $repo_id, $status ) {
+		return update_post_meta( $repo_id, 'qs_dashboard_repo_status', (array) $status );
+	}
+
 	private function load_repos() {
 		$args = array(
 			'orderby' => 'ID',
