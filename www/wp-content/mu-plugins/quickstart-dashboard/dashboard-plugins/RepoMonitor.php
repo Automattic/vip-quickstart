@@ -311,7 +311,9 @@ class RepoMonitor extends Dashboard_Plugin {
                         ),
                         'quickstart-dashboard'
                     );
-                }
+                } else {
+					$text .= __( 'up to date.', 'quickstart-dashboard' );
+				}
 
                 return $text;
 
