@@ -166,6 +166,27 @@ class RepoMonitor extends Dashboard_Plugin {
         return $status;
     }
 
+	/**
+	 * Returns whether or not the repo is considered in need of updating from the
+	 * result of a scan.
+	 *
+	 * @param array $status The status object from a scan.
+	 * @return bool Whether the repo is out of date
+	 */
+	function repo_out_of_date( $status, $repo_type = 'git' ) {
+		if ( empty( $status ) ) {
+			return false;
+		}
+		
+		if ( 'git' === $repo_type ) {
+			return !empty( $status['behind'] ) || !empty( $status['diverged'] );
+		} elseif ( 'svn' === $repo_type ) {
+			return !empty( $status['files_out_of_date'] ) || $status['remote_revision'] != $status['local_revision'];
+		}
+
+		return false;
+	}
+
 	function scan_git_repo( $repo_path ) {
 		$cwd = getcwd();
 
