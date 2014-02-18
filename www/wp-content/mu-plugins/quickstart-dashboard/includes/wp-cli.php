@@ -80,10 +80,10 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp dashboard add_repo --name=Quickstart /srv
-	 *     wp dashboard add_repo --svn --name=WordPress /srv/www/wp
+	 *     wp dashboard add_repo Quickstart /srv
+	 *     wp dashboard add_repo --svn WordPress /srv/www/wp
 	 *
-	 * @synopsis <path> [--warn] [--svn] [--name=<name>]
+	 * @synopsis <name> <path> [--warn] [--svn]
 	 */
 	function add_repo( $args, $assoc_args ) {
 		$type = 'git';
@@ -91,8 +91,8 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 			$type = 'svn';
 		}
 
-		WP_CLI::line( "Adding $type repository {$assoc_args['name']}..." );
-		WP_CLI::line( "Repo path: {$args[0]}" );
+		WP_CLI::line( "Adding $type repository {$args[0]}..." );
+		WP_CLI::line( "Repo path: {$args[1]}" );
 
 		$repo_monitor = $this->load_repo_monitor();
 		
@@ -102,13 +102,12 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 
 		$result = $repo_monitor->add_repo( array(
 			'repo_type'			 => $type,
-			'repo_path'			 => $args[0],
-			'repo_friendly_name' => $assoc_args['name'],
+			'repo_path'			 => $args[1],
+			'repo_friendly_name' => $args[0],
 			'warn_out_of_date'   => ! $assoc_args['warn'],
 		) );
 
 		if ( is_wp_error( $result ) ) {
-			WP_CLI::error( "error: ");
 			WP_CLI::error( $result->get_error_message() );
 			return;
 		}
