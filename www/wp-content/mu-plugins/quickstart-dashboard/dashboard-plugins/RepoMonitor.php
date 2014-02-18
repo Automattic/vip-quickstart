@@ -86,16 +86,19 @@ class RepoMonitor extends Dashboard_Plugin {
                 sprintf( __( 'Error fetching svn status. SVN returned %s', 'quickstart-dashboard' ), $return_value )
             );
         }
-        
-        return array_merge( $this->parse_svn_status( $output ), $info );
+
+		$status = $status;
+		$status['scan_time'] = time();
+
+        return $status;
 	}
-    
+
     private function parse_svn_info( $output ) {
         $status = array(
             'local_revision' => -1,
             'repo_url'       => '',
         );
-        
+
         foreach ( $output as $line ) {
             if ( strpos( $line, 'URL:' ) === 0 ) {
                 $status['repo_url'] = trim( substr( $line, 4 ) );
@@ -103,41 +106,41 @@ class RepoMonitor extends Dashboard_Plugin {
                 $status['local_revision'] = intval( trim( substr( $line, 9 ) ) );
             }
         }
-        
+
         return $status;
     }
-    
+
     private function parse_svn_status( $output ) {
         $status = array(
             'files_out_of_date' => array(),
             'locally_modified'  => array(),
             'remote_revision'   => -1,
         );
-        
+
         foreach ( $output as $line ) {
             // Parse line of output from svn status command
             if ( !preg_match( '/(?<args>(\W|[ACDIMRX?!~CML+SX*]){9})\W*(?<filerev>\d*)\W*(?<filename>(\S)*)/', $line, $matches) ) {
                 // Check if this line shows the remote revision
                 if ( preg_match( '/revision:\W*(?<remote_revision>\d*)/', $line, $matches ) ) {
                     $status['remote_revision'] = intval( $matches['remote_revision'] );
-                    
+
                     // The remote revision line is the last line of meaningful output, exit the loop
                     break;
                 }
                 continue;
             }
-            
+
             // Check for a locally modified file
             if ( ( !ctype_space($matches['args'][0]) && 'X' != $matches['args'][0] ) || !ctype_space( $matches['args'][1] ) ) {
                 $status['locally_modified'][] = $matches['filename'];
             }
-            
+
             // Check the ninth column to see if the file is out of date WRT the server
             if ( !ctype_space( $matches['args'][9] ) ) {
                 $status['files_out_of_date'][] = $matches['filename'];
             }
         }
-        
+
         return $status;
     }
 
@@ -154,20 +157,20 @@ class RepoMonitor extends Dashboard_Plugin {
 
 		// Start by updating remotes
 		exec( 'git remote update origin', $update_output, $return_value );
-        
+
         if ( 0 != $return_value ) {
-            return new WP_Error( 
-                $return_value, 
+            return new WP_Error(
+                $return_value,
                 sprintf( __( 'Error fetching remote "origin". git returned %s', 'quickstart-dashboard' ), $return_value )
             );
         }
 
 		// Now check the repo status
 		exec( 'git status -u no', $output, $return_value );
-        
+
         if ( 0 != $return_value ) {
-            return new WP_Error( 
-                $return_value, 
+            return new WP_Error(
+                $return_value,
                 sprintf( __( 'Error fetching git status. git returned %s', 'quickstart-dashboard' ), $return_value )
             );
         }
@@ -187,7 +190,10 @@ class RepoMonitor extends Dashboard_Plugin {
 			$status .= trim( $line, '# ' ) . "\n";
 		}
 
-		return $this->parse_git_status_text( $status );
+		$status = $this->parse_git_status_text( $status );
+		$status['scan_time'] = time();
+
+		return $status;
 	}
 
 	private function parse_git_status_text( $status ) {
@@ -204,7 +210,7 @@ class RepoMonitor extends Dashboard_Plugin {
 				'num_commits' => $matches['numcommits'],
 			);
 		}
-        
+
         //'(?<branch>[a-zA-Z\/]+)'(\s|\S)*diverged(\s|\S)*(?<firstcount>[0-9]+)(\s|\S)*(?<secondcount>[0-9]+)
 
         // Check if branch diverged
@@ -215,13 +221,13 @@ class RepoMonitor extends Dashboard_Plugin {
                 'remote_commit_count' => $matches['secondcount'],
 			);
 		}
-        
+
 		return $status_var;
 	}
-    
+
     /**
      * Formats a status array into a human-readable string
-     * 
+     *
      * @param array $status A status array from parse_git_status_text().
      * @param string $repo_type The type of repo that generate the status text
      * @return string The textual representation of the repo status
@@ -230,7 +236,7 @@ class RepoMonitor extends Dashboard_Plugin {
         if ( is_wp_error( $status ) ) {
             return $status->get_error_message();
         }
-        
+
         switch ($repo_type) {
             case 'git':
                 $text = __( sprintf( 'Branch %s ', esc_attr( $status['on_branch'] ) ), 'quickstart-dashboard' );
@@ -255,7 +261,7 @@ class RepoMonitor extends Dashboard_Plugin {
                 }
 
                 return $text;
-                
+
             case 'svn':
                 $text = '';
 
@@ -272,17 +278,17 @@ class RepoMonitor extends Dashboard_Plugin {
                     // No locally modified files
                     $text .= __( ' with no local changes', 'quickstart-dashboard' );
                 } else {
-                    $text .= sprintf( 
-                        __( ' with %s local changes', 'quickstart-dashboard' ), 
-                        number_format( count( $status['locally_modified'] ) ) 
+                    $text .= sprintf(
+                        __( ' with %s local changes', 'quickstart-dashboard' ),
+                        number_format( count( $status['locally_modified'] ) )
                     );
                 }
 
                 // Files needing updates
                 if ( !empty( $status['files_out_of_date'] ) ) {
-                    $text .= sprintf( 
-                        __( ' and %s remote changes', 'quickstart-dashboard' ), 
-                        number_format( count( $status['files_out_of_date'] ) ) 
+                    $text .= sprintf(
+                        __( ' and %s remote changes', 'quickstart-dashboard' ),
+                        number_format( count( $status['files_out_of_date'] ) )
                     );
                 }
 
