@@ -52,6 +52,7 @@ class RepoMonitor extends Dashboard_Plugin {
 		$this->repos = array();
 		foreach ( $repo_query as $repo ) {
 			$this->repos[] = array(
+				'repo_id'	=> $repo->ID,
 				'repo_path' => get_post_meta( $repo->ID, 'qs_repo_path', true ),
 				'repo_type' => get_post_meta( $repo->ID, 'qs_repo_type', true ),
 				'repo_friendly_name' => $repo->post_title,
