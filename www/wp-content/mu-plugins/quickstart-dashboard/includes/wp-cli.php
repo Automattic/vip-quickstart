@@ -46,21 +46,17 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
             
 			if ( 'svn' == $repo['repo_type'] ) {
 				$results = $repo_monitor->scan_svn_repo( $repo['repo_path'] );
-                
-                $text = $repo_monitor->get_status_text( $results, 'svn' );
-                
-                if ( is_wp_error( $results) ) {
-                    WP_CLI::error( $text );
-                } elseif ( $results['local_revision'] != $results['remote_revision'] ) {
-                    WP_CLI::warning( $text );
-                }
 			} elseif ( 'git' == $repo['repo_type'] ) {
 				$results = $repo_monitor->scan_git_repo( $repo['repo_path'] );
+			}
 
+			// Output the repo status if out of date or error occured
+			$text = $repo_monitor->get_status_text( $results, $repo['repo_type'] );
 
-                if ( false !== $results['diverged'] || false !== $results['behind'] ) {
-                    WP_CLI::warning( $repo_monitor->get_status_text( $results, 'git' ) );
-                }
+			if ( is_wp_error( $results) ) {
+				WP_CLI::error( $text );
+			} elseif ( $repo_monitor->repo_out_of_date( $results, $repo['repo_type'] ) ) {
+				WP_CLI::warning( $text );
 			}
 
 			// Save the new repo status
