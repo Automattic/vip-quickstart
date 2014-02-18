@@ -17,8 +17,57 @@ class RepoMonitor extends Dashboard_Plugin {
 	}
     
     function init() {
-        
+        add_action( 'quickstart_dashboard_setup', array( $this, 'dashboard_setup' ) );
     }
+
+	function dashboard_setup() {
+        wp_add_dashboard_widget( 'quickstart_dashboard_repomonitor', $this->name(), array( $this, 'show' ) );
+    }
+
+	function show() {
+		?>
+
+		<style>
+            .vip-dashboard-repo-row {
+                display: block;
+				margin: 0;
+				padding: 5px;
+				border: 1px solid #ddd;
+            }
+
+			.vip-dashboard-repo-row.vip-dashboard-repo-warn {
+				background-color: rgba(255, 0, 0, 0.2);
+				color: rgba(255, 0, 0, 0.8);
+			}
+
+            .vip-dashboard-repo-row h4 {
+
+			}
+
+			.vip-dashboard-repo-row .vip-dashboard-repo-type {
+				display: inline-block;
+				background: #ececec;
+				border: 1px solid #ddd;
+				border-radius: 3px;
+				padding: 3px;
+				font-size: 0.8em;
+				margin: 3px;
+			}
+        </style>
+
+		<h4><?php _e( 'Monitored Repositories', 'quickstart-dashboard' ); ?></h4>
+		<?php 
+		foreach ( $this->get_repos() as $repo ):
+			$status = $this->get_repo_status( $repo['repo_id'] );
+			$warn = $repo['warn_out_of_date'] && $this->repo_out_of_date( $status, $repo['repo_type'] );
+			?>
+		<div class="vip-dashboard-repo-row <?php echo $warn ? 'vip-dashboard-repo-warn' : '' ?>">
+			<h4><?php echo $repo['repo_friendly_name']; ?><span class="vip-dashboard-repo-type"><?php echo $repo['repo_type']; ?></span></h4>
+			<span class="vip-dashboard-repo-status"><?php echo $this->get_status_text( $status, $repo['repo_type'] ); ?></span>
+		</div>
+		<?php endforeach; ?>
+		<?php
+	}
 
 	function scan_repositories() {
 		foreach ( $this->get_repos() as $repo ) {
