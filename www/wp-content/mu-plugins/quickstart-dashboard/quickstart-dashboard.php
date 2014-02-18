@@ -29,6 +29,7 @@ class Quickstart_Dashboard {
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
         
         if ( is_admin() ) {
             // Need to load plugins here instead of admin_init so they have a chance to register submenu pages
@@ -43,6 +44,13 @@ class Quickstart_Dashboard {
 	}
 
 	function admin_init() {
+	}
+
+	function admin_enqueue_scripts() {
+		wp_enqueue_script( 'dashboard' );
+
+		if ( wp_is_mobile() )
+			wp_enqueue_script( 'jquery-touch-punch' );
 	}
     
     function admin_menu() {
