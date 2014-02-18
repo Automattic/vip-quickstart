@@ -41,31 +41,107 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 		}
 
 		foreach ( $repo_monitor->get_repos() as $repo ) {
-			// Run the command to determine if it needs an update
-			WP_CLI::line( "Scanning {$repo['repo_type']} repo {$repo['repo_friendly_name']}..." );
-            
-			if ( 'svn' == $repo['repo_type'] ) {
-				$results = $repo_monitor->scan_svn_repo( $repo['repo_path'] );
-			} elseif ( 'git' == $repo['repo_type'] ) {
-				$results = $repo_monitor->scan_git_repo( $repo['repo_path'] );
-			}
-
-			// Output the repo status if out of date or error occured
-			$text = $repo_monitor->get_status_text( $results, $repo['repo_type'] );
-
-			if ( is_wp_error( $results) ) {
-				WP_CLI::error( $text );
-			} elseif ( $repo_monitor->repo_out_of_date( $results, $repo['repo_type'] ) ) {
-				WP_CLI::warning( $text );
-			}
-
-			// Save the new repo status
-			if ( !$repo_monitor->set_repo_status( $repo['repo_id'], $results ) ) {
-				WP_CLI::error( 'An error occured saving the repo status' );
-			}
+			$this->scan_repo( array(), array( 'id' => $repo['repo_id'] ) );
 		}
 
 		WP_CLI::line( 'Scan complete' );
+	}
+
+	/**
+	 * Scans a specific repo for changes
+	 *
+	 * ## OPTIONS
+	 *
+	 * <path>
+	 * : The path to the repository to add
+	 * <name>
+	 * : The friendly name of the repository
+	 * <id>
+	 * : The id of the repo to be scanned
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp dashboard scan_repo --name=quickstart
+	 *     wp dashboard scan_repo /srv
+	 *     wp dashboard scan_repo --id=1
+	 *
+	 * @synopsis [<path>] [--id=<id>] [--name=<name>]
+	 */
+	function scan_repo( $args, $assoc_args ) {
+		$repo_monitor = $this->load_repo_monitor();
+
+		if ( ! $repo_monitor ) {
+			return;
+		}
+
+		$repos = $repo_monitor->get_repos();
+		
+		if ( isset( $assoc_args['id'] ) ) {
+			$enterred_id = intval( $assoc_args['id'] );
+			foreach ( $repos as $r ) {
+				if ( $r['repo_id'] == $enterred_id ) {
+					$repo = $r;
+					break;
+				}
+			}
+
+			if ( !isset( $repo ) ) {
+				WP_CLI::error( "Could not find repo with id '$enterred_id'" );
+				return;
+			}
+		} elseif ( isset( $assoc_args['name'] ) ) {
+			foreach ( $repos as $r ) {
+				if ( strcasecmp( $r['repo_friendly_name'], $assoc_args['name'] ) === 0 ) {
+					$repo = $r;
+					break;
+				}
+			}
+
+			if ( !isset( $repo ) ) {
+				WP_CLI::error( "Could not find repo with name '{$assoc_args['name']}'" );
+				return;
+			}
+		} elseif ( isset( $args[0] ) ) {
+			$path = $args[0];
+			foreach ( $repos as $r ) {
+				if ( strcasecmp( $r['repo_path'], $path ) === 0 ) {
+					$repo = $r;
+					break;
+				}
+			}
+
+			if ( !isset( $repo ) ) {
+				WP_CLI::error( "Could not find repo with path '{$assoc_args['path']}'" );
+				return;
+			}
+		} else {
+			WP_CLI::error( 'No repository info given. Please specify a repository to scanning using either --id, --name, or --path.' );
+			return;
+		}
+
+		// We now have the repo, trigger the scan
+
+		WP_CLI::line( "Scanning {$repo['repo_type']} repo {$repo['repo_friendly_name']}..." );
+
+		if ( 'svn' == $repo['repo_type'] ) {
+			$results = $repo_monitor->scan_svn_repo( $repo['repo_path'] );
+		} elseif ( 'git' == $repo['repo_type'] ) {
+			$results = $repo_monitor->scan_git_repo( $repo['repo_path'] );
+		}
+
+		// Output the repo status if out of date or error occured
+		$text = $repo_monitor->get_status_text( $results, $repo['repo_type'] );
+
+		if ( is_wp_error( $results) ) {
+			WP_CLI::error( $text );
+		} elseif ( $repo_monitor->repo_out_of_date( $results, $repo['repo_type'] ) ) {
+			WP_CLI::warning( $text );
+		}
+
+		// Save the new repo status
+		if ( !$repo_monitor->set_repo_status( $repo['repo_id'], $results ) ) {
+			WP_CLI::error( 'An error occured saving the repo status' );
+		}
 	}
 
 	/**
