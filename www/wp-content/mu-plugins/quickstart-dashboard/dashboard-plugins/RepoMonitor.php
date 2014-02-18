@@ -410,6 +410,19 @@ class RepoMonitor extends Dashboard_Plugin {
 
 		$args = array_merge( $defaults, $args );
 
+		// Test that the repo exists by scanning it
+		if ( 'svn' == $args['repo_type'] ) {
+			$args['repo_status'] = $this->scan_svn_repo( $args['repo_path'] );
+		} elseif ( 'git' == $args['repo_type'] ) {
+			$args['repo_status'] = $this->scan_git_repo( $args['repo_path'] );
+		} else {
+			return new WP_Error( 1, sprintf( __( 'Error: Unknown repo type %s.', 'quickstart-dashboard' ), $args['repo_type'] ) );
+		}
+
+		if ( is_wp_error( $args['repo_status'] ) ) {
+			return $args['repo_status'];
+		}
+
 		$post_args = array(
 			'post_type' => self::REPO_CPT,
 			'post_title' => $args['repo_friendly_name'],
@@ -425,6 +438,7 @@ class RepoMonitor extends Dashboard_Plugin {
 		add_post_meta( $id, 'qs_repo_type', $args['repo_type'], true );
 		add_post_meta( $id, 'qs_repo_path', $args['repo_path'], true );
 		add_post_meta( $id, 'qs_warn_out_of_date', $args['warn_out_of_date'], true );
+		$this->set_repo_status( $id, $args['repo_status'] );
 
 		$this->repos[] = $args;
 
