@@ -62,6 +62,11 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
                     WP_CLI::warning( $repo_monitor->get_status_text( $results, 'git' ) );
                 }
 			}
+
+			// Save the new repo status
+			if ( !$repo_monitor->set_repo_status( $repo['repo_id'], $results ) ) {
+				WP_CLI::error( 'An error occured saving the repo status' );
+			}
 		}
 
 		WP_CLI::line( 'Scan complete' );
