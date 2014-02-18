@@ -46,7 +46,13 @@ class RepoMonitor extends Dashboard_Plugin {
 	 * @return array The repo status
 	 */
 	function get_repo_status( $repo_id ) {
-		return (array) get_post_meta( $repo_id, 'qs_dashboard_repo_status', true );
+		$status = get_post_meta( $repo_id, 'qs_dashboard_repo_status', true );
+
+		if ( is_array( $status ) ) {
+			return $status;
+		}
+
+		return array();
 	}
 
 	/**
