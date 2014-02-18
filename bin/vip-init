@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
+# =====================================
 # Setup command line flags
+# =====================================
 SERVER=false
 
 for i in "$@"
@@ -17,6 +19,18 @@ case $i in
     ;;
 esac
 done
+
+
+# =====================================
+# Setup other options
+# =====================================
+IS_INSTALLED=false
+
+if [ false == $SERVER ]; then
+    IS_INSTALLED=`vagrant ssh -c 'which wp && wp core is-installed'`
+else
+    IS_INSTALLED=`which wp && wp core is-installed`
+fi
 
 
 # =====================================
@@ -62,7 +76,7 @@ echo ""
 # =====================================
 # Ask for domain
 # =====================================
-if [ -z "$QUICKSTART_DOMAIN" ]; then
+if [[ -z "$QUICKSTART_DOMAIN" && ! $IS_INSTALLED ]]; then
     echo "=================================="
     echo "= Domain Setup"
     echo "=================================="
@@ -125,9 +139,13 @@ echo "=================================="
 echo "= Provisioning"
 echo "=================================="
 if [ false == $SERVER ]; then
+    export SVN_USERNAME="$username"
+    export SVN_PASSWORD="$password"
+    [[ -n $QUICKSTART_DOMAIN ]] && export QUICKSTART_DOMAIN="$QUICKSTART_DOMAIN"
+
     vagrant reload --no-provision
     vagrant up --no-provision
-    QUICKSTART_DOMAIN="$QUICKSTART_DOMAIN" SVN_USERNAME="$username" SVN_PASSWORD="$password" vagrant provision
+    vagrant provision
 elif [[ -n "$QUICKSTART_DOMAIN" ]]; then
     export FACTER_svn_username="$username"
     export FACTER_svn_password="$password"
@@ -152,7 +170,7 @@ fi
 # =====================================
 # Add vip.dev entry to hosts file
 # =====================================
-if [[ -n '$QUICKSTART_DOMAIN' && false == $SERVER ]]; then
+if [[ -n $QUICKSTART_DOMAIN && false == $SERVER ]]; then
     echo "=================================="
     echo "= Configuring the hosts file"
     echo "=================================="
