@@ -280,6 +280,10 @@ class RepoMonitor extends Dashboard_Plugin {
             return $status->get_error_message();
         }
 
+		if ( empty( $status ) ) {
+			return __( 'Repo not yet scanned.', 'quickstart-dashboard' );
+		}
+
         switch ($repo_type) {
             case 'git':
                 $text = __( sprintf( 'Branch %s ', esc_attr( $status['on_branch'] ) ), 'quickstart-dashboard' );
