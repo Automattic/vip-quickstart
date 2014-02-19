@@ -400,7 +400,7 @@ class RepoMonitor extends Dashboard_Plugin {
         }
     }
 
-	function add_repo( $args ) {
+	function add_repo( $args, $add_hooks = true ) {
 		$defaults = array(
 			'repo_type'			 => 'git',
 			'repo_path'			 => '',
@@ -441,7 +441,47 @@ class RepoMonitor extends Dashboard_Plugin {
 		$this->set_repo_status( $id, $args['repo_status'] );
 
 		$this->repos[] = $args;
+		if ( $add_hooks ) {
+			$result = $this->setup_repo_hooks( $args );
+			if ( is_wp_error( $result ) ) {
+				return $result;
+			}
+		}
 
 		return $id;
+	}
+
+	private function setup_repo_hooks( $repo ) {
+		$base_path = rtrim( $repo['repo_path'], '/' );
+		if ( 'git' === $repo['repo_type'] ) {
+			$hook_paths = array(
+				'post-update' => $base_path . '/.git/hooks/post-update',
+				'post-merge'  => $base_path . '/.git/hooks/post-merge',
+			);
+		} elseif ( 'svn' === $repo['repo_type'] ) {
+			// Hooks not yet supported for svn repos
+			return;
+		} else {
+			return;
+		}
+
+		foreach ( $hook_paths as $slug => $hook_path ) {
+			if ( ! file_exists( $hook_path ) ) {
+				// Create the hook file
+				$success = file_put_contents( $hook_path, "#!/bin/sh\n" );
+				if ( false === $success ) {
+					return new WP_Error( $success, sprintf( __( 'Unable to create hook %s.', 'quickstart-dashboard' ), $slug ) );
+				}
+			}
+
+			$command = "/usr/bin/wp dashboard scan_repo {$repo['repo_path']}";
+			$success = file_put_contents( $hook_path, "# Quickstart Dashboard Repo Monitor\n$command", FILE_APPEND );
+			if ( false === $success ) {
+				return new WP_Error( $success, sprintf( __( 'Unable to append to hook hook file %s.', 'quickstart-dashboard' ), $slug ) );
+			}
+
+			//   Make sure the file is executable
+			chmod( $hook_path, 0755 );
+		}
 	}
 }
