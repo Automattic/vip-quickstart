@@ -138,9 +138,13 @@ class RepoMonitor extends Dashboard_Plugin {
 	}
 
 	function scan_svn_repo( $repo_path ) {
+		$cwd = getcwd();
+		
 		// Variables to load output into
 		$output = array();
 		$return_value = -1;
+		
+		chdir( $repo_path );
 
         // Execute info command to get info about local repo
         exec( 'svn info --non-interactive', $output, $return_value );
@@ -163,6 +167,9 @@ class RepoMonitor extends Dashboard_Plugin {
                 sprintf( __( 'Error fetching svn status. SVN returned %s', 'quickstart-dashboard' ), $return_value )
             );
         }
+		
+		// Go back to the previous working directory
+		chdir( $cwd );
 
 		$status = $status;
 		$status['scan_time'] = time();
