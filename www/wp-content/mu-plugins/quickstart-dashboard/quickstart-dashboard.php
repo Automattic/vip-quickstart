@@ -31,7 +31,7 @@ class Quickstart_Dashboard {
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
         
-        if ( is_admin() ) {
+        if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
             // Need to load plugins here instead of admin_init so they have a chance to register submenu pages
             $this->load_plugins();
             $this->init_plugins();
