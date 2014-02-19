@@ -11,6 +11,19 @@ class RepoMonitor extends Dashboard_Plugin {
 
 		// Setup cron
 	}
+	
+	/**
+	 * Register 15 minute cron interval for scanning plugins.
+	 * @param array[] $schedules
+	 * @return array[] modified schedules
+	 */
+	public static function repo_15_min_cron_interval( $schedules ) {
+		$schedules[ 'qs-dashboard-15-min-cron-interval' ] = array(
+			'interval' => 900,
+			'display' => __( 'Every 15 minutes', 'quickstart-dashboard' ),
+			);
+		return $schedules;
+	}
 
 	function name() {
 		return __( 'Repo Monitor', 'quickstart-dashboard' );
@@ -18,7 +31,18 @@ class RepoMonitor extends Dashboard_Plugin {
     
     function init() {
         add_action( 'quickstart_dashboard_setup', array( $this, 'dashboard_setup' ) );
+		add_action( 'repomonitor_scan_repos', array( $this, 'scan_repositories' ) );
+		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		
+		add_filter( 'cron_schedules', array( $this, 'repo_15_min_cron_interval' ) );
     }
+	
+	function admin_init() {
+		// Add the cron job to check for updates
+		if ( ! wp_next_scheduled( 'repomonitor_scan_repos' ) ) {
+			wp_schedule_event( time(), 'qs-dashboard-15-min-cron-interval', 'repomonitor_scan_repos' );
+		}
+	}
 
 	function dashboard_setup() {
         wp_add_dashboard_widget( 'quickstart_dashboard_repomonitor', $this->name(), array( $this, 'show' ) );
@@ -73,11 +97,18 @@ class RepoMonitor extends Dashboard_Plugin {
 		foreach ( $this->get_repos() as $repo ) {
 			// Run the command to determine if it needs an update
 			if ( 'svn' == $repo['repo_type'] ) {
-				$results = $this->scan_svn_repo( $repo['repo_path'] );
+				$results = $this->scan_svn_repo( $repo['repo_path'], true );
+			} elseif ( 'git' == $repo['repo_type'] ) {
+				$results = $this->scan_git_repo( $repo['repo_path'] );
 			}
-		}
 
-		return 0;
+			if ( is_wp_error( $results) ) {
+				return;
+			}
+
+			// Save the new repo status
+			$this->set_repo_status( $repo['repo_id'], $results );
+		}
 	}
 
 	function get_repos() {
@@ -253,7 +284,9 @@ class RepoMonitor extends Dashboard_Plugin {
 		if ( 'git' === $repo_type ) {
 			return !empty( $status['behind'] ) || !empty( $status['diverged'] );
 		} elseif ( 'svn' === $repo_type ) {
-			return !empty( $status['files_out_of_date'] ) || $status['remote_revision'] != $status['local_revision'];
+			return !empty( $status['files_out_of_date'] ) || 
+				( isset( $status['remote_revision'] ) && isset( $status['local_revision'] ) && 
+					$status['remote_revision'] != $status['local_revision'] );
 		}
 
 		return false;
@@ -385,6 +418,13 @@ class RepoMonitor extends Dashboard_Plugin {
 
             case 'svn':
                 $text = '';
+				
+				if ( !isset( $status['local_revision'] ) || !isset( $status['remote_revision'] ) ) {
+					return sprintf( 
+						__( 'Status information not available. Please try manually scanning the repo using %s', 'quickstart-dashboard' ),
+						'<code>wp dashboard scan_repo</code>'
+					);
+				}
 
                 // Base status text
                 if ( $status['local_revision'] == $status['remote_revision'] ) {
