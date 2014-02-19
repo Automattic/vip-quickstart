@@ -192,6 +192,37 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 	}
 
 	/**
+	 * Adds a repository to the Repo Monitor.
+	 *
+	 * ## OPTIONS
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp dashboard list_repos
+	 *     wp dashboard list_repos --id
+	 *
+	 * @synopsis [--id] [--only-ids]
+	 */
+	function list_repos( $args, $assoc_args ) {
+		$repo_monitor = $this->load_repo_monitor();
+
+		if ( ! $repo_monitor ) {
+			return;
+		}
+
+		$format_str = '%2$s: %3$s';
+		if ( $assoc_args['id'] ) {
+			$format_str = '(%1$s) ' . $format_str;
+		} elseif ( $assoc_args['only-ids'] ) {
+			$format_str = '%1$s';
+		}
+
+		foreach ( $repo_monitor->get_repos() as $repo ) {
+			WP_CLI::line( sprintf( $format_str, $repo['repo_id'], $repo['repo_friendly_name'], $repo['repo_path'] ) );
+		}
+	}
+
+	/**
 	 *
 	 * @return RepoMonitor|bool The RepoMonitor plugin or false on failure
 	 */
