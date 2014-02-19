@@ -137,7 +137,7 @@ class RepoMonitor extends Dashboard_Plugin {
 		}
 	}
 
-	function scan_svn_repo( $repo_path ) {
+	function scan_svn_repo( $repo_path, $allow_interactive = false ) {
 		$cwd = getcwd();
 		
 		// Variables to load output into
@@ -147,7 +147,12 @@ class RepoMonitor extends Dashboard_Plugin {
 		chdir( $repo_path );
 
         // Execute info command to get info about local repo
-        exec( 'svn info --non-interactive', $output, $return_value );
+		$command_args = '';
+		if ( ! $allow_interactive ) {
+			$command_args .= '--non-interactive';
+		}
+		
+        exec( sprintf( 'svn info %s', $command_args ), $output, $return_value );
         
         if ( 0 != $return_value ) {
             return new WP_Error( 
@@ -158,8 +163,13 @@ class RepoMonitor extends Dashboard_Plugin {
         
         $info = $this->parse_svn_info( $output );
         
+		$command_args = '-u';
+		if ( ! $allow_interactive ) {
+			$command_args .= ' --non-interactive';
+		}
+		
 		// Execute status command to get file into
-		exec( 'svn status -u --non-interactive', $output, $return_value );
+		exec( sprintf( 'svn status %s', $command_args ), $output, $return_value );
         
         if ( 0 != $return_value ) {
             return new WP_Error( 
