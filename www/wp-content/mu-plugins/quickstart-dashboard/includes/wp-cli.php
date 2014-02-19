@@ -124,7 +124,7 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 		WP_CLI::line( "Scanning {$repo['repo_type']} repo {$repo['repo_friendly_name']}..." );
 
 		if ( 'svn' == $repo['repo_type'] ) {
-			$results = $repo_monitor->scan_svn_repo( $repo['repo_path'] );
+			$results = $repo_monitor->scan_svn_repo( $repo['repo_path'], true );
 		} elseif ( 'git' == $repo['repo_type'] ) {
 			$results = $repo_monitor->scan_git_repo( $repo['repo_path'] );
 		}
