@@ -23,13 +23,16 @@ if ( file_exists( __DIR__ . '/local-config.php' ) )
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', 'wordpress');
+if ( ! defined( 'DB_NAME' ) )
+    define('DB_NAME', 'wordpress');
 
 /** MySQL database username */
-define('DB_USER', 'wordpress');
+if ( ! defined( 'DB_USER' ) )
+    define('DB_USER', 'wordpress');
 
 /** MySQL database password */
-define('DB_PASSWORD', 'wordpress');
+if ( ! defined( 'DB_PASSWORD' ) )
+    define('DB_PASSWORD', 'wordpress');
 
 /** MySQL hostname */
 define('DB_HOST', 'localhost');
