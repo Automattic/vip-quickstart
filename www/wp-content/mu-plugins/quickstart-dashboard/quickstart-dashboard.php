@@ -66,57 +66,61 @@ class Quickstart_Dashboard {
 
 			// Check for the authorization info from wp.com
 			if ( isset( $_REQUEST['dashboard_auth'] ) && $_REQUEST['dashboard_auth'] ) {
-				if ( !wp_verify_nonce( $_REQUEST['_qsnonce'], 'dashboard_wpcom_connect' ) ) {
-					wp_nonce_ays( 'dashboard_wpcom_connect' );
-				}
-
-				if ( isset( $_REQUEST['error'] ) ) {
-					?>
-					<div class="error"><p><?php _e( 'Error: You did not authorize Quickstart with WordPress.com VIP.', 'quickstart-dashboard' ); ?></p></div>
-					<?php
-
-					return;
-				}
-
-				if ( !isset( $_REQUEST['code'] ) ) {
-					?>
-					<div class="error"><p><?php _e( 'Error: Code missing from request.', 'quickstart-dashboard' ); ?></p></div>
-					<?php
-
-					return;
-				}
-
-				// Go ahead and get the access token
-				$curl = curl_init( $this->wpcom_api_endpoints['token'] );
-				curl_setopt( $curl, CURLOPT_POST, true );
-				curl_setopt( $curl, CURLOPT_POSTFIELDS, array(
-					'client_id' => apply_filters( 'dashboard_wpcom_client_id', '' ),
-					'redirect_uri' => $this->get_wpcom_redirect_uri(),
-					'client_secret' => apply_filters( 'dashboard_wpcom_client_secret', '' ),
-					'code' => $_GET['code'],
-					'grant_type' => 'authorization_code',
-				) );
-				curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1);
-				$auth = curl_exec( $curl );
-
-				if ( false === $auth ) {
-					?>
-					<div class="error"><p><?php _e( 'An error occured retrieving the access token from WordPress.com. Please try again.', 'quickstart-dashboard' ); ?></p></div>
-					<?php
-
-					return;
-				}
-
-				$secret = json_decode($auth);
-				$access_key = $secret->access_token;
-
-				?>
-				<div class="updated"><p><?php printf( __( 'Successfully connected to WordPress.com.', 'quickstart-dashboard' ), $access_key ); ?></p></div>
-				<?php
-
-				$this->set_wpcom_access_token( $access_key );
+				$this->do_wpcom_auth_flow();
 			}
 		}
+	}
+
+	function do_wpcom_auth_flow() {
+		if ( !wp_verify_nonce( $_REQUEST['_qsnonce'], 'dashboard_wpcom_connect' ) ) {
+			wp_nonce_ays( 'dashboard_wpcom_connect' );
+		}
+
+		if ( isset( $_REQUEST['error'] ) ) {
+			?>
+			<div class="error"><p><?php _e( 'Error: You did not authorize Quickstart with WordPress.com VIP.', 'quickstart-dashboard' ); ?></p></div>
+			<?php
+
+			return;
+		}
+
+		if ( !isset( $_REQUEST['code'] ) ) {
+			?>
+			<div class="error"><p><?php _e( 'Error: Code missing from request.', 'quickstart-dashboard' ); ?></p></div>
+			<?php
+
+			return;
+		}
+
+		// Go ahead and get the access token
+		$curl = curl_init( $this->wpcom_api_endpoints['token'] );
+		curl_setopt( $curl, CURLOPT_POST, true );
+		curl_setopt( $curl, CURLOPT_POSTFIELDS, array(
+			'client_id' => apply_filters( 'dashboard_wpcom_client_id', '' ),
+			'redirect_uri' => $this->get_wpcom_redirect_uri(),
+			'client_secret' => apply_filters( 'dashboard_wpcom_client_secret', '' ),
+			'code' => $_GET['code'],
+			'grant_type' => 'authorization_code',
+		) );
+		curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1);
+		$auth = curl_exec( $curl );
+
+		if ( false === $auth ) {
+			?>
+			<div class="error"><p><?php _e( 'An error occured retrieving the access token from WordPress.com. Please try again.', 'quickstart-dashboard' ); ?></p></div>
+			<?php
+
+			return;
+		}
+
+		$secret = json_decode($auth);
+		$access_key = $secret->access_token;
+
+		?>
+		<div class="updated"><p><?php printf( __( 'Successfully connected to WordPress.com.', 'quickstart-dashboard' ), $access_key ); ?></p></div>
+		<?php
+
+		$this->set_wpcom_access_token( $access_key );
 	}
 
 	function admin_enqueue_scripts() {
