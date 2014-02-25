@@ -19,6 +19,14 @@ class Quickstart_Dashboard {
 
 	private static $instance;
 	
+	private $wpcom_access_token = '';
+	private $show_wpcom_access_notice = true;
+
+	private $wpcom_api_endpoints = array(
+		'authorize' => 'https://public-api.wordpress.com/oauth2/authorize',
+		'token'	    => 'https://public-api.wordpress.com/oauth2/token',
+	);
+	
 	/**
 	 *
 	 * @var array All loaded plugins
@@ -26,10 +34,14 @@ class Quickstart_Dashboard {
 	private $plugins = array();
 
 	function __construct() {
+		// Load the WP.com access token
+		$this->wpcom_access_token = get_option( 'qs_dashboard_wpcom_access_token', '' );
+
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+		add_action( 'admin_notices', array( $this, 'show_admin_notices' ) );
         
         if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
             // Need to load plugins here instead of admin_init so they have a chance to register submenu pages
@@ -44,6 +56,67 @@ class Quickstart_Dashboard {
 	}
 
 	function admin_init() {
+		// Check if we're supposed to be connecting
+		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'vip-dashboard'  ) {
+			// Check for the args to connect to WP.com
+			if ( isset( $_REQUEST['dashboard_wpcom_connect'] ) && $_REQUEST['dashboard_wpcom_connect'] ) {
+				wp_redirect( $this->get_wpcom_authorization_url() );
+				exit;
+			}
+
+			// Check for the authorization info from wp.com
+			if ( isset( $_REQUEST['dashboard_auth'] ) && $_REQUEST['dashboard_auth'] ) {
+				if ( !wp_verify_nonce( $_REQUEST['_qsnonce'], 'dashboard_wpcom_connect' ) ) {
+					wp_nonce_ays( 'dashboard_wpcom_connect' );
+				}
+
+				if ( isset( $_REQUEST['error'] ) ) {
+					?>
+					<div class="error"><p><?php _e( 'Error: You did not authorize Quickstart with WordPress.com VIP.', 'quickstart-dashboard' ); ?></p></div>
+					<?php
+
+					return;
+				}
+
+				if ( !isset( $_REQUEST['code'] ) ) {
+					?>
+					<div class="error"><p><?php _e( 'Error: Code missing from request.', 'quickstart-dashboard' ); ?></p></div>
+					<?php
+
+					return;
+				}
+
+				// Go ahead and get the access token
+				$curl = curl_init( $this->wpcom_api_endpoints['token'] );
+				curl_setopt( $curl, CURLOPT_POST, true );
+				curl_setopt( $curl, CURLOPT_POSTFIELDS, array(
+					'client_id' => apply_filters( 'dashboard_wpcom_client_id', '' ),
+					'redirect_uri' => $this->get_wpcom_redirect_uri(),
+					'client_secret' => apply_filters( 'dashboard_wpcom_client_secret', '' ),
+					'code' => $_GET['code'],
+					'grant_type' => 'authorization_code',
+				) );
+				curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1);
+				$auth = curl_exec( $curl );
+
+				if ( false === $auth ) {
+					?>
+					<div class="error"><p><?php _e( 'An error occured retrieving the access token from WordPress.com. Please try again.', 'quickstart-dashboard' ); ?></p></div>
+					<?php
+
+					return;
+				}
+
+				$secret = json_decode($auth);
+				$access_key = $secret->access_token;
+
+				?>
+				<div class="updated"><p><?php printf( __( 'Successfully connected to WordPress.com.', 'quickstart-dashboard' ), $access_key ); ?></p></div>
+				<?php
+
+				$this->set_wpcom_access_token( $access_key );
+			}
+		}
 	}
 
 	function admin_enqueue_scripts() {
@@ -82,6 +155,51 @@ class Quickstart_Dashboard {
         do_action( 'quickstart_admin_page' );
     }
 
+	function show_admin_notices() {
+		if ( empty( $this->wpcom_access_token ) && $this->show_wpcom_access_notice ) {
+			$connect_url = add_query_arg( array( 'dashboard_wpcom_connect' => true ), menu_page_url( 'vip-dashboard', false ) );
+			?>
+			<div class="error"><p><?php printf( __( 'Please <a href="%s">connect Quickstart</a> with WordPress.com VIP to enable enhanced features.', 'quickstart-dashboard' ), $connect_url ); ?></p></div>
+			<?php
+		}
+	}
+
+	function set_wpcom_access_token( $new_token ) {
+		$this->wpcom_access_token = $new_token;
+		update_option( 'qs_dashboard_wpcom_access_token', $this->wpcom_access_token );
+	}
+
+	function invalidate_wpcom_access_token() {
+		$this->set_wpcom_access_token( '' );
+	}
+
+	function get_wpcom_access_token() {
+		return $this->wpcom_access_token;
+	}
+
+	function get_wpcom_redirect_uri() {
+		$query_args = array(
+			'dashboard_auth' => 1,
+			'_qsnonce'		 => wp_create_nonce( 'dashboard_wpcom_connect' ),
+		);
+
+		update_option( 'qs_dashboard_wpcom_connect_nonce', $query_args['_qsnonce'] );
+
+		return add_query_arg( $query_args, menu_page_url( 'vip-dashboard', false ) );
+	}
+
+	function get_wpcom_authorization_url() {
+		return add_query_arg( array(
+			'client_id'		=> urlencode( apply_filters( 'dashboard_wpcom_client_id', '' ) ),
+			'redirect_uri'  => urlencode( $this->get_wpcom_redirect_uri() ),
+			'response_type' => 'code',
+		), $this->wpcom_api_endpoints['authorize'] );
+	}
+
+	/**
+	 * Gets the current Quickstart_Dashboard instance.
+	 * @return Quickstart_Dashboard
+	 */
 	static function get_instance() {
 		if ( ! isset( self::$instance ) ) {
 			$class_name = __CLASS__;
