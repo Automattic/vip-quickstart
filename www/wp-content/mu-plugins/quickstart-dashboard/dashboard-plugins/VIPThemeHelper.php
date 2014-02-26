@@ -191,7 +191,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 			<h3><?php _e( 'SVN Credentials', 'quickstart-dashboard' ); ?></h3>
 			<form action="<?php menu_page_url( 'vip-dashboard' ) ?>" method="post">
 				<?php wp_nonce_field( 'vipthemehelper-install_and_activate', '_thnonce' ) ?>
-				<input type="hidden" name="vipthemehelper-install_and_activate" value="<?php echo esc_attr( $theme ); ?>" />
+				<input type="hidden" name="vipthemehelper-action" value="<?php echo esc_attr( $theme ); ?>" />
 				<p><?php printf( __( 'Please enter the SVN Credentials for <code>%s</code>.', 'quickstart-dashboard' ), esc_attr( $this->svn_uri . $theme ) ) ?></p>
 				<table class="form-table">
 					<tr>
@@ -201,6 +201,14 @@ class VIPThemeHelper extends Dashboard_Plugin {
 					<tr>
 						<td><label for="vipthemehelper-svn_password"><?php _e( 'SVN Password:', 'quickstart-dashboard' ); ?></label></td>
 						<td><input type="password" id="vipthemehelper-svn_password" name="vipthemehelper-svn_password" value="" /></td>
+					</tr>
+					<tr>
+						<td><label for="vipthemehelper-install"><?php _e( 'Install Theme:', 'quickstart-dashboard' ); ?></label></td>
+						<td><input type="checkbox" id="vipthemehelper-install" name="vipthemehelper-install"<?php echo isset( $_REQUEST['vipthemehelper-install'] ) ? 'checked="checked"' : '' ?> /></td>
+					</tr>
+					<tr>
+						<td><label for="vipthemehelper-activate"><?php _e( 'Activate Theme:', 'quickstart-dashboard' ); ?></label></td>
+						<td><input type="checkbox" id="vipthemehelper-install" name="vipthemehelper-activate"<?php echo isset( $_REQUEST['vipthemehelper-activate'] ) ? 'checked="checked"' : '' ?> /></td>
 					</tr>
 				</table>
 
