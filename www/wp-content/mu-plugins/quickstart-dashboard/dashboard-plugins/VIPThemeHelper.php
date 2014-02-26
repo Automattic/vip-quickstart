@@ -33,7 +33,12 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		if ( !current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		
+
+		echo '<h4>' . __( 'VIP Themes', 'quickstart-dashboard' ) . '</h4>';
+		$table = new ThemeHelperWidgetTable( $this );
+		$table->prepare_items();
+		$table->display();
+
 		if ( ! empty( $this->access_token ) ) {
 			echo '<h4>' . __( 'VIP Themes', 'quickstart-dashboard' ) . '</h4>';
 			$table = new ThemeHelperWidgetTable( $this );
@@ -43,7 +48,6 @@ class VIPThemeHelper extends Dashboard_Plugin {
 			// No access token, print a message
 			echo '<p>' . Quickstart_Dashboard::get_instance()->get_connect_wpcom_message() . '</p>';
 		}
-		
 	}
 
 	/**
@@ -541,7 +545,7 @@ class ThemeHelperWidgetTable extends WP_List_Table {
 		foreach ( $this->theme_helper->get_vip_scanned_themes() as $slug => $theme ) {
 			$wp_theme = wp_get_theme( $theme['stylesheet'] );
 
-			if ( $wp_theme->exists() ) {
+			if ( ! empty( $theme['stylesheet'] ) && $wp_theme->exists() ) {
 				$this->items[] = array_merge( $theme, array(
 					'slug'		  => $slug,
 					'theme_name'  => $wp_theme->display( 'Name' ),
