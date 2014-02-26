@@ -524,7 +524,7 @@ class ThemeHelperWidgetTable extends WP_List_Table {
 		foreach ( $this->theme_helper->get_vip_scanned_themes() as $slug => $theme ) {
 			$wp_theme = wp_get_theme( $theme['stylesheet'] );
 
-			if ( $wp_theme->exists() ) {
+			if ( ! empty( $theme['stylesheet'] ) && $wp_theme->exists() ) {
 				$this->items[] = array_merge( $theme, array(
 					'slug'		  => $slug,
 					'theme_name'  => $wp_theme->display( 'Name' ),
