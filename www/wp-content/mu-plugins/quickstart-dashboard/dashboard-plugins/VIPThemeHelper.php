@@ -67,7 +67,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 	function admin_init() {
 		// If we have a wpcom access token and we've never scanned the users' VIP themes before, do so
 		$this->access_token = Quickstart_Dashboard::get_instance()->get_wpcom_access_token();
-		if ( !empty( $this->access_token ) && ! $this->has_scanned_vip_themes() ) {
+		if (true|| !empty( $this->access_token ) && ! $this->has_scanned_vip_themes() ) {
 			$this->scan_vip_themes();
 		}
 
@@ -132,6 +132,26 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		$themes[$theme]['installed'] = true;
 		$themes[$theme]['stylesheet'] = 'vip/' . $theme;
 		$this->set_vip_scanned_themes( $themes );
+		
+		// Add the theme directory to the RepoMonitor
+		$plugins = Quickstart_Dashboard::get_instance()->get_plugins();
+		if ( isset( $plugins['RepoMonitor'] ) ) {
+			$wp_theme = wp_get_theme( $themes[$theme]['stylesheet'] );
+			
+			$result = $plugins['RepoMonitor']->add_repo( array(
+				'repo_type'			 => 'svn',
+				'repo_path'			 => $wp_theme->get_stylesheet_directory(),
+				'repo_friendly_name' => $wp_theme->display( 'Name', false ),
+			) );
+			
+			if ( is_wp_error( $result ) ) {
+				?>
+				<div class="error"><p><?php printf( __( 'An error occured adding the theme to the RepoMonitor: %s', 'quickstart-dashboard' ), $result->get_error_message() ) ?></p></div>
+				<?php
+				
+				return;
+			}
+		}
 
 		$message = __( 'The theme was installed.', 'quickstart-dashboard' );
 
@@ -329,6 +349,8 @@ class VIPThemeHelper extends Dashboard_Plugin {
 			return;
 		}
 
+		$themes = json_decode( $result, true );
+		
 		if ( ! isset( $themes['themes'] ) ) {
 			?>
 			<div class="error">
@@ -339,8 +361,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 
 			return;
 		}
-
-		$themes = json_decode( $result, true );
+		
 		if ( isset( $themes['error'] ) ) {
 			?>
 			<div class="error"><p><?php printf( __( 'An error occured querying VIP Themes from WordPress.com: %s', 'quickstart-dashboard' ), $themes['message'] ); ?></p></div>
