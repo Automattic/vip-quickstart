@@ -222,7 +222,7 @@ class RepoMonitor extends Dashboard_Plugin {
 		// Go back to the previous working directory
 		chdir( $cwd );
 
-		$status = $status;
+		$status = array_merge( $this->parse_svn_status( $output ), $info );
 		$status['scan_time'] = time();
 
         return $status;
