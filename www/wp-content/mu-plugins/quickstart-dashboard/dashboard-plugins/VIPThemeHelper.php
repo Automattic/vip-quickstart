@@ -111,6 +111,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 
 		// Mark that this theme is now installed
 		$themes[$theme]['installed'] = true;
+		$themes[$theme]['stylesheet'] = 'vip/' . $theme;
 		$this->set_vip_scanned_themes( $themes );
 
 		$message = __( 'The theme was installed.', 'quickstart-dashboard' );
@@ -336,6 +337,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 					'activated'		  => $theme['slug'] == $current_theme->get_stylesheet() || "vip/{$theme['slug']}" == $current_theme->get_stylesheet(),
 					'network_enabled' => isset( $network_allowed_themes[$theme['slug']] ) && $network_allowed_themes[$theme['slug']],
 					'notify'		  => isset( $scanned_themes[$theme['slug']] ) ? $scanned_themes[$theme['slug']]['notify'] : $notify_by_default,
+					'stylesheet'	  => array_key_exists( "vip/{$theme['slug']}", $installed_theme_keys ) ? "vip/{$theme['slug']}" : $theme['slug'],
 				);
 
 				if ( $scanned_themes[$theme['slug']]['activated'] ) {
@@ -348,6 +350,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 					'activated'		  => false,
 					'network_enabled' => false,
 					'notify'		  => isset( $scanned_themes[$theme['slug']] ) ? $scanned_themes[$theme['slug']]['notify'] : $notify_by_default,
+					'stylesheet'	  => '',
 				);
 			}
 		}
