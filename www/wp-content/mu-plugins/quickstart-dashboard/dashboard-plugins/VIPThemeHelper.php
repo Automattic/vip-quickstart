@@ -372,7 +372,6 @@ class VIPThemeHelper extends Dashboard_Plugin {
 
 		$current_theme = wp_get_theme();
 		$installed_themes = wp_get_themes( array( 'allowed' => null ) );
-		$installed_theme_keys = array_keys( $installed_themes );
 		$network_allowed_themes = get_site_option( 'allowedthemes' );
 
 		// Check if the user has activated a VIP theme
@@ -389,14 +388,14 @@ class VIPThemeHelper extends Dashboard_Plugin {
 			}
 
 			// Check if this theme is available in the known places
-			if ( in_array( $theme['slug'], $installed_theme_keys ) || in_array( "vip/{$theme['slug']}", $installed_theme_keys ) ) {
+			if ( array_key_exists( $theme['slug'], $installed_themes ) || array_key_exists( "vip/{$theme['slug']}", $installed_themes ) ) {
 				// Remark that this theme is installed
 				$scanned_themes[$theme['slug']] = array(
 					'installed'		  => true,
 					'activated'		  => $theme['slug'] == $current_theme->get_stylesheet() || "vip/{$theme['slug']}" == $current_theme->get_stylesheet(),
 					'network_enabled' => isset( $network_allowed_themes[$theme['slug']] ) && $network_allowed_themes[$theme['slug']],
 					'notify'		  => isset( $scanned_themes[$theme['slug']] ) ? $scanned_themes[$theme['slug']]['notify'] : $notify_by_default,
-					'stylesheet'	  => array_key_exists( "vip/{$theme['slug']}", $installed_theme_keys ) ? "vip/{$theme['slug']}" : $theme['slug'],
+					'stylesheet'	  => array_key_exists( "vip/{$theme['slug']}", $installed_themes ) ? "vip/{$theme['slug']}" : $theme['slug'],
 				);
 
 				if ( $scanned_themes[$theme['slug']]['activated'] ) {
