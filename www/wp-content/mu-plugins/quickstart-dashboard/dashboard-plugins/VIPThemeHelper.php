@@ -330,6 +330,17 @@ class VIPThemeHelper extends Dashboard_Plugin {
 			return;
 		}
 
+		if ( ! isset( $themes['themes'] ) ) {
+			?>
+			<div class="error">
+				<p><?php _e( 'An error occured querying VIP Themes from WordPress.com:', 'quickstart-dashboard' ); ?></p>
+				<pre><?php echo esc_html( $result ); ?></pre>
+			</div>
+			<?php
+
+			return;
+		}
+
 		$themes = json_decode( $result, true );
 		if ( isset( $themes['error'] ) ) {
 			?>

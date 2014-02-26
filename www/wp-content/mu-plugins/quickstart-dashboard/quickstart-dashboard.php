@@ -96,10 +96,10 @@ class Quickstart_Dashboard {
 		$curl = curl_init( $this->wpcom_api_endpoints['token'] );
 		curl_setopt( $curl, CURLOPT_POST, true );
 		curl_setopt( $curl, CURLOPT_POSTFIELDS, array(
-			'client_id' => apply_filters( 'dashboard_wpcom_client_id', '' ),
+			'client_id' => urlencode( apply_filters( 'dashboard_wpcom_client_id', '33900' ) ),
 			'redirect_uri' => $this->get_wpcom_redirect_uri(),
-			'client_secret' => apply_filters( 'dashboard_wpcom_client_secret', '' ),
-			'code' => $_GET['code'],
+			'client_secret' => urlencode( apply_filters( 'dashboard_wpcom_client_secret', '' ) ),
+			'code' => urlencode( $_GET['code'] ),
 			'grant_type' => 'authorization_code',
 		) );
 		curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1);
@@ -114,6 +114,18 @@ class Quickstart_Dashboard {
 		}
 
 		$secret = json_decode($auth);
+		
+		if ( !isset( $secret->access_token ) ) {
+			?>
+			<div class="error">
+				<p><?php _e( 'An error occured retrieving the access token from WordPress.com. The data received was: ', 'quickstart-dashboard' ); ?></p>
+				<pre><?php echo esc_html( $auth ); ?></pre>
+			</div>
+			<?php
+
+			return;
+		}
+		
 		$access_key = $secret->access_token;
 
 		?>
