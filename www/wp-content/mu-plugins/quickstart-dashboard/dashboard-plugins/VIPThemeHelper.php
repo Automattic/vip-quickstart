@@ -34,11 +34,6 @@ class VIPThemeHelper extends Dashboard_Plugin {
 			return;
 		}
 
-		echo '<h4>' . __( 'VIP Themes', 'quickstart-dashboard' ) . '</h4>';
-		$table = new ThemeHelperWidgetTable( $this );
-		$table->prepare_items();
-		$table->display();
-
 		if ( ! empty( $this->access_token ) ) {
 			echo '<h4>' . __( 'VIP Themes', 'quickstart-dashboard' ) . '</h4>';
 			$table = new ThemeHelperWidgetTable( $this );
