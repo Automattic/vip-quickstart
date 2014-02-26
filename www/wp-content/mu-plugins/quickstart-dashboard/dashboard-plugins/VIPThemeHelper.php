@@ -51,28 +51,26 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		}
 
 		// Check if we're supposed to be downloading and activating a theme right now
-		if ( isset( $_REQUEST['page'] ) && 'vip-dashboard' === $_REQUEST['page'] && isset( $_REQUEST['vipthemehelper-install_and_activate'] ) && ! isset( $_REQUEST['vipthemehelper-svn_credential_form_cancel'] ) ) {
-			$this->install_theme( $_REQUEST['vipthemehelper-install_and_activate'] );
-		} elseif ( isset( $_REQUEST['page'] ) && 'vip-dashboard' === $_REQUEST['page'] && isset( $_REQUEST['vipthemehelper-activate'] ) ) {
-			if ( $this->activate_vip_theme( $_REQUEST['vipthemehelper-activate'] ) ) {
-				if ( !wp_verify_nonce( $_REQUEST['_thnonce'], 'vipthemehelper-install_and_activate' ) ) {
-					wp_nonce_ays( 'vipthemehelper-install_and_activate' );
-					exit;
+		if ( isset( $_REQUEST['page'] ) && 'vip-dashboard' === $_REQUEST['page'] && isset( $_REQUEST['vipthemehelper-action'] ) && ! isset( $_REQUEST['vipthemehelper-svn_credential_form_cancel'] ) ) {
+			if ( !wp_verify_nonce( $_REQUEST['_thnonce'], 'vipthemehelper-install_and_activate' ) ) {
+				wp_nonce_ays( 'vipthemehelper-install_and_activate' );
+				exit;
+			}
+
+			if ( isset( $_REQUEST['vipthemehelper-install'] ) ) {
+				$this->install_theme( $_REQUEST['vipthemehelper-action'], isset( $_REQUEST['vipthemehelper-activate'] ) );
+
+			} elseif ( isset( $_REQUEST['vipthemehelper-activate'] ) ) {
+				if ( $this->activate_vip_theme( $_REQUEST['vipthemehelper-action'] ) ) {
+					?>
+					<div class="updated"><p><?php printf( __( 'New VIP theme activated. <a href="%s">Visit site</a>', 'quickstart-dashboard' ), esc_attr( get_bloginfo( 'wpurl' ) ) ); ?></p></div>
+					<?php
 				}
-				
-				?>
-				<div class="updated"><p><?php printf( __( 'New VIP theme activated. <a href="%s">Visit site</a>', 'quickstart-dashboard' ), esc_attr( get_bloginfo( 'wpurl' ) ) ); ?></p></div>
-				<?php
 			}
 		}
 	}
 
 	function install_theme( $theme, $activate = true ) {
-		if ( !wp_verify_nonce( $_REQUEST['_thnonce'], 'vipthemehelper-install_and_activate' ) ) {
-			wp_nonce_ays( 'vipthemehelper-install_and_activate' );
-			exit;
-		}
-
 		$themes = $this->get_vip_scanned_themes();
 		if ( !isset( $themes[$theme] ) ) {
 			?>
@@ -241,13 +239,13 @@ class VIPThemeHelper extends Dashboard_Plugin {
 				$message = sprintf(
 					__( 'Quickstart Dashboard detected that you have access to the VIP theme <strong>%1$s</strong> but have not installed it. <a href="%2$s">Click here to install and activate it.</a>', 'quickstart-dashboard' ),
 					$available_themes[0],
-					add_query_arg( array( 'vipthemehelper-install_and_activate' => $available_themes[0], '_thnonce' => $install_nonce ), menu_page_url( 'vip-dashboard', false ) )
+					$this->get_theme_action_link( $available_themes[0], true, true, $install_nonce )
 				);
 			} else {
 				$message = sprintf(
 					__( 'Quickstart Dashboard detected that you have access to <strong>%0$s</strong> VIP themes but have not installed them. <a href="%1$s">Click here to install and activate them.</a>', 'quickstart-dashboard' ),
 					$available_theme_count,
-					add_query_arg( array( 'vipthemehelper-install_and_activate' => 'all', '_thnonce' => $install_nonce ), menu_page_url( 'vip-dashboard', false ) )
+					$this->get_theme_action_link( 'all', true, false, $install_nonce )
 				);
 			}
 		} elseif ( $installed_theme_count ) {
@@ -256,7 +254,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 				$message = sprintf(
 					__( 'Quickstart Dashboard detected that you have installed the VIP theme <strong>%1$s</strong> but have not activated it. <a href="%2$s">Click here to activate it.</a>', 'quickstart-dashboard' ),
 					$installed_themes[0],
-					add_query_arg( array( 'vipthemehelper-activate' => $installed_themes[0], '_thnonce' => $install_nonce ), menu_page_url( 'vip-dashboard', false ) )
+					$this->get_theme_action_link( $installed_themes[0], false, true, $install_nonce )
 				);
 			} else {
 				$message = sprintf(
@@ -365,5 +363,23 @@ class VIPThemeHelper extends Dashboard_Plugin {
 
 	function set_vip_scanned_themes( $scanned_themes ) {
 		return update_option( 'qs_vipthemehelper_vip_themes', $scanned_themes );
+	}
+
+	function get_theme_action_link( $theme_slug, $install = true, $activate = true, $nonce = null ) {
+		if ( is_null( $nonce ) ) {
+			$nonce = wp_create_nonce( 'vipthemehelper-install_and_activate' );
+		}
+
+		$args = array( 'vipthemehelper-action' => $theme_slug, '_thnonce' => $nonce );
+
+		if ( $install ) {
+			$args['vipthemehelper-install'] = true;
+		}
+
+		if ( $activate ) {
+			$args['vipthemehelper-install'] = true;
+		}
+
+		return add_query_arg( $args, menu_page_url( 'vip-dashboard', false ) );
 	}
 }
