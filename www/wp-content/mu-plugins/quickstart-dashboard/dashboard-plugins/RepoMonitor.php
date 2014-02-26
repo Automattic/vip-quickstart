@@ -30,6 +30,8 @@ class RepoMonitor extends Dashboard_Plugin {
 	}
     
     function init() {
+		$this->create_post_type();
+		
         add_action( 'quickstart_dashboard_setup', array( $this, 'dashboard_setup' ) );
 		add_action( 'repomonitor_scan_repos', array( $this, 'scan_repositories' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
@@ -42,6 +44,29 @@ class RepoMonitor extends Dashboard_Plugin {
 		if ( ! wp_next_scheduled( 'repomonitor_scan_repos' ) ) {
 			wp_schedule_event( time(), 'qs-dashboard-15-min-cron-interval', 'repomonitor_scan_repos' );
 		}
+	}
+	
+	/**
+	 * Register our CPT
+	 */
+	public static function create_post_type() {
+		register_post_type(
+			self::REPO_CPT,
+			array(
+				'labels'       => array(
+					'name'          => __( 'Repositories' ),
+					'singular_name' => __( 'Repository' ),
+					),
+				'public'       => false,
+				'has_archive'  => false,
+				'rewrite'      => false,
+				'show_ui'      => false,
+				'show_in_menu' => false,
+				'supports'     => array(
+					'title',
+					),
+				)
+			);
 	}
 
 	function dashboard_setup() {
