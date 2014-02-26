@@ -18,10 +18,26 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_notices', array( $this, 'print_admin_notice' ) );
 		add_action( 'switch_theme', array( $this, 'theme_switched' ), 10, 2 );
+		add_action( 'quickstart_dashboard_setup', array( $this, 'dashboard_setup' ) );
 	}
 	
 	public function name() {
 		return __( 'VIP Theme Helper', 'quickstart-dashboard' );
+	}
+
+	function dashboard_setup() {
+        wp_add_dashboard_widget( 'quickstart_dashboard_vipthemehelper', $this->name(), array( $this, 'show' ) );
+    }
+
+	function show() {
+		if ( !current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		echo '<h4>' . __( 'VIP Themes', 'quickstart-dashboard' ) . '</h4>';
+		$table = new ThemeHelperWidgetTable( $this );
+		$table->prepare_items();
+		$table->display();
 	}
 
 	/**
@@ -382,4 +398,123 @@ class VIPThemeHelper extends Dashboard_Plugin {
 
 		return add_query_arg( $args, menu_page_url( 'vip-dashboard', false ) );
 	}
+}
+
+if( ! class_exists( 'WP_List_Table' ) ){
+    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+}
+
+class ThemeHelperWidgetTable extends WP_List_Table {
+	/**
+	 * @var VIPThemeHelper
+	 */
+	private $theme_helper = null;
+
+    function __construct( $theme_helper ) {
+		$this->theme_helper = $theme_helper;
+
+        parent::__construct( array(
+            'singular'  => 'theme',
+            'plural'    => 'themes',
+            'ajax'      => false
+        ) );
+    }
+
+    function column_default( $item, $column_name ){
+		$retval = '';
+        switch( $column_name ){
+            default:
+                $retval = $item[$column_name];
+        }
+
+		return $retval;
+    }
+
+    function column_theme_name( $item ){
+		$page = esc_attr( $_REQUEST['page'] );
+
+		$link_format = '<a href="%s">%s</a>';
+
+        //Build row actions
+        $actions = array();
+
+		if ( ! $item['installed'] ) {
+			$actions['install'] = sprintf( $link_format, $this->theme_helper->get_theme_action_link( $item['slug'], true, false ), __( 'Install', 'quickstart-dashboard' ) );
+			$actions['install_activate'] = sprintf( $link_format, $this->theme_helper->get_theme_action_link( $item['slug'], true, true ), __( 'Install and Activate', 'quickstart-dashboard' ) );
+		} elseif ( ! $item['activated'] ) {
+			$actions['activate'] = sprintf( $link_format, $this->theme_helper->get_theme_action_link( $item['slug'], false, true ), __( 'Activate', 'quickstart-dashboard' ) );
+		}
+
+        //Return the title contents
+        return "<strong>{$item['theme_name']}</strong>" . $this->row_actions( $actions );
+    }
+
+    function column_cb( $item ){
+        return sprintf(
+            '<input type="checkbox" name="%1$s[]" value="%2$s" />',
+            /*$1%s*/ $this->_args['singular'],
+            /*$2%s*/ $item['slug']
+        );
+    }
+
+    function get_columns(){
+		$cols = array(
+            'cb'		  => '<input type="checkbox" />', //Render a checkbox instead of text
+            'theme_name'  => __( 'Theme', 'quickstart-dashboard' ),
+			'description' => __( 'Description', 'quickstart-dashboard' ),
+        );
+
+        return apply_filters( 'vipthemehelper_table_get_columns', $cols );
+    }
+
+    function get_sortable_columns() {
+        return apply_filters( 'vipthemehelper_table_get_sortable_columns', array() );
+    }
+
+    function get_bulk_actions() {
+        return apply_filters( 'vipthemehelper_table_bulk_actions', array(
+            'install'    => 'Install'
+        ) );
+    }
+
+    function process_bulk_action() {
+		do_action( 'vipthemehelper_table_do_bulk_actions' );
+    }
+
+    function prepare_items() {
+        $per_page = 10;
+        $columns = $this->get_columns();
+        $hidden = array();
+        $sortable = $this->get_sortable_columns();
+        $this->_column_headers = array( $columns, $hidden, $sortable );
+        $this->process_bulk_action();
+
+        $total_items = 0;
+        $this->items = array();
+		foreach ( $this->theme_helper->get_vip_scanned_themes() as $slug => $theme ) {
+			$wp_theme = wp_get_theme( $theme['stylesheet'] );
+
+			if ( $wp_theme->exists() ) {
+				$this->items[] = array_merge( $theme, array(
+					'slug'		  => $slug,
+					'theme_name'  => $wp_theme->display( 'Name' ),
+					'description' => $wp_theme->display( 'Description' ),
+				) );
+			} else {
+				$this->items[] = array_merge( $theme, array(
+					'slug'		  => $slug,
+					'theme_name'  => $slug,
+					'description' => '',
+				) );
+			}
+
+			$total_items += 1;
+		}
+
+        $this->set_pagination_args( array(
+            'total_items' => $total_items,
+            'per_page'    => $per_page,
+            'total_pages' => ceil($total_items/$per_page),
+        ) );
+    }
 }
