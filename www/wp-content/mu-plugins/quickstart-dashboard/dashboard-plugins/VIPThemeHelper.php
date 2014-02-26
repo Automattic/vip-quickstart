@@ -33,11 +33,17 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		if ( !current_user_can( 'manage_options' ) ) {
 			return;
 		}
-
-		echo '<h4>' . __( 'VIP Themes', 'quickstart-dashboard' ) . '</h4>';
-		$table = new ThemeHelperWidgetTable( $this );
-		$table->prepare_items();
-		$table->display();
+		
+		if ( ! empty( $this->access_token ) ) {
+			echo '<h4>' . __( 'VIP Themes', 'quickstart-dashboard' ) . '</h4>';
+			$table = new ThemeHelperWidgetTable( $this );
+			$table->prepare_items();
+			$table->display(); 
+		} else {
+			// No access token, print a message
+			echo '<p>' . Quickstart_Dashboard::get_instance()->get_connect_wpcom_message() . '</p>';
+		}
+		
 	}
 
 	/**
