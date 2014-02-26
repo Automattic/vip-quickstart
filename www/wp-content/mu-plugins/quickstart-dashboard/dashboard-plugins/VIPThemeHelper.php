@@ -393,7 +393,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		}
 
 		if ( $activate ) {
-			$args['vipthemehelper-install'] = true;
+			$args['vipthemehelper-activate'] = true;
 		}
 
 		return add_query_arg( $args, menu_page_url( 'vip-dashboard', false ) );
