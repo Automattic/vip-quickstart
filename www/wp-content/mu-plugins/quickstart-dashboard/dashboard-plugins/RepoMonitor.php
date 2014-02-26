@@ -507,6 +507,8 @@ class RepoMonitor extends Dashboard_Plugin {
 		add_post_meta( $id, 'qs_warn_out_of_date', $args['warn_out_of_date'], true );
 		$this->set_repo_status( $id, $args['repo_status'] );
 
+		$args['repo_id'] = $id;
+		
 		$this->repos[] = $args;
 		if ( $add_hooks ) {
 			$result = $this->setup_repo_hooks( $args );
