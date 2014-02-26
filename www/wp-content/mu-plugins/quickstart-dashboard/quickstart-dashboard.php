@@ -161,11 +161,13 @@ class Quickstart_Dashboard {
 
 	function show_admin_notices() {
 		if ( empty( $this->wpcom_access_token ) && $this->show_wpcom_access_notice ) {
-			$connect_url = add_query_arg( array( 'dashboard_wpcom_connect' => true ), menu_page_url( 'vip-dashboard', false ) );
-			?>
-			<div class="error"><p><?php printf( __( 'Please <a href="%s">connect Quickstart</a> with WordPress.com VIP to enable enhanced features.', 'quickstart-dashboard' ), $connect_url ); ?></p></div>
-			<?php
+			echo '<div class="error"><p>' . $this->get_connect_wpcom_message() . '</p></div>';
 		}
+	}
+	
+	function get_connect_wpcom_message() {
+		$connect_url = add_query_arg( array( 'dashboard_wpcom_connect' => true ), menu_page_url( 'vip-dashboard', false ) );
+		return sprintf( __( 'Please <a href="%s">connect Quickstart</a> with WordPress.com VIP to enable enhanced features.', 'quickstart-dashboard' ), $connect_url );
 	}
 
 	function set_wpcom_access_token( $new_token ) {

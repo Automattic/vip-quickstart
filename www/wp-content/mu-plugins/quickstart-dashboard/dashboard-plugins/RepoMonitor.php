@@ -52,23 +52,7 @@ class RepoMonitor extends Dashboard_Plugin {
 		?>
 
 		<style>
-            .vip-dashboard-repo-row {
-                display: block;
-				margin: 0;
-				padding: 5px;
-				border: 1px solid #ddd;
-            }
-
-			.vip-dashboard-repo-row.vip-dashboard-repo-warn {
-				background-color: rgba(255, 0, 0, 0.2);
-				color: rgba(255, 0, 0, 0.8);
-			}
-
-            .vip-dashboard-repo-row h4 {
-
-			}
-
-			.vip-dashboard-repo-row .vip-dashboard-repo-type {
+			.vip-dashboard-repomonitor-table .vip-dashboard-repo-type {
 				display: inline-block;
 				background: #ececec;
 				border: 1px solid #ddd;
@@ -76,21 +60,22 @@ class RepoMonitor extends Dashboard_Plugin {
 				padding: 3px;
 				font-size: 0.8em;
 				margin: 3px;
+				width: 20px;
+				text-align: center;
+				float: right;
+			}
+			
+			.vip-dashboard-repomonitor-table .column-status {
+				width: 60%;
 			}
         </style>
 
 		<h4><?php _e( 'Monitored Repositories', 'quickstart-dashboard' ); ?></h4>
-		<?php 
-		foreach ( $this->get_repos() as $repo ):
-			$status = $this->get_repo_status( $repo['repo_id'] );
-			$warn = $repo['warn_out_of_date'] && $this->repo_out_of_date( $status, $repo['repo_type'] );
-			?>
-		<div class="vip-dashboard-repo-row <?php echo $warn ? 'vip-dashboard-repo-warn' : '' ?>">
-			<h4><?php echo $repo['repo_friendly_name']; ?><span class="vip-dashboard-repo-type"><?php echo $repo['repo_type']; ?></span></h4>
-			<span class="vip-dashboard-repo-status"><?php echo $this->get_status_text( $status, $repo['repo_type'] ); ?></span>
-		</div>
-		<?php endforeach; ?>
 		<?php
+		
+		$table = new RepoMonitorWidgetTable( $this );
+		$table->prepare_items();
+		$table->display();
 	}
 
 	function scan_repositories() {
@@ -541,4 +526,123 @@ class RepoMonitor extends Dashboard_Plugin {
 			chmod( $hook_path, 0755 );
 		}
 	}
+}
+
+if( ! class_exists( 'WP_List_Table' ) ){
+    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+}
+
+class RepoMonitorWidgetTable extends WP_List_Table {
+	/**
+	 * @var RepoMonitor
+	 */
+	private $repo_monitor = null;
+
+    function __construct( $repo_monitor ) {
+		$this->repo_monitor = $repo_monitor;
+
+        parent::__construct( array(
+            'singular'  => 'theme',
+            'plural'    => 'themes',
+            'ajax'      => false
+        ) );
+    }
+
+	function get_table_classes() {
+		return array( 'widefat', 'fixed', $this->_args['plural'], 'vip-dashboard-repomonitor-table', 'plugins' );
+	}
+
+	function single_row( $item ) {
+		static $row_class = '';
+		$row_class = ( $row_class == '' ? 'alternate' : '' );
+
+		$row_classes = array( $row_class );
+		if ( $item['warn'] ) {
+			$row_classes[] = 'active update';
+		}
+
+		echo '<tr class="' . implode( ' ', $row_classes ) . '">';
+		$this->single_row_columns( $item );
+		echo '</tr>';
+	}
+
+    function column_default( $item, $column_name ){
+		$retval = '';
+        switch( $column_name ){
+			case 'status':
+				$retval = $this->repo_monitor->get_status_text( $item[$column_name], $item['repo_type'] );
+				break;
+            default:
+                $retval = $item[$column_name];
+        }
+
+		return $retval;
+    }
+
+    function column_repo_friendly_name( $item ){
+        //Build row actions
+        $actions = array();
+
+        //Return the title contents
+		return sprintf( "<strong>%s</strong><span class='vip-dashboard-repo-type'>%s</span>", esc_html( $item['repo_friendly_name'] ), esc_html( $item['repo_type'] ), $this->row_actions( $actions ) );
+    }
+
+    function column_cb( $item ){
+        return sprintf(
+            '<input type="checkbox" name="%1$s[]" value="%2$s" />',
+            /*$1%s*/ $this->_args['singular'],
+            /*$2%s*/ $item['repo_id']
+        );
+    }
+
+    function get_columns(){
+		$cols = array(
+            'cb'				 => '<input type="checkbox" />', //Render a checkbox instead of text
+            'repo_friendly_name' => __( 'Repo', 'quickstart-dashboard' ),
+			'status'			 => __( 'Status', 'quickstart-dashboard' ),
+        );
+
+        return apply_filters( 'viprepomonitor_table_get_columns', $cols );
+    }
+
+    function get_sortable_columns() {
+        return apply_filters( 'viprepomonitor_table_get_sortable_columns', array() );
+    }
+
+    function get_bulk_actions() {
+        return apply_filters( 'viprepomonitor_table_bulk_actions', array() );
+    }
+
+    function process_bulk_action() {
+		do_action( 'viprepomonitor_table_do_bulk_actions' );
+    }
+
+    function prepare_items() {
+        $per_page = 10;
+        $columns = $this->get_columns();
+        $hidden = array();
+        $sortable = $this->get_sortable_columns();
+        $this->_column_headers = array( $columns, $hidden, $sortable );
+        $this->process_bulk_action();
+		
+        $total_items = 0;
+        $this->items = array();
+		foreach ( $this->repo_monitor->get_repos() as $repo ) {
+			$status = $this->repo_monitor->get_repo_status( $repo['repo_id'] );
+			$warn = $repo['warn_out_of_date'] && $this->repo_monitor->repo_out_of_date( $status, $repo['repo_type'] );
+
+			$this->items[] = array_merge( $repo, array(
+				'status'    => $status,
+				'warn'	    => $warn,
+			) );
+
+			$total_items += 1;
+		}
+
+        $this->set_pagination_args( array(
+            'total_items' => $total_items,
+            'per_page'    => $per_page,
+            'total_pages' => ceil($total_items/$per_page),
+        ) );
+    }
 }
