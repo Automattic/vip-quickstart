@@ -420,6 +420,28 @@ class ThemeHelperWidgetTable extends WP_List_Table {
         ) );
     }
 
+	function get_table_classes() {
+		return array( 'widefat', 'fixed', $this->_args['plural'], 'vip-dashboard-themehelper-table', 'plugins' );
+	}
+
+	function single_row( $item ) {
+		static $row_class = '';
+		$row_class = ( $row_class == '' ? 'alternate' : '' );
+
+		$row_classes = array( $row_class );
+		if ( $item['activated'] ) {
+			$row_classes[] = 'update';
+		}
+
+		if ( $item['installed'] ) {
+			$row_classes[] = 'active';
+		}
+
+		echo '<tr class="' . implode( ' ', $row_classes ) . '">';
+		$this->single_row_columns( $item );
+		echo '</tr>';
+	}
+
     function column_default( $item, $column_name ){
 		$retval = '';
         switch( $column_name ){
