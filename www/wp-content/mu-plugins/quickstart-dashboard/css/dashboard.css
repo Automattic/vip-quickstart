@@ -1,0 +1,12 @@
+.vip-dashboard-table {
+	margin: 0;
+	width: 100%;
+}
+
+.vip-dashboard-table .column-repo_type {
+	width: 3%;
+}
+
+.vip-dashboard-table .column-status {
+	width: 50%;
+}
