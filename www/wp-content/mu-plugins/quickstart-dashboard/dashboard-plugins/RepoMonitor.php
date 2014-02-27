@@ -557,11 +557,7 @@ class RepoMonitor extends Dashboard_Plugin {
 	}
 }
 
-if( ! class_exists( 'WP_List_Table' ) ){
-    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
-}
-
-class RepoMonitorWidgetTable extends WP_List_Table {
+class RepoMonitorWidgetTable extends DashboardWidgetTable {
 	/**
 	 * @var RepoMonitor
 	 */
@@ -578,14 +574,14 @@ class RepoMonitorWidgetTable extends WP_List_Table {
     }
 
 	function get_table_classes() {
-		return array( 'widefat', 'fixed', $this->_args['plural'], 'vip-dashboard-repomonitor-table', 'vip-dashboard-table', 'plugins' );
+		$classes = parent::get_table_classes();
+		$classes[] = 'vip-dashboard-repomonitor-table';
+		return $classes;
 	}
 
 	function single_row( $item ) {
-		static $row_class = '';
-		$row_class = ( $row_class == '' ? 'alternate' : '' );
-
-		$row_classes = array( $row_class );
+		$row_classes = parent::get_row_classes();
+		
 		if ( $item['warn'] ) {
 			$row_classes[] = 'active update';
 		} else {
@@ -595,48 +591,6 @@ class RepoMonitorWidgetTable extends WP_List_Table {
 		echo '<tr class="' . implode( ' ', $row_classes ) . '">';
 		$this->single_row_columns( $item );
 		echo '</tr>';
-	}
-
-	function display() {
-		extract( $this->_args );
-
-		$this->display_tablenav( 'top' );
-
-?>
-<table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>">
-	<tfoot>
-	<tr>
-		<?php $this->print_column_headers( false ); ?>
-	</tr>
-	</tfoot>
-
-	<tbody id="the-list"<?php if ( $singular ) echo " data-wp-lists='list:$singular'"; ?>>
-		<?php $this->display_rows_or_placeholder(); ?>
-	</tbody>
-</table>
-<?php
-		$this->display_tablenav( 'bottom' );
-	}
-
-	function display_tablenav( $which ) {
-		if ( 'top' == $which ) {
-			wp_nonce_field( 'bulk-' . $this->_args['plural'] );
-			return; // Don't display table nav on top
-		}
-?>
-	<div class="tablenav <?php echo esc_attr( $which ); ?>">
-
-		<div class="alignleft actions bulkactions">
-			<?php $this->bulk_actions(); ?>
-		</div>
-<?php
-		$this->extra_tablenav( $which );
-		$this->pagination( $which );
-?>
-
-		<br class="clear" />
-	</div>
-<?php
 	}
 
     function column_default( $item, $column_name ){
