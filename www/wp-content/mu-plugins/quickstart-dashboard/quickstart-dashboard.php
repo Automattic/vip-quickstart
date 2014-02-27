@@ -38,6 +38,8 @@ class Quickstart_Dashboard {
 		// Load the WP.com access token
 		$this->wpcom_access_token = get_option( 'qs_dashboard_wpcom_access_token', '' );
 
+		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ) );
+
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
@@ -70,6 +72,10 @@ class Quickstart_Dashboard {
 				$this->do_wpcom_auth_flow();
 			}
 		}
+	}
+
+	function admin_footer_text( $text ) {
+		return '<span id="footer-thankyou">' . __( 'Thank you for creating with <a href="http://wordpress.org/">WordPress</a> and <a href="https://vip.wordpress.com/">WordPress.com VIP</a>.' ) . '</span>';
 	}
 
 	function do_wpcom_auth_flow() {
