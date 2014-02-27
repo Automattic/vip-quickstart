@@ -26,7 +26,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 	}
 
 	function dashboard_setup() {
-        wp_add_dashboard_widget( 'quickstart_dashboard_vipthemehelper', $this->name(), array( $this, 'show' ) );
+        wp_add_dashboard_widget( 'quickstart_dashboard_vipthemehelper', __( 'VIP Themes', 'quickstart-dashboard' ), array( $this, 'show' ) );
     }
 
 	function show() {
@@ -35,7 +35,6 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		}
 
 		if ( ! empty( $this->access_token ) ) {
-			echo '<h4>' . __( 'VIP Themes', 'quickstart-dashboard' ) . '</h4>';
 			$table = new ThemeHelperWidgetTable( $this );
 			$table->prepare_items();
 			$table->display(); 
@@ -444,11 +443,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 	}
 }
 
-if( ! class_exists( 'WP_List_Table' ) ){
-    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
-}
-
-class ThemeHelperWidgetTable extends WP_List_Table {
+class ThemeHelperWidgetTable extends DashboardWidgetTable {
 	/**
 	 * @var VIPThemeHelper
 	 */
@@ -465,14 +460,14 @@ class ThemeHelperWidgetTable extends WP_List_Table {
     }
 
 	function get_table_classes() {
-		return array( 'widefat', 'fixed', $this->_args['plural'], 'vip-dashboard-themehelper-table', 'plugins' );
+		$classes = parent::get_table_classes();
+		$classes[] = 'vip-dashboard-vipthemehelper-table';
+		return $classes;
 	}
 
 	function single_row( $item ) {
-		static $row_class = '';
-		$row_class = ( $row_class == '' ? 'alternate' : '' );
-
-		$row_classes = array( $row_class );
+		$row_classes = parent::get_row_classes();
+		
 		if ( $item['activated'] ) {
 			$row_classes[] = 'update';
 		}

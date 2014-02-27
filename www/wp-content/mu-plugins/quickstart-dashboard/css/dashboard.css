@@ -22,12 +22,14 @@
 	width: 20px;
 }
 
-#dashboard-widgets #quickstart_dashboard_repomonitor .inside {
+#dashboard-widgets #quickstart_dashboard_repomonitor .inside,
+#dashboard-widgets #quickstart_dashboard_vipthemehelper .inside {
 	margin: -1px;
 	padding: 0px;
 }
 
-#quickstart_dashboard_repomonitor .tablenav {
+#quickstart_dashboard_repomonitor .tablenav,
+#quickstart_dashboard_vipthemehelper .tablenav {
 	margin: 10px 0 13px;
 	padding: 0 13px;
 }
