@@ -190,7 +190,7 @@ class RepoMonitor extends Dashboard_Plugin {
 		}
 	}
 
-	function scan_svn_repo( $repo_path, $allow_interactive = false ) {
+	function scan_svn_repo( $repo_path, $allow_interactive = false, $credentials = array() ) {
 		$cwd = getcwd();
 		
 		// Variables to load output into
@@ -200,13 +200,21 @@ class RepoMonitor extends Dashboard_Plugin {
 		chdir( $repo_path );
 
         // Execute info command to get info about local repo
-		$command_args = '';
+		$command_args = array();
 		if ( ! $allow_interactive ) {
-			$command_args .= '--non-interactive';
+			$command_args[] = '--non-interactive';
+		}
+
+		if ( !empty( $credentials['username'] ) ) {
+			$command_args[] = '--username=' . escapeshellarg( $credentials['username'] );
+		}
+
+		if ( !empty( $credentials['password'] ) ) {
+			$command_args[] = '--password=' . escapeshellarg( $credentials['password'] );
 		}
 		
-        exec( sprintf( 'svn info %s', $command_args ), $output, $return_value );
-        
+        exec( sprintf( 'svn info %s', implode( ' ', $command_args ) ), $output, $return_value );
+
         if ( 0 != $return_value ) {
             return new WP_Error( 
                 $return_value, 
@@ -216,13 +224,10 @@ class RepoMonitor extends Dashboard_Plugin {
         
         $info = $this->parse_svn_info( $output );
         
-		$command_args = '-u';
-		if ( ! $allow_interactive ) {
-			$command_args .= ' --non-interactive';
-		}
+		$command_args[] = '-u';
 		
 		// Execute status command to get file into
-		exec( sprintf( 'svn status %s', $command_args ), $output, $return_value );
+		exec( sprintf( 'svn status %s', implode( ' ', $command_args ) ), $output, $return_value );
         
         if ( 0 != $return_value ) {
             return new WP_Error( 
@@ -479,7 +484,20 @@ class RepoMonitor extends Dashboard_Plugin {
         }
     }
 
-	function add_repo( $args, $add_hooks = true ) {
+	/**
+	 * Adds a repo to be tracked by the RepoMonitor. The repo must already exist.
+	 *
+	 * Git credentials are not yet supported.
+	 *
+	 * Hooks are only supported on git repositories.
+	 *
+	 * @param array $args The array arguments
+	 * @param boolean $add_hooks Whether or not to add repo hooks (git only)
+	 * @param boolean $allow_interactive Whether or not to allow the subcommands to give interactive prompts.
+	 * @param array $credentials Optional credentials to provide the command (svn only)
+	 * @return int\WP_Error The repo ID or WP_Error on failure.
+	 */
+	function add_repo( $args, $add_hooks = true, $allow_interactive = false, $credentials = array() ) {
 		$defaults = array(
 			'repo_type'			 => 'git',
 			'repo_path'			 => '',
@@ -491,7 +509,7 @@ class RepoMonitor extends Dashboard_Plugin {
 
 		// Test that the repo exists by scanning it
 		if ( 'svn' == $args['repo_type'] ) {
-			$args['repo_status'] = $this->scan_svn_repo( $args['repo_path'] );
+			$args['repo_status'] = $this->scan_svn_repo( $args['repo_path'], $allow_interactive, $credentials );
 		} elseif ( 'git' == $args['repo_type'] ) {
 			$args['repo_status'] = $this->scan_git_repo( $args['repo_path'] );
 		} else {
