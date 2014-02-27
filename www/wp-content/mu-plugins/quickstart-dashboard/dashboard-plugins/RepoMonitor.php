@@ -565,6 +565,100 @@ class RepoMonitor extends Dashboard_Plugin {
 			chmod( $hook_path, 0755 );
 		}
 	}
+	
+	/**
+	 * Checks to see if we can *probably* update the repo. This checks for an uncommitted
+	 * changes inside the working directory.
+	 *
+	 * Ignores untracked files.
+	 *
+	 * @param array $repo
+	 * @return boolean Returns true if the working directory is clean, or false otherwise.
+	 */
+	function can_update_repo( $repo ) {
+		$dirty_files = $this->get_dirty_files( $repo );
+
+		if ( false === $dirty_files ) {
+			return false;
+		}
+
+		return empty( $dirty_files['staged'] ) && empty( $dirty_files['unstaged'] );
+	}
+
+	/**
+	 * Gets all staged, unstaged and untracked files in a repo.
+	 *
+	 * The array will have sub-arrays 'staged', 'unstaged', and 'untracked' with
+	 * a list of each file matching that criteria.
+	 *
+	 * If the repo is an SVN repo, all changes will be 'unstaged' except for
+	 * untracked files.
+	 *
+	 * @param array $repo The repo to get dirt files for.
+	 * @return array|boolean Returns an array of files on success or false on failure.
+	 */
+	function get_dirty_files( $repo ) {
+		$cwd = getcwd();
+
+		// Variables to load output into
+		$output = array();
+		$return_value = -1;
+		$staged_col = 0;
+		$unstaged_col = 1;
+		$untracked_char = '?';
+
+		// Go to repository directory
+		chdir( $repo['repo_path'] );
+
+		// Fetch the status
+		if ( $repo['repo_type'] == 'git' ) {
+			exec( 'git status --porcelain', $output, $return_value );
+		} elseif ( $repo['repo_type'] == 'svn' ) {
+			exec( 'svn status', $output, $return_value );
+			$unstaged_col = 0;
+		} else {
+			return false;
+		}
+
+		if ( 0 !== $return_value ) {
+			return false;
+		}
+
+		// Go back to previous working directory
+		chdir( $cwd );
+
+		// Parse the repo status
+		$staged = array();
+		$unstaged = array();
+		$untracked = array();
+		foreach ( $output as $line ) {
+			// Question marks occur for files that have not been added
+			if ( $untracked_char == $line[0] || $untracked_char == $line[1] ) {
+				$untracked[] = trim( substr( $line, 2 ) );
+				continue;
+			}
+
+			// Check the staged column. Only used by git.
+			if ( $repo['repo_type'] == 'git' && ! ctype_space( $line[$staged_col] ) ) {
+				$staged[] = trim( substr( $line, 2 ) );
+			}
+
+			// Check the unstaged column. Used by SVN and git.
+			if ( ! ctype_space( $line[$unstaged_col] ) ) {
+				$unstaged[] = trim( substr( $line, 2 ) );
+			}
+		}
+
+		return array( 'staged' => $staged, 'unstaged' => $unstaged, 'untracked' => $untracked );
+	}
+
+	/**
+	 * Updates the given repo to the latest version.
+	 * @param array $repo The repo to update
+	 */
+	function update_repo( $repo ) {
+
+	}
 }
 
 class RepoMonitorWidgetTable extends DashboardWidgetTable {
@@ -592,8 +686,14 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 	function single_row( $item ) {
 		$row_classes = parent::get_row_classes();
 		
+		$can_update = false;
 		if ( $item['warn'] ) {
-			$row_classes[] = 'active update';
+			$can_update = $this->repo_monitor->can_update_repo( $item );
+
+			$row_classes[] = 'active';
+			if ( $item['warn'] && ! $can_update ) {
+				$row_classes[] = 'update';
+			}
 		} else {
 			$row_classes[] = 'inactive';
 		}
@@ -601,6 +701,18 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 		echo '<tr class="' . implode( ' ', $row_classes ) . '">';
 		$this->single_row_columns( $item );
 		echo '</tr>';
+
+		// Check if the item needs updating. If it can't be updated, tell the user to fix the problem.
+		if ( $item['warn'] && ! $can_update ) {
+			$message = '';
+			if ( $item['repo_type'] == 'git' ) {
+				$message = __( 'Please <code>git stash</code> or <code>git commit</code> your changes to update.', 'quickstart-dashboard' );
+			} elseif ( $item['repo_type'] == 'svn' ) {
+				$message = __( 'Please <code>svn commit</code> or <code>svn revert</code> your changes to update.', 'quickstart-dashboard' );
+			}
+
+			printf( '<tr class="plugin-update-tr"><td class="plugin-update colspanchange" colspan="%s"><div class="update-message">%s</div></td></tr>', $this->get_column_count(), wp_kses( $message, wp_kses_allowed_html( 'post' ) ) );
+		}
 	}
 
     function column_default( $item, $column_name ){
@@ -624,7 +736,7 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
         $actions = array();
 
         //Return the title contents
-		return sprintf( '<strong>%s</strong>', esc_html( $item['repo_friendly_name'] ), $this->row_actions( $actions ) );
+		return sprintf( '<strong>%s</strong>', esc_html( $item['repo_friendly_name'] ), $this->row_actions( $actions, true ) );
     }
 
     function column_cb( $item ){
