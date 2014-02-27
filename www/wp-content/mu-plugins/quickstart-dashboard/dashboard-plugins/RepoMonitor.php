@@ -53,24 +53,26 @@ class RepoMonitor extends Dashboard_Plugin {
 
 		<style>
 			.vip-dashboard-repomonitor-table .vip-dashboard-repo-type {
-				display: inline-block;
-				background: #ececec;
-				border: 1px solid #ddd;
+				background: none repeat scroll 0 0 #ECECEC;
 				border-radius: 3px;
-				padding: 3px;
+				display: inline-block;
 				font-size: 0.8em;
-				margin: 3px;
-				width: 20px;
+				padding: 0 2px 2px;
 				text-align: center;
-				float: right;
+				vertical-align: middle;
+				width: 20px;
 			}
-			
-			.vip-dashboard-repomonitor-table .column-status {
-				width: 60%;
+
+			#dashboard-widgets #quickstart_dashboard_repomonitor .inside {
+				margin: -1px;
+				padding: 0px;
+			}
+
+			#quickstart_dashboard_repomonitor .tablenav {
+				margin: 10px 0 13px;
+				padding: 0 13px;
 			}
         </style>
-
-		<h4><?php _e( 'Monitored Repositories', 'quickstart-dashboard' ); ?></h4>
 		<?php
 		
 		$table = new RepoMonitorWidgetTable( $this );
@@ -549,7 +551,7 @@ class RepoMonitorWidgetTable extends WP_List_Table {
     }
 
 	function get_table_classes() {
-		return array( 'widefat', 'fixed', $this->_args['plural'], 'vip-dashboard-repomonitor-table', 'plugins' );
+		return array( 'widefat', 'fixed', $this->_args['plural'], 'vip-dashboard-repomonitor-table', 'vip-dashboard-table', 'plugins' );
 	}
 
 	function single_row( $item ) {
@@ -559,6 +561,8 @@ class RepoMonitorWidgetTable extends WP_List_Table {
 		$row_classes = array( $row_class );
 		if ( $item['warn'] ) {
 			$row_classes[] = 'active update';
+		} else {
+			$row_classes[] = 'inactive';
 		}
 
 		echo '<tr class="' . implode( ' ', $row_classes ) . '">';
@@ -566,11 +570,56 @@ class RepoMonitorWidgetTable extends WP_List_Table {
 		echo '</tr>';
 	}
 
+	function display() {
+		extract( $this->_args );
+
+		$this->display_tablenav( 'top' );
+
+?>
+<table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>">
+	<tfoot>
+	<tr>
+		<?php $this->print_column_headers( false ); ?>
+	</tr>
+	</tfoot>
+
+	<tbody id="the-list"<?php if ( $singular ) echo " data-wp-lists='list:$singular'"; ?>>
+		<?php $this->display_rows_or_placeholder(); ?>
+	</tbody>
+</table>
+<?php
+		$this->display_tablenav( 'bottom' );
+	}
+
+	function display_tablenav( $which ) {
+		if ( 'top' == $which ) {
+			wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+			return; // Don't display table nav on top
+		}
+?>
+	<div class="tablenav <?php echo esc_attr( $which ); ?>">
+
+		<div class="alignleft actions bulkactions">
+			<?php $this->bulk_actions(); ?>
+		</div>
+<?php
+		$this->extra_tablenav( $which );
+		$this->pagination( $which );
+?>
+
+		<br class="clear" />
+	</div>
+<?php
+	}
+
     function column_default( $item, $column_name ){
 		$retval = '';
         switch( $column_name ){
 			case 'status':
 				$retval = $this->repo_monitor->get_status_text( $item[$column_name], $item['repo_type'] );
+				break;
+			case 'repo_type':
+				$retval = sprintf( '<span class="vip-dashboard-repo-type">%s</span>', esc_html( $item['repo_type'] ) );
 				break;
             default:
                 $retval = $item[$column_name];
@@ -584,7 +633,7 @@ class RepoMonitorWidgetTable extends WP_List_Table {
         $actions = array();
 
         //Return the title contents
-		return sprintf( "<strong>%s</strong><span class='vip-dashboard-repo-type'>%s</span>", esc_html( $item['repo_friendly_name'] ), esc_html( $item['repo_type'] ), $this->row_actions( $actions ) );
+		return sprintf( '<strong>%s</strong>', esc_html( $item['repo_friendly_name'] ), $this->row_actions( $actions ) );
     }
 
     function column_cb( $item ){
@@ -599,6 +648,7 @@ class RepoMonitorWidgetTable extends WP_List_Table {
 		$cols = array(
             'cb'				 => '<input type="checkbox" />', //Render a checkbox instead of text
             'repo_friendly_name' => __( 'Repo', 'quickstart-dashboard' ),
+			'repo_type'			 => '', // Don't show anything in the header
 			'status'			 => __( 'Status', 'quickstart-dashboard' ),
         );
 
@@ -610,7 +660,9 @@ class RepoMonitorWidgetTable extends WP_List_Table {
     }
 
     function get_bulk_actions() {
-        return apply_filters( 'viprepomonitor_table_bulk_actions', array() );
+        return apply_filters( 'viprepomonitor_table_bulk_actions', array(
+			'install' => __( 'Install', 'quickstart-dashboard' ),
+		) );
     }
 
     function process_bulk_action() {
