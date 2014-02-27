@@ -159,7 +159,7 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 	 *     wp dashboard add_repo Quickstart /srv
 	 *     wp dashboard add_repo --svn WordPress /srv/www/wp
 	 *
-	 * @synopsis <name> <path> [--warn] [--svn]
+	 * @synopsis <name> <path> [--warn] [--svn] [--username] [--password]
 	 */
 	function add_repo( $args, $assoc_args ) {
 		$type = 'git';
@@ -176,12 +176,21 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 			return;
 		}
 
+		$credentials = array();
+		if ( isset( $assoc_args['username'] ) ) {
+			$credentials['username'] = sanitize_text_field( $assoc_args['username'] );
+		}
+
+		if ( isset( $assoc_args['password'] ) ) {
+			$credentials['password'] = sanitize_text_field( $assoc_args['password'] );
+		}
+
 		$result = $repo_monitor->add_repo( array(
 			'repo_type'			 => $type,
 			'repo_path'			 => $args[1],
 			'repo_friendly_name' => $args[0],
 			'warn_out_of_date'   => ! $assoc_args['warn'],
-		) );
+		), true, ! isset( $credentials['password'] ), $credentials ); // Only allow interactive mode if password not given
 
 		if ( is_wp_error( $result ) ) {
 			WP_CLI::error( $result->get_error_message() );
