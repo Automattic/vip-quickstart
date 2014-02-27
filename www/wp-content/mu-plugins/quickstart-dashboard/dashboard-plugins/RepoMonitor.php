@@ -35,6 +35,7 @@ class RepoMonitor extends Dashboard_Plugin {
         add_action( 'quickstart_dashboard_setup', array( $this, 'dashboard_setup' ) );
 		add_action( 'repomonitor_scan_repos', array( $this, 'scan_repositories' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_notices', array( $this, 'print_admin_notice' ) );
 		
 		add_filter( 'cron_schedules', array( $this, 'repo_15_min_cron_interval' ) );
     }
@@ -43,6 +44,41 @@ class RepoMonitor extends Dashboard_Plugin {
 		// Add the cron job to check for updates
 		if ( ! wp_next_scheduled( 'repomonitor_scan_repos' ) ) {
 			wp_schedule_event( time(), 'qs-dashboard-15-min-cron-interval', 'repomonitor_scan_repos' );
+		}
+	}
+
+	function print_admin_notice() {
+		// Check if any repos are out of date
+		$repos = $this->get_repos();
+		$outofdate = array();
+		foreach ( $repos as $repo ) {
+			$status = $this->get_repo_status( $repo['repo_id'] );
+			if ( $repo['warn_out_of_date'] && $this->repo_out_of_date( $status, $repo['repo_type'] ) ) {
+				$outofdate[] = array( 'repo' => $repo, 'status' => $status );
+			}
+		}
+
+		$outofdate_count = count( $outofdate );
+		if ( $outofdate_count == 1 ) {
+			$message = sprintf(
+				__( 'The %s repo is out of date: %s Visit the <a href="%s">VIP Dashboard</a> for more info.', 'quickstart-dashboard' ),
+				$outofdate[0]['repo']['repo_friendly_name'],
+				$this->get_status_text( $outofdate[0]['status'], $outofdate[0]['repo']['repo_type'] ),
+				menu_page_url( 'vip-dashboard', false )
+			);
+
+			?>
+			<div class="update update-nag"><?php echo $message; ?></div>
+			<?php
+		} elseif ( $outofdate_count > 1 ) {
+			$message = sprintf(
+				__( 'There are %s repos that are out of date. Visit the <a href="%s">VIP Dashboard</a> for more info.', 'quickstart-dashboard' ),
+				number_format( $outofdate_count ),
+				menu_page_url( 'vip-dashboard', false )
+			);
+			?>
+			<div class="update update-nag"><?php echo $message; ?></div>
+			<?php
 		}
 	}
 	
