@@ -136,12 +136,20 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		$plugins = Quickstart_Dashboard::get_instance()->get_plugins();
 		if ( isset( $plugins['RepoMonitor'] ) ) {
 			$wp_theme = wp_get_theme( $themes[$theme]['stylesheet'] );
+
+			$credentials = array();
+			if ( isset( $_REQUEST['vipthemehelper-svn_username'] ) ) {
+				$credentials['username'] = sanitize_text_field( $_REQUEST['vipthemehelper-svn_username'] );
+			}
+			if ( isset( $_REQUEST['vipthemehelper-svn_password'] ) ) {
+				$credentials['password'] = sanitize_text_field( $_REQUEST['vipthemehelper-svn_password'] );
+			}
 			
 			$result = $plugins['RepoMonitor']->add_repo( array(
 				'repo_type'			 => 'svn',
 				'repo_path'			 => $wp_theme->get_stylesheet_directory(),
 				'repo_friendly_name' => $wp_theme->display( 'Name', false ),
-			) );
+			), true, false, $credentials );
 			
 			if ( is_wp_error( $result ) ) {
 				?>
@@ -507,7 +515,7 @@ class ThemeHelperWidgetTable extends DashboardWidgetTable {
 		}
 
         //Return the title contents
-        return "<strong>{$item['theme_name']}</strong>" . $this->row_actions( $actions );
+        return "<strong>{$item['theme_name']}</strong>" . $this->row_actions( $actions, true );
     }
 
     function column_cb( $item ){
