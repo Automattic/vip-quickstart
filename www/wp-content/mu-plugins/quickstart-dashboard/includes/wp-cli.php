@@ -101,8 +101,12 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 				WP_CLI::error( "Could not find repo with name '{$assoc_args['name']}'" );
 				return;
 			}
-		} elseif ( isset( $args[0] ) ) {
-			$path = $args[0];
+		} else {
+			if ( !isset( $args[0] ) ) {
+				$args[0] = '.';
+			}
+			
+			$path = realpath( $args[0] );
 			foreach ( $repos as $r ) {
 				if ( strcasecmp( $r['repo_path'], $path ) === 0 ) {
 					$repo = $r;
@@ -111,12 +115,9 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 			}
 
 			if ( !isset( $repo ) ) {
-				WP_CLI::error( "Could not find repo with path '{$assoc_args['path']}'" );
+				WP_CLI::error( "Could not find repo with path '{$path}'" );
 				return;
 			}
-		} else {
-			WP_CLI::error( 'No repository info given. Please specify a repository to scanning using either --id, --name, or --path.' );
-			return;
 		}
 
 		// We now have the repo, trigger the scan
@@ -158,8 +159,9 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 			$type = 'svn';
 		}
 
+		$path = realpath( $args[1] );
 		WP_CLI::line( "Adding $type repository {$args[0]}..." );
-		WP_CLI::line( "Repo path: {$args[1]}" );
+		WP_CLI::line( "Repo path: $path" );
 
 		$repo_monitor = $this->load_repo_monitor();
 		
@@ -178,7 +180,7 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 
 		$result = $repo_monitor->add_repo( array(
 			'repo_type'			 => $type,
-			'repo_path'			 => $args[1],
+			'repo_path'			 => $path,
 			'repo_friendly_name' => $args[0],
 			'warn_out_of_date'   => ! $assoc_args['warn'],
 		), true, ! isset( $credentials['password'] ), $credentials ); // Only allow interactive mode if password not given
