@@ -36,6 +36,7 @@ class RepoMonitor extends Dashboard_Plugin {
 		add_action( 'repomonitor_scan_repos', array( $this, 'scan_repositories' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_notices', array( $this, 'print_admin_notice' ) );
+		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		
 		add_filter( 'cron_schedules', array( $this, 'repo_15_min_cron_interval' ) );
     }
@@ -45,6 +46,14 @@ class RepoMonitor extends Dashboard_Plugin {
 		if ( ! wp_next_scheduled( 'repomonitor_scan_repos' ) ) {
 			wp_schedule_event( time(), 'qs-dashboard-15-min-cron-interval', 'repomonitor_scan_repos' );
 		}
+
+		if ( isset( $_REQUEST['page'] ) && 'repomonitor-update' === $_REQUEST['page'] && isset( $_REQUEST['no_wp'] ) ) {
+			$this->update_repo_page();
+		}
+	}
+
+	function admin_menu() {
+		add_submenu_page( null, __( 'RepoMonitor Update Repo', 'quickstart-dashboard' ), __( 'RepoMonitor Update Repo', 'quickstart-dashboard' ), 'manage_options', 'repomonitor-update', array( $this, 'update_repo_page' ) );
 	}
 
 	function print_admin_notice() {
@@ -113,6 +122,68 @@ class RepoMonitor extends Dashboard_Plugin {
 		$table = new RepoMonitorWidgetTable( $this );
 		$table->prepare_items();
 		$table->display();
+	}
+
+	function update_repo_page() {
+		if ( !current_user_can( 'manage_options' ) ) {
+			wp_die( __( 'You have insufficient permissions to perform that action.', 'quickstart-dashboard' ) );
+		}
+
+		echo '<h2>' . __( 'Updating Repo', 'quickstart-dashboard' ) . '</h2>';
+
+		if ( ! isset( $_REQUEST['repo_id'] ) ) {
+			wp_die( __( 'No repo specified.', 'quickstart-dashboard' ) );
+		}
+
+		// Get the repo we're updating
+		$repos = $this->get_repos();
+		$repo = null;
+		foreach ( $repos as $r ) {
+			if ( $r['repo_id'] == $_REQUEST['repo_id'] ) {
+				$repo = $r;
+				break;
+			}
+		}
+
+		if ( is_null( $repo ) ) {
+			wp_die( sprintf( __( 'Unknown repo id: ', 'quickstart-dashboard' ), intval( $_REQUEST['repo_id'] ) ) );
+		}
+
+		// Check that we can perform an update
+		if ( ! $this->can_update_repo( $repo ) ) {
+			wp_die( __( 'Error: This repo is not currently in a state where it can be updated.', 'quickstart-dashboard' ) );
+		}
+
+		// Start the update
+		$result = $this->update_repo( $repo, true );
+
+		// Print the result
+		if ( false === $result ) {
+			printf( '<p>%s</p>', __( 'Update failed.', 'quickstart-dashboard' ) );
+		} elseif ( is_wp_error( $result ) ) {
+			printf( '<p>%s %s</p>', __( 'Update failed:', 'quickstart-dashboard' ), $result->get_error_message() );
+		} else {
+			// Scan the repo
+			if( 'git' === $repo['repo_type'] ) {
+				$results = $this->scan_git_repo( $repo['repo_path'] );
+			} else {
+				$results = $this->scan_svn_repo( $repo['repo_path'] );
+			}
+
+			if ( !is_wp_error( $results ) ) {
+				$this->set_repo_status( $repo['repo_id'], $results );
+			}
+
+			printf( '<p>%s</p>', __( 'Update successful!', 'quickstart-dashboard' ) );
+		}
+
+		if ( isset( $_REQUEST['no_wp'] ) ) {
+			printf( '<p><a href="%s">&larr; %s</a></p>', 'javascript:window.parent.location.reload()', __( 'Return to dashboard', 'quickstart-dashboard' ) );
+			die();
+		} else {
+			// Print the return link
+			printf( '<p><a href="%s">&larr; %s</a></p>', menu_page_url( 'vip-dashboard', false ), __( 'Return to dashboard', 'quickstart-dashboard' ) );
+		}
 	}
 
 	function scan_repositories() {
@@ -687,12 +758,110 @@ class RepoMonitor extends Dashboard_Plugin {
 		return array( 'staged' => $staged, 'unstaged' => $unstaged, 'untracked' => $untracked );
 	}
 
+	private function exec_cmd( $cmd, &$output, &$return_value, $echo = false ) {
+		if ( $echo ) {
+			printf( '<p>' . __( "Executing command: %s\n", 'quickstart-dashboard' ) . '</p>', esc_html( $cmd ) );
+			passthru( $cmd, $return_value );
+			flush();
+		} else {
+			exec( $cmd . ' 2>&1', $output, $return_value );
+		}
+	}
+
 	/**
 	 * Updates the given repo to the latest version.
 	 * @param array $repo The repo to update
+	 * @param boolean $echo Whether the output should be echoed.
+	 * @param array $output The output from the executed commands will be loaded into this variable.
+	 * @return boolean|WP_Error True on success or false|WP_Error on failure.
 	 */
-	function update_repo( $repo ) {
+	function update_repo( $repo, $echo = false, &$output = null ) {
+		if ( !current_user_can( 'manage_options' ) ) {
+			wp_die( __( 'You have insufficient permissions to perform that action.', 'quickstart-dashboard' ) );
+		}
 
+		// Always check if we can update the repo before we try
+		if ( ! $this->can_update_repo( $repo ) ) {
+			return false;
+		}
+
+		// Go to the repo directory
+		$cwd = getcwd();
+
+		// Variables to load output into
+		$return_value = -1;
+
+		// Grab the repo status
+		$status = $this->get_repo_status( $repo['repo_id'] );
+
+		// Go to repository directory
+		chdir( $repo['repo_path'] );
+		if ( $echo ) {
+			printf( '<p>' . __( "Changing to directory: %s\n", 'quickstart-dashboard' ) . '</p>', $repo['repo_path'] );
+		}
+
+		// Okay, looks like we're good to go. LEEEROY JEEEEEENKINS!!
+		if ( 'git' == $repo['repo_type'] ) {
+			// Fetch updates
+			$this->exec_cmd( 'git fetch origin', $output, $return_value, $echo );
+
+			if ( 0 !== $return_value ) {
+				return new WP_Error( $return_value, __( 'Git fetch failed.', 'quickstart-dashboard' ) );
+			}
+
+			// Attempt a merge
+			if ( !empty( $status['behind'] ) && !empty( $status['behind']['branch'] ) ) {
+				$cmd = sprintf(
+					'git merge %s %s',
+					$status['behind']['branch'], // from branch
+					$status['on_branch'] // to branch
+				);
+			} elseif ( !empty( $status['diverged'] ) && !empty( $status['diverged']['branch'] ) ) {
+				$cmd = sprintf(
+					'git merge %s %s',
+					$status['diverged']['branch'], // from branch
+					$status['on_branch'] // to branch
+				);
+			} else {
+				$cmd = 'git merge';
+			}
+
+			$this->exec_cmd( $cmd, $output, $return_value, $echo );
+
+			if ( 0 !== $return_value ) {
+				// Uhoh, merge failed. Revert!
+				$this->exec_cmd( 'git merge --abort', $output, $revert_return_value, $echo );
+
+				if ( 0 !== $revert_return_value ) {
+					// Merge failed. Just give up.
+					return new WP_Error( $revert_return_value, __( 'The git merge failed. We tried to undo it but that failed too.', 'quickstart-dashboard' ) );
+				}
+
+				return new WP_Error( $return_value, __( 'Merging changes from origin failed, so we aborted the merge. Please try manually.', 'quickstart-dashboard' ) );
+			}
+		} elseif ( 'svn' == $repo['repo_type'] ) {
+			$this->exec_cmd( 'svn merge --dry-run -r BASE:HEAD .', $output, $return_value, $echo );
+
+			if ( 0 !== $return_value ) {
+				return new WP_Error( $return_value, __( 'The SVN dry run failed, so we won\'t go any further. Please try to update manually.', 'quickstart-dashboard' ) );
+			}
+
+			// Looks like we're good...
+			$this->exec_cmd( 'svn up', $output, $return_value, $echo );
+
+			if ( 0 !== $return_value ) {
+				return new WP_Error( $return_value, __( 'The SVN update failed. Please take a look at the repository.', 'quickstart-dashboard' ) );
+			}
+		}
+
+		// Party! We didn't fail...
+
+		chdir( $cwd );
+		if ( $echo ) {
+			printf( '<p>' . __( "Going back to cwd: %s\n", 'quickstart-dashboard' ) . '</p>', $cwd );
+		}
+
+		return true;
 	}
 }
 
@@ -721,12 +890,9 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 	function single_row( $item ) {
 		$row_classes = parent::get_row_classes();
 		
-		$can_update = false;
 		if ( $item['warn'] ) {
-			$can_update = $this->repo_monitor->can_update_repo( $item );
-
 			$row_classes[] = 'active';
-			if ( $item['warn'] && ! $can_update ) {
+			if ( $item['warn'] && ! $item['can_update'] ) {
 				$row_classes[] = 'update';
 			}
 		} else {
@@ -738,7 +904,7 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 		echo '</tr>';
 
 		// Check if the item needs updating. If it can't be updated, tell the user to fix the problem.
-		if ( $item['warn'] && ! $can_update ) {
+		if ( $item['warn'] && ! $item['can_update'] ) {
 			$message = '';
 			if ( $item['repo_type'] == 'git' ) {
 				$message = __( 'Please <code>git stash</code> or <code>git commit</code> your changes to update.', 'quickstart-dashboard' );
@@ -770,8 +936,18 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
         //Build row actions
         $actions = array();
 
+		// Show the update action only if the repo needs and update and we can update it
+		if ( $item['warn']  && $item['can_update'] ) {
+			$actions['update'] = sprintf(
+				'<a class="thickbox" title="%1$s" href="%2$s">%3$s</a>',
+				__( 'Update this repo', 'quickstart-dashboard' ),
+				add_query_arg( array( 'repo_id' => $item['repo_id'], 'no_wp' => true ), menu_page_url( 'repomonitor-update', false ) ),
+				__( 'Update', 'quickstart-dashboard' )
+			);
+		}
+
         //Return the title contents
-		return sprintf( '<strong>%s</strong>', esc_html( $item['repo_friendly_name'] ), $this->row_actions( $actions, true ) );
+		return sprintf( '<strong>%s</strong>%s', esc_html( $item['repo_friendly_name'] ), $this->row_actions( $actions, true ) );
     }
 
     function column_cb( $item ){
@@ -822,8 +998,9 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 			$warn = $repo['warn_out_of_date'] && $this->repo_monitor->repo_out_of_date( $status, $repo['repo_type'] );
 
 			$this->items[] = array_merge( $repo, array(
-				'status'    => $status,
-				'warn'	    => $warn,
+				'status'     => $status,
+				'warn'	     => $warn,
+				'can_update' => ! $warn || $this->repo_monitor->can_update_repo( $repo ),
 			) );
 
 			$total_items += 1;
