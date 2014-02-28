@@ -646,6 +646,7 @@ class RepoMonitor extends Dashboard_Plugin {
 			$hook_paths = array(
 				'post-update' => $base_path . '/.git/hooks/post-update',
 				'post-merge'  => $base_path . '/.git/hooks/post-merge',
+				'post-commit' => $base_path . '/.git/hooks/post-commit',
 			);
 		} elseif ( 'svn' === $repo['repo_type'] ) {
 			// Hooks not yet supported for svn repos
