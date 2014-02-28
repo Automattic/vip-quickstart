@@ -146,6 +146,7 @@ class Quickstart_Dashboard {
 	function admin_enqueue_scripts() {
 		wp_enqueue_script( 'dashboard' );
 
+		add_thickbox();
 		if ( wp_is_mobile() )
 			wp_enqueue_script( 'jquery-touch-punch' );
 
