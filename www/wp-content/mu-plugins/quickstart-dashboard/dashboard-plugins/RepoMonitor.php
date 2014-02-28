@@ -584,6 +584,9 @@ class RepoMonitor extends Dashboard_Plugin {
 		);
 
 		$args = array_merge( $defaults, $args );
+		
+		// Get the real path in case this was a relative path
+		$args['repo_path'] = realpath( $args['repo_path'] );
 
 		// Check if another repo exists with this name or path
 		$repos = $this->get_repos();
