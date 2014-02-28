@@ -512,6 +512,18 @@ class RepoMonitor extends Dashboard_Plugin {
 
 		$args = array_merge( $defaults, $args );
 
+		// Check if another repo exists with this name or path
+		$repos = $this->get_repos();
+		foreach ( $repos as $repo ) {
+			if ( rtrim( $repo['repo_path'], '/' ) == rtrim( $args['repo_path'], '/' ) ) {
+				return new WP_Error( 2, __( 'A repo with this path already exists.', 'quickstart-dashboard' ) );
+			}
+
+			if ( strcasecmp( $repo['repo_friendly_name'], $args['repo_friendly_name'] ) == 0 ) {
+				return new WP_Error( 2, __( 'A repo with this name already exists.', 'quickstart-dashboard' ) );
+			}
+		}
+
 		// Test that the repo exists by scanning it
 		if ( 'svn' == $args['repo_type'] ) {
 			$args['repo_status'] = $this->scan_svn_repo( $args['repo_path'], $allow_interactive, $credentials );
