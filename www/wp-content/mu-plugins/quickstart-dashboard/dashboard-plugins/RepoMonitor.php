@@ -779,8 +779,10 @@ class RepoMonitor extends Dashboard_Plugin {
 
 	private function exec_cmd( $cmd, &$output, &$return_value, $echo = false ) {
 		if ( $echo ) {
-			printf( '<p>' . __( "Executing command: %s\n", 'quickstart-dashboard' ) . '</p>', esc_html( $cmd ) );
+			printf( '<p>' . __( "Executing command: <code>%s</code>\n", 'quickstart-dashboard' ) . '</p>', esc_html( $cmd ) );
+			echo '<pre>';
 			passthru( $cmd, $return_value );
+			echo '</pre>';
 			flush();
 		} else {
 			exec( $cmd . ' 2>&1', $output, $return_value );
