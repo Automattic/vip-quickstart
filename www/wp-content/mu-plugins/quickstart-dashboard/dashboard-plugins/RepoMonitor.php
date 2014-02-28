@@ -5,6 +5,7 @@ class RepoMonitor extends Dashboard_Plugin {
 	const REPO_CPT = 'qs_repo';
 
 	private $repos = null;
+	private $repo_update_cache = array();
 
 	function __construct() {
 		// Register the dashboard plugin
@@ -681,14 +682,31 @@ class RepoMonitor extends Dashboard_Plugin {
 	 * @param array $repo
 	 * @return boolean Returns true if the working directory is clean, or false otherwise.
 	 */
-	function can_update_repo( $repo ) {
+	function can_update_repo( $repo, $force_rescan = false ) {
+		if ( !$force_rescan ) {
+			if ( isset ( $this->repo_update_cache[$repo['repo_id']] ) ) {
+				return $this->repo_update_cache[$repo['repo_id']];
+			}
+			
+			$postmeta_val = get_post_meta( $repo['repo_id'], 'repomonitor_can_update_repo', true );
+			if ( $postmeta_val !== '' ) {
+				return $postmeta_val;
+			}
+		}
+		
 		$dirty_files = $this->get_dirty_files( $repo );
 
 		if ( false === $dirty_files ) {
 			return false;
 		}
+		
+		$can_update = empty( $dirty_files['staged'] ) && empty( $dirty_files['unstaged'] );
 
-		return empty( $dirty_files['staged'] ) && empty( $dirty_files['unstaged'] );
+		// Save the result
+		$this->repo_update_cache[$repo['repo_id']] = $can_update;
+		update_post_meta( $repo['repo_id'], 'repomonitor_can_update_repo', $can_update );
+		
+		return $can_update;
 	}
 
 	/**
@@ -781,7 +799,7 @@ class RepoMonitor extends Dashboard_Plugin {
 		}
 
 		// Always check if we can update the repo before we try
-		if ( ! $this->can_update_repo( $repo ) ) {
+		if ( ! $this->can_update_repo( $repo, true ) ) {
 			return false;
 		}
 
