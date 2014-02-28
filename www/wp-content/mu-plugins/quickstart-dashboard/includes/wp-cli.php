@@ -123,11 +123,7 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 
 		WP_CLI::line( "Scanning {$repo['repo_type']} repo {$repo['repo_friendly_name']}..." );
 
-		if ( 'svn' == $repo['repo_type'] ) {
-			$results = $repo_monitor->scan_svn_repo( $repo['repo_path'], true );
-		} elseif ( 'git' == $repo['repo_type'] ) {
-			$results = $repo_monitor->scan_git_repo( $repo['repo_path'] );
-		}
+		$results = $repo_monitor->scan_repo( $repo );
 
 		// Output the repo status if out of date or error occured
 		$text = $repo_monitor->get_status_text( $results, $repo['repo_type'] );
@@ -136,11 +132,6 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 			WP_CLI::error( $text );
 		} elseif ( $repo_monitor->repo_out_of_date( $results, $repo['repo_type'] ) ) {
 			WP_CLI::warning( $text );
-		}
-
-		// Save the new repo status
-		if ( !$repo_monitor->set_repo_status( $repo['repo_id'], $results ) ) {
-			WP_CLI::error( 'An error occured saving the repo status' );
 		}
 	}
 
