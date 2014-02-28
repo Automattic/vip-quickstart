@@ -330,6 +330,11 @@ class RepoMonitor extends Dashboard_Plugin {
 		// Go to repository directory
 		chdir( $repo_path );
 
+		// Check for the .git dir
+		if ( !file_exists( '.git' ) ) {
+			return new WP_Error( 1, __( 'Could not find .git directory. Is this the root of a git repo?', 'quickstart-dashboard' ) );
+		}
+
 		// Start by updating remotes
 		exec( 'git remote update origin', $update_output, $return_value );
 
