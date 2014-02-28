@@ -165,15 +165,7 @@ class RepoMonitor extends Dashboard_Plugin {
 			printf( '<p>%s %s</p>', __( 'Update failed:', 'quickstart-dashboard' ), $result->get_error_message() );
 		} else {
 			// Scan the repo
-			if( 'git' === $repo['repo_type'] ) {
-				$results = $this->scan_git_repo( $repo['repo_path'] );
-			} else {
-				$results = $this->scan_svn_repo( $repo['repo_path'] );
-			}
-
-			if ( !is_wp_error( $results ) ) {
-				$this->set_repo_status( $repo['repo_id'], $results );
-			}
+			$this->scan_repo( $repo );
 
 			printf( '<p>%s</p>', __( 'Update successful!', 'quickstart-dashboard' ) );
 		}
@@ -189,20 +181,29 @@ class RepoMonitor extends Dashboard_Plugin {
 
 	function scan_repositories() {
 		foreach ( $this->get_repos() as $repo ) {
-			// Run the command to determine if it needs an update
-			if ( 'svn' == $repo['repo_type'] ) {
-				$results = $this->scan_svn_repo( $repo['repo_path'], true );
-			} elseif ( 'git' == $repo['repo_type'] ) {
-				$results = $this->scan_git_repo( $repo['repo_path'] );
-			}
-
-			if ( is_wp_error( $results) ) {
-				return;
-			}
-
-			// Save the new repo status
-			$this->set_repo_status( $repo['repo_id'], $results );
+			$this->scan_repo( $repo );
 		}
+	}
+	
+	function scan_repo( $repo ) {
+		// Run the command to determine if it needs an update
+		if ( 'svn' == $repo['repo_type'] ) {
+			$results = $this->scan_svn_repo( $repo['repo_path'], true );
+		} elseif ( 'git' == $repo['repo_type'] ) {
+			$results = $this->scan_git_repo( $repo['repo_path'] );
+		}
+
+		if ( is_wp_error( $results) ) {
+			return $results;
+		}
+
+		// Save the new repo status
+		$this->set_repo_status( $repo['repo_id'], $results );
+		
+		// Force a scan of the repo for updatability. This result gets cached.
+		$this->can_update_repo( $repo, true );
+		
+		return $results;
 	}
 
 	function get_repos() {
