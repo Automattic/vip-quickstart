@@ -66,7 +66,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 	function admin_init() {
 		// If we have a wpcom access token and we've never scanned the users' VIP themes before, do so
 		$this->access_token = Quickstart_Dashboard::get_instance()->get_wpcom_access_token();
-		if (true|| !empty( $this->access_token ) && ! $this->has_scanned_vip_themes() ) {
+		if ( !empty( $this->access_token ) && ! $this->has_scanned_vip_themes() ) {
 			$this->scan_vip_themes();
 		}
 

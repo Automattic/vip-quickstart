@@ -15,6 +15,7 @@ define ( 'QUICKSTART_DASHBOARD_PLUGINS_DIR', dirname( __FILE__ ) . '/dashboard-p
 
 require_once( dirname( __FILE__ ) . '/includes/class-dashboard-plugin.php' );
 require_once( dirname( __FILE__ ) . '/includes/class-dashboard-widget-table.php' );
+require_once( dirname( __FILE__ ) . '/includes/class-dashboard-data-table.php' );
 
 class Quickstart_Dashboard {
 
