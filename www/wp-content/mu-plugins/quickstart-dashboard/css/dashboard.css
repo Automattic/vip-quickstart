@@ -11,6 +11,26 @@
 	width: 50%;
 }
 
+.vip-dashboard-table tr.inactive td:first-child {
+	padding-left: 13px;
+}
+
+.vip-dashboard-table tr.active td:first-child {
+	border-left: 4px solid #2EA2CC;
+}
+
+.vip-dashboard-table tr.active td {
+	background-color: #F7FCFE;
+}
+
+.vip-dashboard-table tr.warn td:first-child {
+	border-left: 4px solid #D54E21;
+}
+
+.vip-dashboard-table tr.warn td {
+	background-color: #FEFAF7;
+}
+
 .vip-dashboard-repomonitor-table .vip-dashboard-repo-type {
 	background: none repeat scroll 0 0 #ECECEC;
 	border-radius: 3px;
