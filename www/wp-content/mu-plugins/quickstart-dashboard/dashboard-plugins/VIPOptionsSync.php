@@ -2,6 +2,52 @@
 
 class VIPOptionsSync extends Dashboard_Plugin {
 	private $action_descriptions = null;
+	
+	/**
+	 * This object describes the WordPress relational database. Specifically it
+	 * describes foreign key relationships within the database.
+	 * 
+	 * It is in the form:
+	 *	database_table => ( column_depends_on => ( table_column_depends_on ) )
+	 * 
+	 * It is assumed that when the dependency is on the primary key of the table
+	 * being referred to. Ie: 'wp_postmeta'	=> array( 'post_id' => array( 'wp_posts' ) ),
+	 * implies that the 'post_id' column in 'wp_postmeta' depends on the primary key
+	 * of 'wp_posts.
+	 * 
+	 * @var array
+	 */
+	private $table_dependencies = array(
+		'posts'				 => array(),
+		'users'				 => array(),
+		'terms'				 => array(),
+		'links'				 => array(),
+		'options'			 => array(),
+		'postmeta'			 => array( 'post_id' => array( 'posts' ) ),
+		'comments'			 => array( 'comment_post_id' => array( 'posts' ), 'user_id' => array( 'users' ) ),
+		'commentmeta'		 => array( 'comment_id' => array( 'comments' ) ),
+		'usermeta'			 => array( 'user_id' => array( 'users' ) ),
+		'term_taxonomy'		 => array( 'term_id' => array( 'terms' ) ),
+		'term_relationships' => array( 'term_taxonomy_id' => array( 'term_taxonomy' ), 'object_id' => array( 'posts', 'links' ) ),
+	);
+	
+	/**
+	 * Lists the primary key of each table in the DB.
+	 * @var array
+	 */
+	private $table_primary_keys = array(
+		'posts'				 => 'ID',
+		'users'				 => 'ID',
+		'terms'				 => 'term_id',
+		'links'				 => 'link_id',
+		'options'			 => 'option_name',
+		'postmeta'			 => 'meta_id',
+		'comments'			 => 'comment_ID',
+		'commentmeta'		 => 'meta_id',
+		'usermeta'			 => 'umeta_id',
+		'term_taxonomy'		 => 'term_taxonomy_id',
+		'term_relationships' => 'object_id',
+	);
 
 	public function init() {
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
@@ -148,7 +194,14 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		<?php
 	}
 
+	/**
+	 * Imports the GT bundle given by $filepath.
+	 * 
+	 * @global WPDB $wpdb
+	 * @param string $filepath The path to the GT bundle.
+	 */
 	function import_bundle( $filepath ) {
+		global $wpdb;
 		$destination = $this->get_extracted_filename( $filepath );
 
 		// Extract the file
@@ -170,6 +223,10 @@ class VIPOptionsSync extends Dashboard_Plugin {
 
 		// List files in dir
 		$files = scandir( $destination );
+		unset( $files[0] ); // '.'
+		unset( $files[1] ); // '..'
+		
+		$import_table_prefix = $this->compute_table_prefix( $files );
 
 		// Import each file
 		$results = array();
@@ -179,28 +236,88 @@ class VIPOptionsSync extends Dashboard_Plugin {
 			}
 
 			$result = array(
+				'table'	 => str_replace( $import_table_prefix, '', $this->get_file_table( $file ) ),
 				'action' => $this->get_file_action( $file ),
 				'file'	 => $file,
-				'result' => false,
+				'import' => false,
+				'merge'  => null,
 			);
 
 			switch ( $result['action'] ) {
 				case 'merge-import':
-					$result['result'] = $this->do_merge_import( $destination . $file );
-					break;
-
 				case 'destructive-import':
-					$result['result'] = $this->do_destructive_import( $destination . $file );
+					$result['import'] = $this->import_sql_file( $destination . $file );
 					break;
 
 				case 'skip':
 				default:
 					$result['action'] = 'skip';
-					$result['result'] = true;
+					$result['import'] = true;
 					break;
 			}
 
-			$results[] = $result;
+			$results[$result['table']] = $result;
+		}
+		
+		// Now merge each file. We need to respect the fact that some tables
+		// depend on others, so we need to do this in an order such that each table
+		// with a dependant is merged before the dependant table. We then keep
+		// tract of the list of IDs that have been merged so that if a row in the
+		// parent table was skipped, the child rows in the dependant table are also
+		// skipped.
+		
+		// Merged data contains the list of data that has been inserted into the DB.
+		// It is in the format 'tablename => array of IDS'
+		$merged_data = array();
+		$unmerged_tables = $this->table_dependencies;
+		while ( ! empty( $unmerged_tables ) ) {
+			foreach ( $unmerged_tables as $table => $deps ) {
+				// Check that the import for this table succeeded
+				if ( true !== $results[$table]['import'] ) {
+					$merged_data[$table] = array();
+					continue;
+				}
+				
+				// Check if this table's dependencies are satisfied
+				if ( ! empty( $deps ) ) {
+					foreach ( $deps as $dep_col => $dep_tables ) {
+						foreach ( $dep_tables as $tablename ) {
+							if ( !array_key_exists( $tablename, $merged_data ) ) {
+								var_dump( sprintf( "Skipping table %s because of failed dependency %s", $table, $tablename ) );
+								// This tables' dependencies aren't satisfied
+								continue 3;
+							}
+						}
+					}
+				}
+				
+				// Table dependencies appear to be satisfied. Do the merge.
+				switch ( $results[$table]['action'] ) {
+					case 'merge-import':
+						$results[$table]['merge'] = $this->do_merge_import( $table, $import_table_prefix . $table, $wpdb->prefix . $table, $merged_data, true );
+						break;
+
+					case 'destructive-import':
+						// Fake complete this
+						$merged_data[$table] = array();
+						$results[$table]['merge'] = $this->do_destructive_import( $table, $import_table_prefix . $table, $wpdb->prefix . $table, $merged_data );
+						break;
+
+					case 'skip':
+					default:
+						// Fake adding data for dependency resolution
+						$merged_data[$table] = array();
+						$results[$table]['merge'] = true;
+						break;
+				}
+			}
+
+			// Mark the tables that have been merged as such
+			foreach ( $merged_data as $merged_table => $ids ) {
+				if ( isset( $unmerged_tables[$merged_table] ) ) {
+					unset( $unmerged_tables[$merged_table] );
+				}
+			}
 		}
 
 		// Summarize the results in a table
@@ -208,25 +325,42 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		$cols = array(
 			'file' => __( 'File', 'quickstart-dashboard' ),
 			'action' => __( 'Action', 'quickstart-dashboard' ),
-			'result' => __( 'Result', 'quickstart-dashboard' ),
+			'result_text' => __( 'Result', 'quickstart-dashboard' ),
 		);
 
 		// Prepare data for the table
 		$table_results = array();
 		foreach ( $results as $result ) {
-			if ( $result['result'] !== true ) {
+			if ( $result['import'] !== true ) {
 				$errors_occured = true;
 			}
 
 			// Get the error text if this was an error
-			$success = false;
-			if ( is_wp_error( $result['result'] ) ) {
-				$result['result'] = $result['result'] ->get_error_message();
-			} elseif ( true === $result['result'] ) {
-				$success = true;
-				$result['result'] = __( 'Action succeeded.', 'quickstart-dashboard' );
+			$import_success = false;
+			if ( is_wp_error( $result['import'] ) ) {
+				$result['import'] = __( 'Import failed: ', 'quickstart-dashboard' ) . $result['import']->get_error_message();
+			} elseif ( true === $result['import'] ) {
+				$import_success = true;
+				$result['import'] = __( 'Import succeeded.', 'quickstart-dashboard' );
+			} else {
+				$result['import'] = __( 'Import failed.', 'quickstart-dashboard' );
 			}
+			
+			$merge_success = false;
+			if ( is_wp_error( $result['merge'] ) ) {
+				$result['merge'] = __( 'Merge failed: ', 'quickstart-dashboard' ) . $result['merge']->get_error_message();
+			} elseif ( true === $result['merge'] ) {
+				$merge_success = true;
+				$result['merge'] = __( 'Merge succeeded.', 'quickstart-dashboard' );
+			} elseif ( false === $result['merge'] ) {
+				$result['merge'] = __( 'Merge failed.', 'quickstart-dashboard' );
+			} else {
+				$result['merge'] = __( 'Merge not run.', 'quickstart-dashboard' );
+			}
+			
+			$result['result_text'] = $result['import'] . ' ' . $result['merge'];
 
+			$success = $import_success && $merge_success;
 			$table_results[] = array(
 				'warn'   => ! $success,
 				'active' => $result['action'] !== 'skip' && $success,
@@ -245,24 +379,21 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		<p><a class="button-primary" href="<?php menu_page_url( 'vip-dashboard' ); ?>"><?php _e( 'Return to Dashboard', 'quickstart-dashboard' ); ?></a></p>
 		<?php
 	}
-
+	
 	/**
-	 * Does a merge import of the file. This means that the SQL in the table is
-	 * executed, generating a new table with the name of the file.
-	 *
-	 * We then copy the rows from the new table into the corresponding WP table.
-	 * If there's a row with the same ID or key, overwrite it.
-	 *
-	 * After the merge is complete, we delete the old table.
-	 *
-	 * @param type $file
+	 * Executes the SQL in a SQL file against the database, ensuring that each
+	 * query succeeds.
+	 * 
+	 * @global WPDB $wpdb
+	 * @param string $file The path to the sql file to import.
+	 * @return boolean|\WP_Error True on success of WP_Error on failure.
 	 */
-	function do_merge_import( $file ) {
+	function import_sql_file( $file ) {
 		global $wpdb;
 		$sql = file_get_contents( $file );
 
 		if ( false === $sql ) {
-			return new WP_Error( 1, sprintf( __( 'An error occured reading the merge source file %s.', 'quickstart-dashboard' ), esc_attr( $file ) ) );
+			return new WP_Error( 1, sprintf( __( 'An error occured reading the source file %s.', 'quickstart-dashboard' ), esc_attr( $file ) ) );
 		}
 
 		// Iterate over each line, removing comments
@@ -294,8 +425,222 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		return true;
 	}
 
+	/**
+	 * Copies the rows from a freshly imported database table into the quickstart 
+	 * table.
+	 *
+	 * After the merge is complete, we delete the old table.
+	 * 
+	 * @global WPDB $wpdb
+	 * @param string $base_tbl_name The root tablename (without prefix) of the table to import. Ie: 'posts'
+	 * @param string $src_table The source tablename of the table to import from.
+	 * @param string $dest_table The destination tablename.
+	 * @param array $merged_data The array of already merged data. See `import_bundle()`
+	 * @param boolean $overwrite Whether to overwrite the existing value in the destination when there is a key conflict.
+	 * @return boolean|\WP_Error True on success or WP_Error on failure.
+	 */
+	function do_merge_import( $base_tbl_name, $src_table, $dest_table, &$merged_data, $overwrite = true ) {
+		global $wpdb;
+
+		$table_pk = $this->table_primary_keys[$base_tbl_name];
+
+		$src_table_escaped = esc_sql( $src_table );
+		$dest_table_escaped = esc_sql( $dest_table );
+		$table_pk_escaped = esc_sql( $table_pk );
+
+		// Get a list of IDs to be merged. Can't use $wpdb->prepare() because we need column names
+		$key_cols = array_merge( array( $table_pk ), array_keys( $this->table_dependencies[$base_tbl_name] ) );
+
+		// Escape colmn names
+		foreach ( $key_cols as $index => $col ) {
+			$key_cols[$index] = "`$src_table_escaped`.`" . esc_sql( $col ) . '`';
+		}
+
+		$query = sprintf( "SELECT %s FROM `$src_table_escaped`", implode( ',', $key_cols ) );
+
+		// If we aren't supposed to overwrite, add that clause in.
+		if ( ! $overwrite ) {
+			$query .= " WHERE `$src_table_escaped`.`$table_pk_escaped` NOT IN ( SELECT `$dest_table_escaped`.`$table_pk_escaped` FROM `$dest_table_escaped` )";
+		}
+
+		$import_ids = array();
+		
+		// Make sure that all dependencies are satisfied
+		if ( ! empty( $this->table_dependencies[$base_tbl_name] ) ) {
+			$source_rows = $wpdb->get_results( $query, ARRAY_A );
+			
+			foreach ( $source_rows as $row ) {
+				foreach ( $row as $colname => $col ) {
+					if ( $colname === $table_pk ) {
+						continue;
+					}
+					
+					// Check that this dependency is filled
+					$dep_tables = $this->table_dependencies[$base_tbl_name][$colname];
+					
+					foreach ( $dep_tables as $table ) {
+						if ( ! in_array( $row[$table_pk], $merged_data[$table] ) ) {
+							// This dependency is not satisfied. Break out of this row
+							continue 3;
+						}
+					}
+				}
+				
+				// This rows' dependencies are satisfied, add it to the list of import IDs
+				$import_ids[] = $row[$table_pk];
+			}
+		} else {
+			// This table has no dependencies, insert all IDs from the DB
+			$import_ids = $wpdb->get_col( $query );
+		}
+		
+		$error = null;
+		if ( ! empty( $wpdb->last_error ) ) {
+			// Mark that no IDs will be imported due to the error
+			$import_ids = array();
+			$error = new WP_Error( 1, sprintf( __( 'An error occured fetching data from the source table for merge: %s', 'quickstart-dashboard' ), $wpdb->last_error ) );
+		}
+		
+		if ( ! empty( $import_ids ) ) {
+			$ids_str = $this->prepare_sql_in_statement( $import_ids );
+
+			// Get ready to insert data by deleting any conflicting rows in the destination DB
+			$wpdb->query( sprintf( "DELETE FROM `$dest_table_escaped` WHERE `$dest_table_escaped`.`$table_pk_escaped` IN (%s)", $ids_str ) );
+
+			if ( empty( $wpdb->last_error ) ) {
+				// Get the column list (made up of columns common to both tables)
+				$dest_cols = array_intersect( $this->get_table_cols( $dest_table ), $this->get_table_cols( $src_table ));
+				$insert_cols = array();
+				foreach ( $dest_cols as $dest_col ) {
+					$insert_cols[] = esc_sql( $dest_col );
+				}
+				
+				// Insert the data from the source table
+				$sql = sprintf( "INSERT INTO `$dest_table_escaped` (%1\$s) SELECT DISTINCT %1\$s FROM `$src_table_escaped` WHERE `$src_table_escaped`.`$table_pk_escaped` IN (%2\$s)", implode( ',', $insert_cols ), $ids_str );
+				
+				// Add the ON DUPLICATE KEY handling
+				if ( $overwrite ) {
+					if ( ! empty( $dest_cols ) ) {
+						// Remove key columns
+						foreach ( $key_cols as $key ) {
+							$position = array_search( $key, $dest_cols );
+							if ( false !== $position ) {
+								unset( $dest_cols[$position] );
+							}
+						}
+
+						// Add the update clauses. Dest_col already escaped.
+						$clauses = array();
+						foreach ( $insert_cols as $dest_col ) {
+							$clauses[] = "`$dest_table_escaped`.`$dest_col`=`$src_table_escaped`.`$dest_col`";
+						}
+
+						// Add the on update clause if we have things to say
+						if ( !empty( $clauses ) ) {
+							$sql .= ' ON DUPLICATE KEY UPDATE ' . implode( ', ', $clauses );
+						}
+					}
+				} else {
+					$sql .= " ON DUPLICATE KEY UPDATE `$dest_table_escaped`.`$table_pk_escaped`=`$src_table_escaped`.`$table_pk_escaped`";
+				}
+
+				$wpdb->query( $sql );
+			}
+		}
+
+		if ( ! empty( $wpdb->last_error ) ) {
+			$import_ids = array();
+			$error = new WP_Error( 1, sprintf( __( 'A database error occured during merge: %s', 'quickstart-dashboard' ), $wpdb->last_error ) );
+		}
+
+		// Finally, drop the source table. Do this even if errors have occured to clean up.
+		$wpdb->query( sprintf( "DROP TABLE `$src_table_escaped`;" ) );
+
+		// Mark which data was imported
+		$merged_data[$base_tbl_name] = $import_ids;
+		
+		if ( !is_null( $error ) ) {
+			return $error;
+		}
+		
+		return true;
+	}
+	
 	function do_destructive_import( $file ) {
 		return true;
+	}
+	
+	/**
+	 * Gets the columns for the given database table.
+	 * 
+	 * @global WPDB $wpdb
+	 * @param string $table The name of the table to fetch columns for.
+	 * @return array An array of tablenames inside the table.
+	 */
+	function get_table_cols( $table ) {
+		global $wpdb;
+
+		$results = $wpdb->get_col( 'SHOW COLUMNS FROM `' . esc_sql( $table ) . '`' );
+
+		return $results;
+	}
+	
+	/*
+	 * Creates an escape list of values to place inside of a SQL "IN" clause.
+	 * 
+	 * Assumes that all data in the array are of the same type.
+	 * 
+	 * @global type $wpdb
+	 * @param array $array The array of values to prepare
+	 * @return string The prepared list.
+	 */
+	private function prepare_sql_in_statement( $array ) {
+		global $wpdb;
+		if ( empty( $array ) ) {
+			return '';
+		}
+		
+		$digit_str = '%s';
+		if ( is_numeric( $array[0] ) ) {
+			$digit_str = '%d';
+		}
+		
+		$base_str = implode(',', array_fill( 0, count( $array ), $digit_str ) );
+		
+		return $wpdb->prepare( $base_str, $array );
+	}
+	
+	/**
+	 * Takes a list of files and computes the table prefix for the tables that
+	 * the file will generate.
+	 * 
+	 * Worst case running time is roughly O( n*(m-1) ) where n is the length of 
+	 * the shortest string in $files and m is the number of elements in $files.
+	 * 
+	 * @param array $files The list of files from scandir()
+	 * @return string|boolean The path prefix on success of false if $files is empty
+	 */
+	function compute_table_prefix( $files ) {
+		if ( empty( $files ) ) {
+			return false;
+		}
+
+		$common = array();
+
+		// Set the prefix to the first file
+		$base = array_pop( $files );
+
+		foreach ( str_split( $base ) as $index => $chr ) {
+			foreach ( $files as $file ) {
+				if ( $file[$index] !== $chr ) {
+					return implode( '', $common );
+				}
+			}
+			
+			$common[] = $chr;
+		}
+
+		return implode( '', $common );
 	}
 
 	/**
@@ -305,22 +650,37 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	 * @return string The action to perform
 	 */
 	function get_file_action( $file ) {
-		$match = preg_match( '/wp_\d+_(?<tablename>\w+)\.sql$/', $file, $matches );
-		if ( !$match || empty( $matches['tablename'] ) ) {
+		$match = $this->get_file_table( $file );
+		if ( false === $match || empty( $match ) ) {
 			return 'skip';
 		}
 
-		switch ( $matches['tablename'] ) {
-			case 'options':
-				return 'merge-import';
-
+		switch ( $match ) {
 			case 'users':
 			case 'usermeta':
-				return 'skip';
+			case 'options':
+				return 'merge-import';
 
 			default:
 				return 'destructive-import';
 		}
+	}
+	
+	/**
+	 * Computes what the affected tablename is for a GT dump file.
+	 * 
+	 * The file is expected to be of the format "wp_xxxxx_posts.sql" where "posts"
+	 * would be the tablename returned. The number of numeric digits does not matter.
+	 * 
+	 * @param string $file The name of the file
+	 * @return string|boolean The tablename on success or false if the filename is not in the expected format.
+	 */
+	function get_file_table( $file ) {
+		if ( preg_match( '/wp_\d+_(?<tablename>\w+)\.sql$/', $file, $matches ) ) {
+			return $matches['tablename'];
+		}
+		
+		return false;
 	}
 
 	/**
