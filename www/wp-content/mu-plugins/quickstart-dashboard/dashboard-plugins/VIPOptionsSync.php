@@ -149,18 +149,18 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		// List files in dir
 		$files = scandir( $destination );
 		$table_items = array();
-
+		
 		// Loop over the files in the directory, getting the action that will be performed
-		 foreach ( $files as $file ) {
+		foreach ( $files as $file ) {
 			if ( '.' == $file || '..' == $file ) {
 				continue;
 			}
 
-			$action = $this->get_file_action( $file );
+			$action = $this->get_file_action( $file, false );
 			$table_items[] = array(
 				'data' => array(
 					'file'		  => $file,
-					'action'	  => $action,
+					'action'	  => $this->generate_action_select_box( $file, $action ),
 					'description' => $this->get_action_description( $action ),
 				),
 			);
@@ -174,24 +174,59 @@ class VIPOptionsSync extends Dashboard_Plugin {
         );
 
 		$os_table = new DashboardDataTable( $cols, $table_items );
+		$os_table->disable_output_escaping();
 		$os_table->prepare_items();
 
 		$_SESSION['options-sync-path'] = esc_attr( $_REQUEST['options-sync-path'] );
 
 		?>
 		<h3><?php _e( 'Actions to be Undertaken:', 'quickstart-dashboard' ); ?></h3>
-		<?php $os_table->display(); ?>
 		<form action="<?php menu_page_url( 'dashboard-options-sync' ); ?>" method="POST">
 			<input type="hidden" id="action" name="action" value="import" />
 			<input type="hidden" id="no-preview" name="no-preview" value="1" />
 			<input type="hidden" name="options-sync-path" id="options-sync-path" value="<?php echo $_SESSION['options-sync-path']; ?>" />
 			<?php wp_nonce_field( 'dashboard-options-sync'  ) ?>
+			<?php $os_table->display(); ?>
 			<p>
 				<input class="button-primary" type="submit" name="options-sync-import" value="<?php _e( 'Continue Import', 'quickstart-dashboard' ) ?>" />
 				<a class="button-secondary" href="<?php menu_page_url( 'vip-dashboard' ) ?>"><?php _e( 'Cancel', 'quickstart-dashboard' ); ?></a>
 			</p>
 		</form>
 		<?php
+	}
+	
+	private function generate_action_select_box( $file, $file_action ) {
+		$action_descriptions = $this->get_action_descriptions();
+		
+		$actions_str = '';
+		foreach ( $action_descriptions as $action => $description ) {
+			$text = $action;
+			
+			switch ( $action ) {
+				case 'merge-import':
+					$text = __( 'Merge Import', 'quickstart-dashboard' );
+					break;
+				
+				case 'destructive-import':
+					$text = __( 'Destructive Import', 'quickstart-dashboard' );
+					break;
+				
+				case 'skip':
+					$text = __( 'Skip', 'quickstart-dashboard' );
+					break;
+				
+				default:
+			}
+			
+			$actions_str .= sprintf( 
+				'<option value="%s"%s>%s</option>',
+				esc_attr( $action ),
+				$action == $file_action ? ' selected="selected"' : '',
+				esc_attr( $text )
+			);
+		}
+		
+		return sprintf( '<select id="%1$s" name="%1$s">%2$s</select>', esc_attr( 'options-action-select-' . $this->get_file_table( $file ) ), $actions_str );
 	}
 
 	/**
@@ -756,12 +791,22 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	 * Returns the action that should be taken for a file in a GT dump.
 	 *
 	 * @param string $file The filename
+	 * @param boolean $check_request Whether to check the request to see if this action has been set
 	 * @return string The action to perform
 	 */
-	function get_file_action( $file ) {
+	function get_file_action( $file, $check_request = true ) {
 		$match = $this->get_file_table( $file );
 		if ( false === $match || empty( $match ) ) {
 			return 'skip';
+		}
+		
+		// Check if this action has been set in the request.
+		if ( $check_request && isset( $_REQUEST["options-action-select-$match"] ) ) {
+			$action_descriptions = $this->get_action_descriptions();
+			
+			if ( array_key_exists( $_REQUEST["options-action-select-$match"], $action_descriptions ) ) {
+				return $_REQUEST["options-action-select-$match"];
+			}
 		}
 
 		switch ( $match ) {
