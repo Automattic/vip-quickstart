@@ -52,6 +52,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	public function init() {
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 	}
 
 	public function name() {
@@ -65,6 +66,20 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	function admin_init() {
 		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'dashboard_options_sync' && isset( $_REQUEST['action'] ) ) {
 			session_start();
+		}
+	}
+	
+	function admin_enqueue_scripts() {
+		if ( isset( $_REQUEST['page'] ) && 'dashboard_options_sync' == $_REQUEST['page'] ) {
+			wp_enqueue_script( 'options_sync_js', get_bloginfo( 'wpurl' ) . '/wp-content/mu-plugins/quickstart-dashboard/js/options_sync.js', array( 'jquery' ) );
+			wp_localize_script( 'options_sync_js', 'options_sync_settings', array(
+				'action_descriptions' => $this->get_action_descriptions(),
+				'table_dependencies'  => $this->table_dependencies,
+				'translations'		  => array(
+					'table_dependency_conflict' => __( 'This table is dependant on the {other_table} table which has the more restrictive {other_table_action} merge action applied to it. This could cause unexpected results and errors.', 'quickstart-dashboard' ),
+					'table_dependency_skipped'  => __( 'This table is dependant on the {other_table} table which is being skipped, so this table must be skipped as well.', 'quickstart-dashboard' ),
+				),
+			) );
 		}
 	}
 
@@ -226,7 +241,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 			);
 		}
 		
-		return sprintf( '<select id="%1$s" name="%1$s">%2$s</select>', esc_attr( 'options-action-select-' . $this->get_file_table( $file ) ), $actions_str );
+		return sprintf( '<select id="%1$s" name="%1$s" class="options-action-select">%2$s</select><div class="actiong-warning-explanation"></div>', esc_attr( 'options-action-select-' . $this->get_file_table( $file ) ), $actions_str );
 	}
 
 	/**
