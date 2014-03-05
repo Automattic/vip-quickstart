@@ -202,6 +202,9 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	 */
 	function import_bundle( $filepath ) {
 		global $wpdb;
+		
+		set_time_limit( 0 );
+		
 		$destination = $this->get_extracted_filename( $filepath );
 
 		// Extract the file
@@ -294,12 +297,10 @@ class VIPOptionsSync extends Dashboard_Plugin {
 				// Table dependencies appear to be satisfied. Do the merge.
 				switch ( $results[$table]['action'] ) {
 					case 'merge-import':
-						$results[$table]['merge'] = $this->do_merge_import( $table, $import_table_prefix . $table, $wpdb->prefix . $table, $merged_data, true );
+						$results[$table]['merge'] = $this->do_merge_import( $table, $import_table_prefix . $table, $wpdb->prefix . $table, $merged_data, false );
 						break;
 
 					case 'destructive-import':
-						// Fake complete this
-						$merged_data[$table] = array();
 						$results[$table]['merge'] = $this->do_destructive_import( $table, $import_table_prefix . $table, $wpdb->prefix . $table, $merged_data );
 						break;
 
@@ -447,52 +448,9 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		$src_table_escaped = esc_sql( $src_table );
 		$dest_table_escaped = esc_sql( $dest_table );
 		$table_pk_escaped = esc_sql( $table_pk );
-
-		// Get a list of IDs to be merged. Can't use $wpdb->prepare() because we need column names
-		$key_cols = array_merge( array( $table_pk ), array_keys( $this->table_dependencies[$base_tbl_name] ) );
-
-		// Escape colmn names
-		foreach ( $key_cols as $index => $col ) {
-			$key_cols[$index] = "`$src_table_escaped`.`" . esc_sql( $col ) . '`';
-		}
-
-		$query = sprintf( "SELECT %s FROM `$src_table_escaped`", implode( ',', $key_cols ) );
-
-		// If we aren't supposed to overwrite, add that clause in.
-		if ( ! $overwrite ) {
-			$query .= " WHERE `$src_table_escaped`.`$table_pk_escaped` NOT IN ( SELECT `$dest_table_escaped`.`$table_pk_escaped` FROM `$dest_table_escaped` )";
-		}
-
-		$import_ids = array();
 		
-		// Make sure that all dependencies are satisfied
-		if ( ! empty( $this->table_dependencies[$base_tbl_name] ) ) {
-			$source_rows = $wpdb->get_results( $query, ARRAY_A );
-			
-			foreach ( $source_rows as $row ) {
-				foreach ( $row as $colname => $col ) {
-					if ( $colname === $table_pk ) {
-						continue;
-					}
-					
-					// Check that this dependency is filled
-					$dep_tables = $this->table_dependencies[$base_tbl_name][$colname];
-					
-					foreach ( $dep_tables as $table ) {
-						if ( ! in_array( $row[$table_pk], $merged_data[$table] ) ) {
-							// This dependency is not satisfied. Break out of this row
-							continue 3;
-						}
-					}
-				}
-				
-				// This rows' dependencies are satisfied, add it to the list of import IDs
-				$import_ids[] = $row[$table_pk];
-			}
-		} else {
-			// This table has no dependencies, insert all IDs from the DB
-			$import_ids = $wpdb->get_col( $query );
-		}
+		// Get the importable IDs
+		$import_ids = $this->get_importable_ids( $base_tbl_name, $src_table, $dest_table, $merged_data, $overwrite );
 		
 		$error = null;
 		if ( ! empty( $wpdb->last_error ) ) {
@@ -522,6 +480,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 				if ( $overwrite ) {
 					if ( ! empty( $dest_cols ) ) {
 						// Remove key columns
+						$key_cols = array_merge( array( $table_pk ), array_keys( $this->table_dependencies[$base_tbl_name] ) );
 						foreach ( $key_cols as $key ) {
 							$position = array_search( $key, $dest_cols );
 							if ( false !== $position ) {
@@ -566,8 +525,158 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		return true;
 	}
 	
-	function do_destructive_import( $file ) {
+	/**
+	 * Completely replaces the $dest_table with the $src_table.
+	 * 
+	 * @global WPDB $wpdb
+	 * @param string $base_tbl_name The root tablename (without prefix) of the table to import. Ie: 'posts'
+	 * @param string $src_table The source tablename of the table to import from.
+	 * @param string $dest_table The destination tablename.
+	 * @param array $merged_data The array of already merged data. See `import_bundle()`
+	 * @param boolean $force Whether or not to force the operation. Stops the sanity check from happening.
+	 * @return boolean|\WP_Error True on success or WP_Error on failure.
+	 */
+	function do_destructive_import( $base_tbl_name, $src_table, $dest_table, &$merged_data, $force = false ) {
+		global $wpdb;
+		
+		// Make sure that this replacement is sane. Ie: they should at least share some columns.
+		if ( ! $force ) {
+			$shared_tables = array_intersect( $this->get_table_cols( $dest_table ), $this->get_table_cols( $src_table ) );
+			if ( empty( $shared_tables ) ) {
+				return new WP_Error( 1, sprintf( 
+						__( 'Cannot perform destructive import because %s is not a sane replacement for %s. Set $force=true if you would really like to do this.', 'quickstart-dashboard' ),
+						esc_attr( $src_table ),
+						esc_attr( $dest_table )
+					) 
+				);
+			}
+		}
+		
+		$table_pk = $this->table_primary_keys[$base_tbl_name];
+
+		$src_table_escaped = esc_sql( $src_table );
+		$dest_table_escaped = esc_sql( $dest_table );
+		$table_pk_escaped = esc_sql( $table_pk );
+		
+		// Get the importable IDs
+		$merged_data[$base_tbl_name] = array();
+		if ( ! empty( $this->table_dependencies[$base_tbl_name] ) ) {
+			$merged_data[$base_tbl_name] = $this->get_importable_ids( $base_tbl_name, $src_table, $dest_table, $merged_data, true );
+		}
+		
+		// Assemble the queries to be executed
+		$queries = array(
+			'START TRANSACTION;',
+			
+			// Drop the destination
+			"DROP TABLE `$dest_table_escaped`;",
+			
+			// Rename the source
+			"RENAME TABLE `$src_table_escaped` TO `$dest_table_escaped`;",
+		);
+		
+		// If this table has dependencies, delete all the rows that do not have satisfied dependencies
+		if ( ! empty( $this->table_dependencies[$base_tbl_name] ) ) {
+			if ( empty( $merged_data[$base_tbl_name] ) ) {
+				$queries[] = "DELETE FROM `$dest_table_escaped`";
+			} else {
+				$queries[] = sprintf( "DELETE FROM `$dest_table_escaped` WHERE `$dest_table_escaped`.`$table_pk_escaped` NOT IN (%s);", $this->prepare_sql_in_statement( $merged_data[$base_tbl_name] ) );
+			}
+		}
+		
+		// Execute each query. Roll back in case of error.
+		foreach ( $queries as $query ) {
+			if ( false === $wpdb->query( $query ) ) {
+				$error = new WP_Error( 1, sprintf( __( 'Executing the query failed. The error was: %s', 'quickstart-dashboard' ), $wpdb->last_error ) );
+
+				$wpdb->query( 'ROLLBACK;' );
+
+				return $error;
+			}
+		}
+		
+		$wpdb->query( 'COMMIT' );
+		
+		// Select the ids that were inserted if we don't already have a list.
+		if ( empty( $merged_data[$base_tbl_name] ) ) {
+			$merged_data[$base_tbl_name] = $wpdb->get_col( "SELECT `$dest_table_escaped`.`$table_pk_escaped` FROM `$dest_table_escaped`;" );
+		}
+		
 		return true;
+	}
+	
+	/**
+	 * Gets a list of IDs from the $src_table that may be safely imported because
+	 * their primary and foreign key restraints are satisfied.
+	 * 
+	 * @global WPDB $wpdb
+	 * @param string $base_tbl_name The root tablename (without prefix) of the table to import. Ie: 'posts'
+	 * @param string $src_table The source tablename of the table to import from.
+	 * @param string $dest_table The destination tablename.
+	 * @param array $merged_data The array of already merged data. See `import_bundle()`
+	 * @param boolean $overwrite Whether to overwrite the existing value in the destination when there is a key conflict.
+	 * @return array The list of IDs from $src_table that may be safely imported
+	 */
+	function get_importable_ids( $base_tbl_name, $src_table, $dest_table, $merged_data, $overwrite ) {
+		global $wpdb;
+		
+		$table_pk = $this->table_primary_keys[$base_tbl_name];
+		$src_table_escaped = esc_sql( $src_table );
+		$dest_table_escaped = esc_sql( $dest_table );
+		$table_pk_escaped = esc_sql( $table_pk );
+		
+		// Get a list of IDs to be merged. Can't use $wpdb->prepare() because we need column names
+		$key_cols = array_merge( array( $table_pk ), array_keys( $this->table_dependencies[$base_tbl_name] ) );
+
+		// Escape colmn names
+		foreach ( $key_cols as $index => $col ) {
+			$key_cols[$index] = "`$src_table_escaped`.`" . esc_sql( $col ) . '`';
+		}
+
+		$query = sprintf( "SELECT %s FROM `$src_table_escaped`", implode( ',', $key_cols ) );
+		
+		// If we aren't supposed to overwrite, add that clause in.
+		if ( ! $overwrite ) {
+			$query .= " WHERE `$src_table_escaped`.`$table_pk_escaped` NOT IN ( SELECT `$dest_table_escaped`.`$table_pk_escaped` FROM `$dest_table_escaped` )";
+		}
+
+		// Get the rows for which dependencies are satisfied
+		$import_ids = array();
+		if ( ! empty( $this->table_dependencies[$base_tbl_name] ) ) {
+			$source_rows = $wpdb->get_results( $query, ARRAY_A );
+			
+			foreach ( $source_rows as $row ) {
+				foreach ( $row as $colname => $col ) {
+					// The pk cannot have a dependency
+					if ( $colname === $table_pk ) {
+						continue;
+					}
+
+					// Check that this ID is not zero. Zero IDs are used when there is not a foreign key
+					if ( '0' === $col ) {
+						continue;
+					}
+
+					// Check that this dependency is filled
+					$dep_tables = $this->table_dependencies[$base_tbl_name][$colname];
+
+					foreach ( $dep_tables as $table ) {
+						if ( ! in_array( $col, $merged_data[$table] ) ) {
+							// This dependency is not satisfied. Break out of this row
+							continue 3;
+						}
+					}
+				}
+				
+				// This rows' dependencies are satisfied, add it to the list of import IDs
+				$import_ids[] = $row[$table_pk];
+			}
+		} else {
+			// This table has no dependencies, insert all IDs from the DB
+			return $wpdb->get_col( $query );
+		}
+		
+		return $import_ids;
 	}
 	
 	/**
