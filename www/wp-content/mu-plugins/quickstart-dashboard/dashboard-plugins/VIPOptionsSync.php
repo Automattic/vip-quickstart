@@ -320,6 +320,12 @@ class VIPOptionsSync extends Dashboard_Plugin {
 				if ( ! empty( $deps ) ) {
 					foreach ( $deps as $dep_col => $dep_tables ) {
 						foreach ( $dep_tables as $tablename ) {
+							if ( 'skip' == $results[$tablename]['action'] ) {
+								// This table has a dependency whose import was skipped, skip this one too.
+								$results[$table]['action'] = 'forced-skip';
+								break 2;
+							}
+							
 							if ( !array_key_exists( $tablename, $merged_data ) ) {
 								// This tables' dependencies aren't satisfied
 								continue 3;
@@ -370,32 +376,42 @@ class VIPOptionsSync extends Dashboard_Plugin {
 				$errors_occured = true;
 			}
 
-			// Get the error text if this was an error
-			$import_success = false;
-			if ( is_wp_error( $result['import'] ) ) {
-				$result['import'] = __( 'Import failed: ', 'quickstart-dashboard' ) . $result['import']->get_error_message();
-			} elseif ( true === $result['import'] ) {
-				$import_success = true;
-				$result['import'] = __( 'Import succeeded.', 'quickstart-dashboard' );
+			$success = false;
+			if ( 'skip' == $result['action'] ) { 
+				$result['result_text'] = __( 'Skipped.', 'quickstart-dashboard' );
+				$success = true;
+				
+			} elseif ( 'forced-skip' == $result['action'] ) {
+				$result['result_text'] = __( 'Skipped due to a skipped dependency.', 'quickstart-dashboard' );
+				
 			} else {
-				$result['import'] = __( 'Import failed.', 'quickstart-dashboard' );
-			}
-			
-			$merge_success = false;
-			if ( is_wp_error( $result['merge'] ) ) {
-				$result['merge'] = __( 'Merge failed: ', 'quickstart-dashboard' ) . $result['merge']->get_error_message();
-			} elseif ( true === $result['merge'] ) {
-				$merge_success = true;
-				$result['merge'] = __( 'Merge succeeded.', 'quickstart-dashboard' );
-			} elseif ( false === $result['merge'] ) {
-				$result['merge'] = __( 'Merge failed.', 'quickstart-dashboard' );
-			} else {
-				$result['merge'] = __( 'Merge not run.', 'quickstart-dashboard' );
-			}
-			
-			$result['result_text'] = $result['import'] . ' ' . $result['merge'];
+				// Get the error text if this was an error
+				$import_success = false;
+				if ( is_wp_error( $result['import'] ) ) {
+					$result['import'] = __( 'Import failed: ', 'quickstart-dashboard' ) . $result['import']->get_error_message();
+				} elseif ( true === $result['import'] ) {
+					$import_success = true;
+					$result['import'] = __( 'Import succeeded.', 'quickstart-dashboard' );
+				} else {
+					$result['import'] = __( 'Import failed.', 'quickstart-dashboard' );
+				}
 
-			$success = $import_success && $merge_success;
+				$merge_success = false;
+				if ( is_wp_error( $result['merge'] ) ) {
+					$result['merge'] = __( 'Merge failed: ', 'quickstart-dashboard' ) . $result['merge']->get_error_message();
+				} elseif ( true === $result['merge'] ) {
+					$merge_success = true;
+					$result['merge'] = __( 'Merge succeeded.', 'quickstart-dashboard' );
+				} elseif ( false === $result['merge'] ) {
+					$result['merge'] = __( 'Merge failed.', 'quickstart-dashboard' );
+				} else {
+					$result['merge'] = __( 'Merge not run.', 'quickstart-dashboard' );
+				}
+
+				$result['result_text'] = $result['import'] . ' ' . $result['merge'];
+				$success = $import_success && $merge_success;
+			}
+
 			$table_results[] = array(
 				'warn'   => ! $success,
 				'active' => $result['action'] !== 'skip' && $success,
