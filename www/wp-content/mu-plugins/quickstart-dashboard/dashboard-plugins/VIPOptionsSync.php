@@ -840,13 +840,15 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		}
 
 		switch ( $match ) {
-			case 'users':
-			case 'usermeta':
-			case 'options':
-				return 'merge-import';
+			case 'terms':
+			case 'term_taxonomy':
+			case 'term_relationships':
+			case 'posts':
+			case 'postmeta':
+				return 'destructive-import';
 
 			default:
-				return 'destructive-import';
+				return 'merge-import';
 		}
 	}
 	
