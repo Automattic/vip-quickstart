@@ -888,7 +888,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	function get_action_descriptions() {
 		$this->action_descriptions = apply_filters( 'vipoptionssync_action_descriptions', array(
 			'merge-import'		 => __( 'This file will be merged. Content in this file will be merged with the existing database, but existing entries will not be overwritten.', 'quickstart-dashboard' ),
-			'destructive-import' => __( 'This file will be merged. Any content in the existing table will be list.', 'quickstart-dashboard' ),
+			'destructive-import' => __( 'This file will be merged. Any content in the existing table will be lost.', 'quickstart-dashboard' ),
 			'skip'				 => __( 'This file will not be merged.', 'quickstart-dashboard' ),
 		) );
 
