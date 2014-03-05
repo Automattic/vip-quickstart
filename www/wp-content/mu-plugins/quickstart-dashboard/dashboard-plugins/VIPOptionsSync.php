@@ -321,7 +321,6 @@ class VIPOptionsSync extends Dashboard_Plugin {
 					foreach ( $deps as $dep_col => $dep_tables ) {
 						foreach ( $dep_tables as $tablename ) {
 							if ( !array_key_exists( $tablename, $merged_data ) ) {
-								var_dump( sprintf( "Skipping table %s because of failed dependency %s", $table, $tablename ) );
 								// This tables' dependencies aren't satisfied
 								continue 3;
 							}
