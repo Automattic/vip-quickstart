@@ -34,7 +34,7 @@ add_filter( 'infinite_scroll_archive_supported', 'infinite_scroll_archive_suppor
 
 add_action( 'infinite_scroll_credit', 'wpcom_infinite_scroll_custom_credits' );
 function wpcom_infinite_scroll_custom_credits( $credit ) {
-    if ( wpcom_is_vip() )
+    if ( function_exists( 'wpcom_is_vip' ) && wpcom_is_vip() )
         $credit = sprintf( __( 'Powered by <a href="%s" rel="generator">WordPress.com VIP</a>' ), 'http://vip.wordpress.com?ref=is-footer' );
     return $credit;
 }
