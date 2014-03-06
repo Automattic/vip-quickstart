@@ -23,7 +23,7 @@
 	background-color: #F7FCFE;
 }
 
-.vip-dashboard-table tr.warn td:first-child {
+.vip-dashboard-table tr.warn > :first-child {
 	border-left: 4px solid #D54E21;
 }
 
