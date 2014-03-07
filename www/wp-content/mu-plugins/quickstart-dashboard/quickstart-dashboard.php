@@ -104,9 +104,9 @@ class Quickstart_Dashboard {
 		$curl = curl_init( $this->wpcom_api_endpoints['token'] );
 		curl_setopt( $curl, CURLOPT_POST, true );
 		curl_setopt( $curl, CURLOPT_POSTFIELDS, array(
-			'client_id' => urlencode( apply_filters( 'dashboard_wpcom_client_id', '33900' ) ),
+			'client_id' => urlencode( $this->get_wpcom_client_id() ),
 			'redirect_uri' => $this->get_wpcom_redirect_uri(),
-			'client_secret' => urlencode( apply_filters( 'dashboard_wpcom_client_secret', '' ) ),
+			'client_secret' => urlencode( $this->get_wpcom_client_secret() ),
 			'code' => urlencode( $_GET['code'] ),
 			'grant_type' => 'authorization_code',
 		) );
@@ -219,10 +219,26 @@ class Quickstart_Dashboard {
 
 	function get_wpcom_authorization_url() {
 		return add_query_arg( array(
-			'client_id'		=> urlencode( apply_filters( 'dashboard_wpcom_client_id', '' ) ),
+			'client_id'		=> urlencode( $this->get_wpcom_client_id() ),
 			'redirect_uri'  => urlencode( $this->get_wpcom_redirect_uri() ),
 			'response_type' => 'code',
 		), $this->wpcom_api_endpoints['authorize'] );
+	}
+	
+	function get_wpcom_client_id() {
+		return (string) apply_filters( 'dashboard_wpcom_client_id', get_option( 'dashboard_wpcom_client_id', '' ) );
+	}
+	
+	function set_wpcom_client_id( $client_id ) {
+		update_option( 'dashboard_wpcom_client_id', $client_id );
+	}
+	
+	function get_wpcom_client_secret() {
+		return (string) apply_filters( 'dashboard_wpcom_client_secret', get_option( 'dashboard_wpcom_client_secret', '' ) );
+	}
+	
+	function set_wpcom_client_secret( $secret ) { 
+		update_option( 'dashboard_wpcom_client_secret', $secret );
 	}
 
 	/**
