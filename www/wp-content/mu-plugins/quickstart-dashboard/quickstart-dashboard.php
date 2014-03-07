@@ -60,6 +60,35 @@ class Quickstart_Dashboard {
 	}
 
 	function admin_init() {
+		// Check if this user just submitted the dashboard credentials form
+		if ( isset( $_POST['dashboard-credentials-save-and-connect'] ) ) {
+			check_admin_referer( 'dashboard-credentials' );
+			if ( !current_user_can( 'manage_options' ) ) {
+				wp_die( 'You do not have sufficient permissions to access this page.' );
+			}
+			
+			// Alphanumeric characters and digits allowed in client secret.
+			$secret_valid = preg_match( '/\A[a-z0-9]+\z/i', $_POST['oauth-client-secret'] );
+			$id_valid = preg_match( '/\A[0-9]+\z/', $_POST['oauth-client-id'] );
+			
+			if ( $secret_valid && $id_valid ) {
+				// Save the enterred credentials
+				$this->set_wpcom_client_id( intval( $_POST['oauth-client-id'] ) );
+				$this->set_wpcom_client_secret( $_POST['oauth-client-secret'] );
+				
+				// Redirect the user to the auth page
+				wp_redirect( $this->get_wpcom_authorization_url() );
+			} elseif ( !$secret_valid ) {
+				?>
+				<div class="error"><p><?php _e( 'The Client Secret you entered is invalid. Client IDs may contain only alphanumerical digits.' ); ?></p></div>
+				<?php
+			} else {
+				?>
+				<div class="error"><p><?php _e( 'The Client ID you entered is invalid. Client IDs may contain only numerical digits.' ); ?></p></div>
+				<?php
+			}
+		}
+		
 		// Check if we're supposed to be connecting
 		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'vip-dashboard'  ) {
 			// Check for the args to connect to WP.com
@@ -156,6 +185,7 @@ class Quickstart_Dashboard {
     function admin_menu() {
         add_menu_page( __( 'VIP Dashboard', 'quickstart-dashboard' ), __( 'VIP', 'quickstart-dashboard' ), 'manage_options', 'vip-dashboard', null, 'dashicons-cloud', 3 );
 		add_submenu_page( 'vip-dashboard', __( 'VIP Dashboard', 'quickstart-dashboard' ), __( 'Dashboard', 'quickstart-dashboard' ), 'manage_options', 'vip-dashboard', array( $this, 'vip_admin_page' ), 'dashicons-cloud', 3 );
+		add_submenu_page( null, __( 'Dashboard Credentials', 'quickstart-dashboard' ), __( 'Dashboard Credentials', 'quickstart-dashboard' ), 'manage_options', 'dashboard-credentials', array( $this, 'dashboard_credentials_page' ) );
         
         do_action( 'quickstart_dashboard_admin_menu' );
     }
@@ -181,6 +211,39 @@ class Quickstart_Dashboard {
         
         do_action( 'quickstart_admin_page' );
     }
+	
+	function dashboard_credentials_page() {
+		if ( !current_user_can( 'manage_options' ) ) {
+			wp_die( 'You do not have sufficient permissions to access this page.' );
+		}
+		
+		?>
+        <div class="wrap">
+            <div id="icon-vip" class="icon32"><br /></div>
+            <h2><?php _e( 'Dashboard Credentials', 'quickstart-dashboard' ); ?></h2>
+            <h3><?php _e( 'WordPress.com OAuth Credentials', 'quickstart-dashboard' ); ?></h3>
+			<p><?php _e( 'The WordPress.com OAuth credentials are used to query information about your VIP sites, get your VIP themes, and provide other connected goodness.' ); ?></p>
+			<p><?php printf( __( 'If you do not already have WordPress.com OAuth credentials, you can get them by creating an application on the <a href="%s" target="_blank">WordPress.com Developer Site</a>.' ), 'https://developer.wordpress.com/apps/' ); ?></p>
+			<form action="<?php menu_page_url( 'dashboard-credentials' ); ?>" method="POST">
+				<?php wp_nonce_field( 'dashboard-credentials' ); ?>
+				<table class="form-table">
+					<tr>
+						<th scope="row"><label for="oauth-client-id"><?php _e( 'Client ID', 'quickstart-dashboard' ) ?></label></th>
+						<td><input type="text" id="oauth-client-id" name="oauth-client-id" value="<?php echo esc_attr( $this->get_wpcom_client_id() ); ?>" /></td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="oauth-client-secret"><?php _e( 'Client Secret', 'quickstart-dashboard' ) ?></label></th>
+						<td><input type="text" id="oauth-client-secret" name="oauth-client-secret" value="<?php echo esc_attr( $this->get_wpcom_client_secret() ); ?>" /></td>
+					</tr>
+				</table>
+				<p>
+					<input type="submit" class="button-primary" name="dashboard-credentials-save-and-connect" value="<?php _e( 'Save Credentials and Connect to WordPress.com', 'quickstart-dashboard' ); ?>" />
+					<a class="button-secondary" href="<?php menu_page_url( 'vip-dashboard' ); ?>"><?php _e( 'Cancel', 'quickstart-dashboard' ); ?></a>
+				</p>
+			</form>
+        </div>
+        <?php
+	}
 
 	function show_admin_notices() {
 		if ( empty( $this->wpcom_access_token ) && $this->show_wpcom_access_notice ) {
