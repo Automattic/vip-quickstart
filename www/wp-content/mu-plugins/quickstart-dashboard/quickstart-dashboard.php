@@ -246,14 +246,27 @@ class Quickstart_Dashboard {
 	}
 
 	function show_admin_notices() {
-		if ( empty( $this->wpcom_access_token ) && $this->show_wpcom_access_notice ) {
+		if ( $this->show_wpcom_access_notice && ( !$this->has_oauth_credentials() || empty( $this->wpcom_access_token ) ) ) {
 			echo '<div class="error"><p>' . $this->get_connect_wpcom_message() . '</p></div>';
 		}
 	}
 	
 	function get_connect_wpcom_message() {
-		$connect_url = add_query_arg( array( 'dashboard_wpcom_connect' => true ), menu_page_url( 'vip-dashboard', false ) );
+		// Check whether we need credentials or just need to be connected
+		if ( !$this->has_oauth_credentials() ) {
+			$connect_url = menu_page_url( 'dashboard-credentials', false );
+		} else {
+			$connect_url = add_query_arg( array( 'dashboard_wpcom_connect' => true ), menu_page_url( 'vip-dashboard', false ) );
+		}
+		
 		return sprintf( __( 'Please <a href="%s">connect Quickstart</a> with WordPress.com VIP to enable enhanced features.', 'quickstart-dashboard' ), $connect_url );
+	}
+	
+	function has_oauth_credentials() {
+		$client_id = $this->get_wpcom_client_id();
+		$client_secret = $this->get_wpcom_client_secret();
+		
+		return !empty( $client_id ) && !empty( $client_secret );
 	}
 
 	function set_wpcom_access_token( $new_token ) {
