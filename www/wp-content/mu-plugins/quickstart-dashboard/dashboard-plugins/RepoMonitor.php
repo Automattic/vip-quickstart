@@ -38,11 +38,15 @@ class RepoMonitor extends Dashboard_Plugin {
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_notices', array( $this, 'print_admin_notice' ) );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		
 		add_filter( 'cron_schedules', array( $this, 'repo_15_min_cron_interval' ) );
     }
 	
 	function admin_init() {
+		add_action( 'wp_ajax_repomonitor_list_repos', array( $this, 'ajax_list_repos' ) );
+		add_action( 'wp_ajax_repomonitor_scan_repo', array( $this, 'ajax_scan_repo' ) );
+		
 		// Add the cron job to check for updates
 		if ( ! wp_next_scheduled( 'repomonitor_scan_repos' ) ) {
 			wp_schedule_event( time(), 'qs-dashboard-15-min-cron-interval', 'repomonitor_scan_repos' );
@@ -55,6 +59,20 @@ class RepoMonitor extends Dashboard_Plugin {
 
 	function admin_menu() {
 		add_submenu_page( null, __( 'RepoMonitor Update Repo', 'quickstart-dashboard' ), __( 'RepoMonitor Update Repo', 'quickstart-dashboard' ), 'manage_options', 'repomonitor-update', array( $this, 'update_repo_page' ) );
+	}
+	
+	function admin_enqueue_scripts() {
+		if ( isset( $_REQUEST['page'] ) && 'vip-dashboard' == $_REQUEST['page'] ) {
+			wp_enqueue_script( 'repomonitor_js', get_bloginfo( 'wpurl' ) . '/wp-content/mu-plugins/quickstart-dashboard/js/repomonitor.js', array( 'jquery' ) );
+			wp_localize_script( 'repomonitor_js', 'repomonitor_settings', array(
+				'translations'	=> array(
+					'fetching_repos' => 'Retrieving list of repositories',
+					'scanning_repo'	 => 'Scanning {repo_name}',
+					'updating_repo'  => 'Updating {repo_name}',
+					'action_done'	 => 'Done.',
+				),
+			) );
+		}
 	}
 
 	function print_admin_notice() {
@@ -116,13 +134,71 @@ class RepoMonitor extends Dashboard_Plugin {
 	}
 
 	function dashboard_setup() {
-        wp_add_dashboard_widget( 'quickstart_dashboard_repomonitor', $this->name(), array( $this, 'show' ) );
+		$update_link = ' <a class="widget_update" title="' . __( 'Check for updates', 'quickstart-dashboard' ) . '"><span class="noticon noticon-refresh"></span></a>';
+        wp_add_dashboard_widget( 'quickstart_dashboard_repomonitor', $this->name() . $update_link, array( $this, 'show' ) );
     }
 
 	function show() {
+		echo '<div id="repomonitor-update-box" class="widget-update-box"></div>';
 		$table = new RepoMonitorWidgetTable( $this );
 		$table->prepare_items();
 		$table->display();
+	}
+	
+	function ajax_list_repos() {
+		if ( !current_user_can( 'manage_options' ) || !wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-repos' ) ) {
+			wp_send_json_error( array( 'error' => __( 'You do not have sufficient permissions to access this page.', 'quickstart-dashboard' ) ) );
+		}
+
+		// Get the list of repos and summarize
+		$output_data = array();
+		foreach ( $this->get_repos() as $repo ) {
+			$status = $this->get_repo_status( $repo['repo_id'] );
+			$out_of_date = $this->repo_out_of_date( $status, $repo['repo_type'] );
+			
+			$output_data[] = array_merge( $repo, array(
+				'status_text' => $this->get_status_text( $status, $repo['repo_type'] ),
+				'out_of_date' => $out_of_date,
+				'can_update'  => !$out_of_date || $this->can_update_repo( $repo ),
+			) );
+		}
+		
+		wp_send_json_success( $output_data );
+	}
+	
+	function ajax_scan_repo() {
+		if ( !current_user_can( 'manage_options' ) || !wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-repos' ) ) {
+			wp_send_json_error( array( 'error' => __( 'You do not have sufficient permissions to access this page.', 'quickstart-dashboard' ) ) );
+		}
+		
+		$repo_id = intval( $_REQUEST['repo_id'] );
+
+		// Get the list of repos and summarize
+		$scan_repo = null;
+		foreach ( $this->get_repos() as $repo ) {
+			if ( $repo['repo_id'] === $repo_id ) {
+				$scan_repo = $repo;
+				break;
+			}
+		}
+		
+		if ( is_null( $scan_repo ) ) {
+			wp_send_json_error( array( 'error' => __( 'The repo id was not found.', 'quickstart-dashboard' ) ) );
+		}
+		
+		// Scan the repo
+		$this->scan_repo( $repo );
+		
+		// Send back useful info
+		$status = $this->get_repo_status( $repo['repo_id'] );
+		$out_of_date = $this->repo_out_of_date( $status, $repo['repo_type'] );
+		$output_data = array_merge( $repo, array(
+			'status_text' => $this->get_status_text( $status, $repo['repo_type'] ),
+			'out_of_date' => $out_of_date,
+			'can_update'  => !$out_of_date || $this->can_update_repo( $repo ),
+		) );
+		
+		wp_send_json_success( $output_data );
 	}
 
 	function update_repo_page() {
@@ -361,7 +437,7 @@ class RepoMonitor extends Dashboard_Plugin {
             }
 
             // Check the ninth column to see if the file is out of date WRT the server
-            if ( !ctype_space( $matches['args'][9] ) ) {
+            if ( isset( $matches['args'][9] ) && !ctype_space( $matches['args'][9] ) ) {
                 $status['files_out_of_date'][] = $matches['filename'];
             }
         }
@@ -900,8 +976,8 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 		$this->repo_monitor = $repo_monitor;
 
         parent::__construct( array(
-            'singular'  => 'theme',
-            'plural'    => 'themes',
+            'singular'  => 'repo',
+            'plural'    => 'repos',
             'ajax'      => false
         ) );
     }

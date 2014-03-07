@@ -180,6 +180,7 @@ class Quickstart_Dashboard {
 			wp_enqueue_script( 'jquery-touch-punch' );
 
 		wp_enqueue_style( 'quickstart-dashboard', get_bloginfo( 'wpurl' ) . '/wp-content/mu-plugins/quickstart-dashboard/css/dashboard.css' );
+		wp_enqueue_style( 'noticons', '//s0.wordpress.com/i/noticons/noticons.css' );
 	}
     
     function admin_menu() {
@@ -202,7 +203,7 @@ class Quickstart_Dashboard {
         <div class="wrap">
             <div id="icon-vip" class="icon32"><br /></div>
             <h2><?php _e( 'VIP Quickstart Dashboard', 'quickstart-dashboard' ); ?></h2>
-            <div id="dashboard-widgets-wrap">
+            <div id="dashboard-widgets-wrap" class="quickstart-dashboard-widgets-wrap">
                 <?php wp_dashboard(); // Main call that displays the widgets ?>
                 <div class="clear"></div>
             </div>

@@ -1,3 +1,13 @@
+.quickstart-dashboard-widgets-wrap #dashboard-widgets .hndle a.widget_update {
+	text-decoration: none;
+	display: inline-block;
+	cursor:pointer;
+}
+
+.quickstart-dashboard-widgets-wrap #dashboard-widgets .hndle span.widget_update_status {
+	display: none;
+}
+
 .vip-dashboard-table {
 	margin: 0;
 	width: 100%;
@@ -52,4 +62,19 @@
 #quickstart_dashboard_vipthemehelper .tablenav {
 	margin: 10px 0 13px;
 	padding: 0 13px;
+}
+
+.widget-update-box {
+	display: none;
+	width: 100%;
+	height: 100%;
+}
+
+.repomonitor-update-status {
+	display: none;
+}
+
+#dashboard-widgets #quickstart_dashboard_repomonitor .inside.doing-update,
+#dashboard-widgets #quickstart_dashboard_vipthemehelper .inside.doing-update {
+	padding: 0 12px 12px;
 }
