@@ -18,6 +18,83 @@
 			add_action( 'fetching-repos', repomonitor_settings.translations.fetching_repos );
 		}
 		
+		function finish_repomonitor_update() {
+			add_action( 'updating-status-table', repomonitor_settings.translations.updating_table );
+			
+			update_repo_status_table();
+			
+			complete_action( 'updating-status-table' );
+			
+			hide_update_box();
+		}
+		
+		function update_repo_status_table() {
+			for ( var r in repos ) {
+				update_status_row_for_repo( repos[r] );
+			}
+		}
+		
+		function update_status_row_for_repo( repo ) {
+			var $row = $( '#repo-' + repo['repo_id'] + '-status' );
+
+			// Get the current status of the row
+			var current_status = 'inactive';
+			if ( $row.hasClass( 'active' ) ) {
+				current_status = 'active';
+			}
+			if ( $row.hasClass( 'update' ) ) {
+				current_status = 'update';
+			}
+
+			// Figure out what the new status will be
+			var new_status = 'inactive';
+			if ( repo.out_of_date ) {
+				if ( repo.can_update ) {
+					new_status = 'active';
+				} else {
+					new_status = 'update';
+				}
+			}
+
+			// If we don't have to update the row status, just update the text
+			$row.children( '.column-status' ).html( repo.status_text );
+			if ( current_status === new_status ) {
+				return;
+			} else {
+				if ( 'update' === current_status && $row.next().hasClass( 'plugin-update-tr' ) ) {
+					// The current status is warn, but the new status is not. We need to remove the next row which is a status message
+					$row.next().remove();
+				}
+
+				// Remove the current status
+				$row.removeClass( current_status );
+				
+				// Add the new status
+				$row.addClass( new_status );
+				
+				if ( 'active' === new_status ) {
+					// Add the row actions div if its missing
+					if ( ! $( '.column-repo_friendly_name .row-actions', $row ).length ) {
+						$row.children( '.column-repo_friendly_name' ).append( '<div class="row-actions visible"></div>' );
+					}
+
+					// Update the row action if its missing
+					if ( ! $( '.column-repo_friendly_name .row-actions .update', $row ).length ) {
+						console.log( repo );
+						$( '.row-actions', $row ).append(
+							'<span class="update"><a href="{update_link}" title="{update_descr}" class="thickbox">{update_action}</a></span>'
+							.replace( '{update_link}', repo['update_link'] )
+							.replace( '{update_descr}', repomonitor_settings.translations.update_descr )
+							.replace( '{update_action}', repomonitor_settings.translations.update_action )
+						);
+					}
+				} else {
+					// Remove the actions div
+					$( '.column-repo_friendly_name .row-actions', $row ).remove();
+				}
+			}
+		}
+		
 		function parse_repo_list_ajax_response( response ) {
 			if ( !response.success ) {
 				// We should alert the user that something happened
@@ -40,24 +117,24 @@
 			// Mark the current action coplete
 			complete_action( 'updating-repo-' + repos[current_update_repo]['repo_id'] );
 			
-			// Update the next repo
-			scan_next_repo();
-			
-			// Lastly, save this repo's info
+			// Save this repo's info
 			for ( var r in repos ) {
 				if ( repos[r]['repo_id'] === response.data['repo_id'] ) {
 					repos[r] = response.data;
 					break;
 				}
 			}
+			
+			// Update the next repo
+			scan_next_repo();
 		}
 		
 		function scan_next_repo() {
 			current_update_repo += 1;
 			
 			// Check if we're done updating
-			if ( current_update_repo === repos.length - 1 ) {
-				hide_update_box();
+			if ( current_update_repo === repos.length ) {
+				finish_repomonitor_update();
 				return;
 			}
 			

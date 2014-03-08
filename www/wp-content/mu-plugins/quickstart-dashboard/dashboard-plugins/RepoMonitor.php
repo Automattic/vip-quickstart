@@ -70,6 +70,9 @@ class RepoMonitor extends Dashboard_Plugin {
 					'scanning_repo'	 => __( 'Scanning {repo_name}', 'quickstart-dashboard' ),
 					'updating_repo'  => __( 'Updating {repo_name}', 'quickstart-dashboard' ),
 					'action_done'	 => __( 'Done.', 'quickstart-dashboard' ),
+					'updating_table' => __( 'Updating status table', 'quickstart-dashboard' ),
+					'update_action'  => __( 'Update', 'quickstart-dashboard' ),
+					'update_descr'   => __( 'Update this repo', 'quickstart-dashboard' ),
 				),
 			) );
 		}
@@ -196,6 +199,7 @@ class RepoMonitor extends Dashboard_Plugin {
 			'status_text' => $this->get_status_text( $status, $repo['repo_type'] ),
 			'out_of_date' => $out_of_date,
 			'can_update'  => !$out_of_date || $this->can_update_repo( $repo ),
+			'update_link' => add_query_arg( array( 'repo_id' => $repo['repo_id'], 'no_wp' => true, 'page' => 'repomonitor-update' ), '' ),
 		) );
 		
 		wp_send_json_success( $output_data );
@@ -1000,7 +1004,7 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 			$row_classes[] = 'inactive';
 		}
 
-		echo '<tr class="' . implode( ' ', $row_classes ) . '">';
+		echo '<tr id="repo-' . esc_attr( $item['repo_id'] ) . '-status" class="' . implode( ' ', $row_classes ) . '">';
 		$this->single_row_columns( $item );
 		echo '</tr>';
 
