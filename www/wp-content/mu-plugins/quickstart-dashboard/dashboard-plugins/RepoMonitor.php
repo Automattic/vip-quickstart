@@ -46,6 +46,7 @@ class RepoMonitor extends Dashboard_Plugin {
 	function admin_init() {
 		add_action( 'wp_ajax_repomonitor_list_repos', array( $this, 'ajax_list_repos' ) );
 		add_action( 'wp_ajax_repomonitor_scan_repo', array( $this, 'ajax_scan_repo' ) );
+		add_action( 'wp_ajax_repomonitor_update_repo', array( $this, 'ajax_update_repo' ) );
 		
 		// Add the cron job to check for updates
 		if ( ! wp_next_scheduled( 'repomonitor_scan_repos' ) ) {
@@ -198,16 +199,73 @@ class RepoMonitor extends Dashboard_Plugin {
 		}
 		
 		// Send back useful info
+		wp_send_json_success( $this->get_ajax_repo_status( $repo ) );
+	}
+
+	function ajax_update_repo() {
+		if ( !current_user_can( 'manage_options' ) || !wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-repos' ) ) {
+			wp_send_json_error( array( 'error' => __( 'You do not have sufficient permissions to access this page.', 'quickstart-dashboard' ) ) );
+		}
+		
+		if ( ! isset( $_REQUEST['repo_id'] ) ) {
+			wp_die( __( 'No repo specified.', 'quickstart-dashboard' ) );
+		}
+
+		$repo_id = intval( $_REQUEST['repo_id'] );
+
+		// Get the list of repos and summarize
+		$repo = null;
+		foreach ( $this->get_repos() as $potential_repo ) {
+			if ( $potential_repo['repo_id'] === $repo_id ) {
+				$repo = $potential_repo;
+				break;
+			}
+		}
+
+		if ( is_null( $repo ) ) {
+			wp_send_json_error( array( 'error' => __( 'The repo id was not found.', 'quickstart-dashboard' ) ) );
+		}
+
+		// Check that we can perform an update
+		if ( ! $this->can_update_repo( $repo ) ) {
+			wp_send_json_error( array( 'error' =>  __( 'Error: This repo is not currently in a state where it can be updated.', 'quickstart-dashboard' ) ) );
+		}
+
+		// Start the update
+		$result = $this->update_repo( $repo, false );
+
+		// Print the result
+		if ( false === $result ) {
+			wp_send_json_error( array( 'error' => __( 'The update failed for an unknown reason.', 'quickstart-dashboard' ) ) );
+		} elseif ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'error' => $result->get_error_message() ) );
+		} else {
+			// Scan the repo
+			$scan_result = $this->scan_repo( $repo, false );
+			if ( is_wp_error( $scan_result ) ) {
+				wp_send_json_error( array( 'error' => $scan_result->get_error_message() ) );
+			}
+
+			wp_send_json_success( $this->get_ajax_repo_status( $repo ) );
+		}
+	}
+
+	/**
+	 * Returns an object with most of a repos status info combined in one. This is
+	 * very useful for JS where it is not convenient to quickly retrieve status information.
+	 *
+	 * @param array $repo The repo to fetch status info for.
+	 * @return array
+	 */
+	function get_ajax_repo_status( $repo ) {
 		$status = $this->get_repo_status( $repo['repo_id'] );
 		$out_of_date = $this->repo_out_of_date( $status, $repo['repo_type'] );
-		$output_data = array_merge( $repo, array(
+		return array_merge( $repo, array(
 			'status_text' => $this->get_status_text( $status, $repo['repo_type'] ),
 			'out_of_date' => $out_of_date,
 			'can_update'  => !$out_of_date || $this->can_update_repo( $repo ),
 			'update_link' => add_query_arg( array( 'repo_id' => $repo['repo_id'], 'no_wp' => true, 'page' => 'repomonitor-update' ), '' ),
 		) );
-		
-		wp_send_json_success( $output_data );
 	}
 
 	function update_repo_page() {
@@ -270,10 +328,10 @@ class RepoMonitor extends Dashboard_Plugin {
 		}
 	}
 	
-	function scan_repo( $repo ) {
+	function scan_repo( $repo, $allow_interactive = true ) {
 		// Run the command to determine if it needs an update
 		if ( 'svn' == $repo['repo_type'] ) {
-			$results = $this->scan_svn_repo( $repo['repo_path'], true );
+			$results = $this->scan_svn_repo( $repo['repo_path'], $allow_interactive );
 		} elseif ( 'git' == $repo['repo_type'] ) {
 			$results = $this->scan_git_repo( $repo['repo_path'] );
 		}
@@ -1030,7 +1088,7 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 		$retval = '';
         switch( $column_name ){
 			case 'status':
-				$retval = $this->repo_monitor->get_status_text( $item[$column_name], $item['repo_type'] );
+				$retval = sprintf( '<span class="vip-dashboard-repo-status">%s</span>', esc_html( $this->repo_monitor->get_status_text( $item[$column_name], $item['repo_type'] ) ) );
 				break;
 			case 'repo_type':
 				$retval = sprintf( '<span class="vip-dashboard-repo-type">%s</span>', esc_html( $item['repo_type'] ) );
@@ -1049,10 +1107,11 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 		// Show the update action only if the repo needs and update and we can update it
 		if ( $item['warn']  && $item['can_update'] ) {
 			$actions['update'] = sprintf(
-				'<a class="thickbox" title="%1$s" href="%2$s">%3$s</a>',
+				'<a class="repo-update" title="%1$s" href="%2$s">%3$s</a><input type="hidden" class="repo-id" value="%4$s" />',
 				__( 'Update this repo', 'quickstart-dashboard' ),
 				add_query_arg( array( 'repo_id' => $item['repo_id'], 'no_wp' => true ), menu_page_url( 'repomonitor-update', false ) ),
-				__( 'Update', 'quickstart-dashboard' )
+				__( 'Update', 'quickstart-dashboard' ),
+				esc_attr( $item['repo_id'] )
 			);
 		}
 
