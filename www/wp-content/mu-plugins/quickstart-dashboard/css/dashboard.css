@@ -4,6 +4,10 @@
 	cursor:pointer;
 }
 
+.quickstart-dashboard-widgets-wrap #dashboard-widgets .hndle a.widget_update span.noticon {
+	vertical-align: middle;
+}
+
 .quickstart-dashboard-widgets-wrap #dashboard-widgets .hndle span.widget_update_status {
 	display: none;
 }
