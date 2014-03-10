@@ -1,5 +1,5 @@
 ( function ( $ ) {
-	$(document).ready( function () {
+	$( document ).ready( function () {
 		var updating = false;
 		var repos = [];
 		var current_action_index = 0;
@@ -18,7 +18,7 @@
 
 		$( '#quickstart_dashboard_repomonitor input#doaction' ).click( function() {
 			// Handle the bulk actions
-			if ( $( '#quickstart_dashboard_repomonitor .bulkactions select' ). val() === 'update' ) {
+			if ( $( '#quickstart_dashboard_repomonitor .bulkactions select' ).val() === 'update' ) {
 				// Get a list of selected checkbox
 				var repo_ids = [];
 				$( '#quickstart_dashboard_repomonitor .check-column input' ).filter( function() {
@@ -46,7 +46,6 @@
 
 		function update_next_repo() {
 			if ( ! repo_updates.length ) {
-				console.log( repos );
 				finish_repomonitor_update();
 				return;
 			}
@@ -70,8 +69,6 @@
 		}
 
 		function parse_repo_update_ajax_response( response ) {
-			console.log( response );
-
 			complete_action( 'update-repo-' + current_update_repo, response.success );
 
 			// Save this repo's info if the scan succeeded
