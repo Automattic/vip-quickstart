@@ -110,18 +110,16 @@
 		}
 		
 		function parse_repo_scan_ajax_response( response ) {
-			if ( !response.success ) {
-				return;
-			}
-			
 			// Mark the current action coplete
-			complete_action( 'updating-repo-' + repos[current_update_repo]['repo_id'] );
+			complete_action( 'updating-repo-' + repos[current_update_repo]['repo_id'], response.success );
 			
-			// Save this repo's info
-			for ( var r in repos ) {
-				if ( repos[r]['repo_id'] === response.data['repo_id'] ) {
-					repos[r] = response.data;
-					break;
+			// Save this repo's info if the scan succeeded
+			if ( response.sucess ) {
+				for ( var r in repos ) {
+					if ( repos[r]['repo_id'] === response.data['repo_id'] ) {
+						repos[r] = response.data;
+						break;
+					}
 				}
 			}
 			
@@ -162,10 +160,15 @@
 			current_action_index += 1;
 		}
 		
-		function complete_action( action_slug ) {
+		function complete_action( action_slug, success ) {
 			var action = $( '#repomonitor-update-box' ).children( '.' + action_slug );
 			action.children( '.spinner' ).remove();
-			action.html( action.html() + ' ' + repomonitor_settings.translations.action_done );
+
+			if ( typeof sucess === 'undefined' || success ) {
+				action.html( action.html() + ' ' + repomonitor_settings.translations.action_done );
+			} else {
+				action.html( action.html() + ' ' + repomonitor_settings.translations.action_fail );
+			}
 		}
 		
 		function ajax_get_repo_list() {
