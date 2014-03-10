@@ -332,11 +332,3 @@
 		}
 	} );
 } )( jQuery );
-
-( function ( $ ) {
-	$(document).ready( function () {
-		var animation_speed = 'fast';
-
-		
-	} );
-} )( jQuery );
