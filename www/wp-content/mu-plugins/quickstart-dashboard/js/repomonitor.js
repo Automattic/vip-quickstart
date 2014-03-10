@@ -80,7 +80,6 @@
 
 					// Update the row action if its missing
 					if ( ! $( '.column-repo_friendly_name .row-actions .update', $row ).length ) {
-						console.log( repo );
 						$( '.row-actions', $row ).append(
 							'<span class="update"><a href="{update_link}" title="{update_descr}" class="thickbox">{update_action}</a></span>'
 							.replace( '{update_link}', repo['update_link'] )
