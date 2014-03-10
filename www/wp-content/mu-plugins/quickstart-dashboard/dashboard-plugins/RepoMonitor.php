@@ -1144,7 +1144,7 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 
     function get_bulk_actions() {
         return apply_filters( 'viprepomonitor_table_bulk_actions', array(
-			'install' => __( 'Install', 'quickstart-dashboard' ),
+			'update' => __( 'Update', 'quickstart-dashboard' ),
 		) );
     }
 
