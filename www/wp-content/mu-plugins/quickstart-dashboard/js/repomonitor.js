@@ -16,6 +16,26 @@
 			return false;
 		} );
 
+		$( '#quickstart_dashboard_repomonitor input#doaction' ).click( function() {
+			// Handle the bulk actions
+			if ( $( '#quickstart_dashboard_repomonitor .bulkactions select' ). val() === 'update' ) {
+				// Get a list of selected checkbox
+				var repo_ids = [];
+				$( '#quickstart_dashboard_repomonitor .check-column input' ).filter( function() {
+					return $( this ).attr( 'checked' );
+				} ).each( 
+					function () {
+						repo_ids.push( $( this ).val() );
+						$( this ).removeAttr( 'checked' );
+					}
+				);
+
+				start_repo_updates( repo_ids );
+
+				return false;
+			}
+		} );
+
 		function start_repo_updates( update_repos ) {
 			repo_updates.push.apply( repo_updates, update_repos );
 
@@ -180,8 +200,10 @@
 			
 			// Save this repo's info if the scan succeeded
 			if ( response.success ) {
+				var found = false;
 				for ( var r in repos ) {
 					if ( repos[r]['repo_id'] === response.data['repo_id'] ) {
+						found = true;
 						repos[r] = response.data;
 						break;
 					}
