@@ -70,6 +70,7 @@ class RepoMonitor extends Dashboard_Plugin {
 					'scanning_repo'	 => __( 'Scanning {repo_name}', 'quickstart-dashboard' ),
 					'updating_repo'  => __( 'Updating {repo_name}', 'quickstart-dashboard' ),
 					'action_done'	 => __( 'Done.', 'quickstart-dashboard' ),
+					'action_fail'	 => __( 'Failed.', 'quickstart-dashboard' ),
 					'updating_table' => __( 'Updating status table', 'quickstart-dashboard' ),
 					'update_action'  => __( 'Update', 'quickstart-dashboard' ),
 					'update_descr'   => __( 'Update this repo', 'quickstart-dashboard' ),
@@ -190,7 +191,11 @@ class RepoMonitor extends Dashboard_Plugin {
 		}
 		
 		// Scan the repo
-		$this->scan_repo( $repo );
+		$result = $this->scan_repo( $repo );
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'error' => $result->get_error_message() ) );
+		}
 		
 		// Send back useful info
 		$status = $this->get_repo_status( $repo['repo_id'] );
