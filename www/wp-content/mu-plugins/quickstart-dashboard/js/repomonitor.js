@@ -5,8 +5,74 @@
 		var current_action_index = 0;
 		var current_update_repo = 0;
 		var animation_speed = 'slow';
+		var repo_updates = [];
+		var update_box_visible = false;
 		
 		$( 'a.widget_update' ).click( start_repomonitor_update );
+		$( 'a.repo-update' ).click( function () {
+			// Figure out which repo we're updating..
+			var repo_id = $( 'input.repo-id', $( this ).parents( 'tr' ) ).val();
+			start_repo_updates( [ repo_id ] );
+			return false;
+		} );
+
+		function start_repo_updates( update_repos ) {
+			repo_updates.push.apply( repo_updates, update_repos );
+
+			show_update_box();
+			
+			update_next_repo();
+		}
+
+		function update_next_repo() {
+			if ( ! repo_updates.length ) {
+				console.log( repos );
+				finish_repomonitor_update();
+				return;
+			}
+
+			current_update_repo = repo_updates.pop();
+			var $repo = $( '#repo-' + current_update_repo + '-status' );
+
+			ajax_update_repo( current_update_repo );
+
+			add_action( 'update-repo-' + current_update_repo, "Updating " + $( '.column-repo_friendly_name strong', $repo ).html() );
+		}
+
+		function ajax_update_repo( repo_id ) {
+			return $.ajax( ajaxurl, {
+				data: {
+					action: 'repomonitor_update_repo',
+					repo_id: repo_id,
+					_wpnonce: $( '#quickstart_dashboard_repomonitor #_wpnonce' ).val(),
+				},
+			} ).done( parse_repo_update_ajax_response );
+		}
+
+		function parse_repo_update_ajax_response( response ) {
+			console.log( response );
+
+			complete_action( 'update-repo-' + current_update_repo, response.success );
+
+			// Save this repo's info if the scan succeeded
+			if ( response.success ) {
+				var found = false;
+				for ( var r in repos ) {
+					if ( repos[r]['repo_id'] === response.data['repo_id'] ) {
+						repos[r] = response.data;
+						found = true;
+						break;
+					}
+				}
+
+				// If this item isn't already in the list, add it
+				if ( !found ) {
+					repos.push( response.data );
+				}
+			}
+
+			update_next_repo();
+		}
 		
 		function start_repomonitor_update() {
 			current_update_repo = -1;
@@ -81,7 +147,7 @@
 					// Update the row action if its missing
 					if ( ! $( '.column-repo_friendly_name .row-actions .update', $row ).length ) {
 						$( '.row-actions', $row ).append(
-							'<span class="update"><a href="{update_link}" title="{update_descr}" class="thickbox">{update_action}</a></span>'
+							'<span class="update"><a href="{update_link}" title="{update_descr}" class="repo-update">{update_action}</a></span>'
 							.replace( '{update_link}', repo['update_link'] )
 							.replace( '{update_descr}', repomonitor_settings.translations.update_descr )
 							.replace( '{update_action}', repomonitor_settings.translations.update_action )
@@ -113,12 +179,17 @@
 			complete_action( 'updating-repo-' + repos[current_update_repo]['repo_id'], response.success );
 			
 			// Save this repo's info if the scan succeeded
-			if ( response.sucess ) {
+			if ( response.success ) {
 				for ( var r in repos ) {
 					if ( repos[r]['repo_id'] === response.data['repo_id'] ) {
 						repos[r] = response.data;
 						break;
 					}
+				}
+
+				// If this item isn't already in the list, add it
+				if ( !found ) {
+					repos.push( response.data );
 				}
 			}
 			
@@ -190,6 +261,10 @@
 		}
 		
 		function show_update_box() {
+			if ( update_box_visible ) {
+				return;
+			}
+
 			// hide the refresh button and show the spinner
 			var $refresh = $( 'a.widget_update' );
 			$refresh.hide();
@@ -205,11 +280,17 @@
 				$update_box.siblings().hide();
 				$update_box.parent().addClass( 'doing-update' ).slideDown( animation_speed );
 			} );
+
+			update_box_visible = true;
 			
 			return $update_box;
 		}
 		
 		function hide_update_box() {
+			if ( ! update_box_visible ) {
+				return;
+			}
+
 			// Re-enable the refresh button
 			var $refresh = $( 'a.widget_update' );
 			$refresh.show();
@@ -222,8 +303,18 @@
 				$update_box.siblings().show();
 				$update_box.parent().removeClass( 'doing-update' ).slideDown( animation_speed );
 			} );
-			
+
+			update_box_visible = false;
+
 			return $update_box;
 		}
+	} );
+} )( jQuery );
+
+( function ( $ ) {
+	$(document).ready( function () {
+		var animation_speed = 'fast';
+
+		
 	} );
 } )( jQuery );
