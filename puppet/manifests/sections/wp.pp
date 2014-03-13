@@ -90,11 +90,9 @@ vcsrepo { '/srv/www/wp':
 }
 
 vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
-  ensure              => 'present',
-  source              => 'https://vip-svn.wordpress.com/plugins/',
-  provider            => svn,
-  basic_auth_username => $svn_username,
-  basic_auth_password => $svn_password,
+  ensure   => 'present',
+  source   => 'https://vip-svn.wordpress.com/plugins/',
+  provider => svn,
 }
 
 vcsrepo { '/srv/www/wp-content/themes/pub':

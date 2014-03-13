@@ -106,38 +106,6 @@ git submodule sync
 git submodule update --init --recursive
 echo ""
 
-# =====================================
-# Checkout the VIP shared plugins repo
-# =====================================
-for i in {1..3}; do
-    unset response
-
-    echo -n "Enter your WordPress.com username: "
-    read username
-
-    if [[ -n $username ]]; then
-        echo -n "Enter your WordPress.com password: "
-        read -s password
-        response=$(curl -u "$username:$password" --write-out %{http_code} --silent --output /dev/null -I https://vip-svn.wordpress.com/plugins/)
-
-        if [[ 200 -ne $response ]]; then
-            echo "Login failed. Try again."
-        else
-            break
-        fi
-    fi
-done
-
-if [[ 200 -ne $response ]]; then
-    echo ""
-    echo "Login Failed. Max Attempts."
-    echo "---------------------------"
-    echo "Looks like you might not have access to our VIP Shared Plugins repo. Just send an email to vip-support@wordpress.com and let us know what project you're working on and we'll set things up for you!"
-fi
-
-echo ""
-echo ""
-
 
 # =====================================
 # Start the VM (always provision, even if it's already running)
@@ -146,16 +114,12 @@ echo "=================================="
 echo "= Provisioning"
 echo "=================================="
 if [ false == $SERVER ]; then
-    export SVN_USERNAME="$username"
-    export SVN_PASSWORD="$password"
     [[ -n $QUICKSTART_DOMAIN ]] && export QUICKSTART_DOMAIN="$QUICKSTART_DOMAIN"
 
     vagrant reload --no-provision
     vagrant up --no-provision
     vagrant provision
 elif [[ -n "$QUICKSTART_DOMAIN" ]]; then
-    export FACTER_svn_username="$username"
-    export FACTER_svn_password="$password"
     export FACTER_quickstart_domain="$QUICKSTART_DOMAIN"
 
     puppet apply --modulepath=/srv/puppet/modules --templatedir=/srv/puppet/files /srv/puppet/manifests/init.pp
