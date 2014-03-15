@@ -3,7 +3,7 @@
 # =====================================
 # Set cwd to vip-quickstart
 # =====================================
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$( dirname $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ) )"
 ORIG=`pwd`
 cd $DIR
 
