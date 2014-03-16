@@ -24,7 +24,7 @@ VIP Quickstart is a local development environment for WordPress.com VIP develope
 ### Local
 
 * [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-* [Vagrant](http://downloads.vagrantup.com/)
+* [Vagrant](http://www.vagrantup.com/downloads.html)
 * [Git](http://git-scm.com/downloads)
 
 ### Server
