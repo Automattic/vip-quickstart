@@ -9,7 +9,7 @@ apt::source { 'php54':
   release     => 'precise',
   repos       => 'main',
   key         => '14aa40ec0831756756d7f66c4f4ea0aae5267a6c',
-  key_server  => 'keyserver.ubuntu.com',
+  key_server  => 'hkp://keyserver.ubuntu.com:80',
   include_src => true
 }
 
