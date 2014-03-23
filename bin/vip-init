@@ -154,12 +154,14 @@ fi
 # =====================================
 # Outro/next steps
 # =====================================
-echo "=================================="
-echo "= Next Steps"
-echo "=================================="
+if [[ ! $IS_INSTALLED ]]; then
+    echo "=================================="
+    echo "= Next Steps"
+    echo "=================================="
 
-echo "* Go to http://$QUICKSTART_DOMAIN in your browser"
-echo ""
+    echo "* Go to http://$QUICKSTART_DOMAIN in your browser"
+    echo ""
+fi
 
 
 # =====================================
