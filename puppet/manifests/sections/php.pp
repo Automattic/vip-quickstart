@@ -1,3 +1,4 @@
+# Use the latest version of PHP from oldstable
 $php_version = '5.4.26-1+deb.sury.org~precise+1'
 
 include php
