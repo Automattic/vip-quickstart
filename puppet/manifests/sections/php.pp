@@ -1,6 +1,4 @@
-# Use the latest version of PHP from oldstable
-$php_version = '5.4.26-1+deb.sury.org~precise+1'
-
+# PHP 5.4 + extensions
 include php
 include apt
 
@@ -15,11 +13,11 @@ apt::source { 'php54':
 
 class {
   'php::cli':
-    ensure  => $php_version,
+    ensure  => latest,
     require => Apt::Source['php54'];
   'php::composer':;
   'php::dev':
-    ensure  => $php_version,
+    ensure  => latest,
     require => Apt::Source['php54'];
   'php::fpm':;
   'php::pear':;
