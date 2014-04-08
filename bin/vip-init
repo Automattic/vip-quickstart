@@ -146,7 +146,7 @@ if [[ -n $QUICKSTART_DOMAIN && false == $SERVER ]]; then
     echo "= Configuring the hosts file"
     echo "=================================="
 
-    cat /etc/hosts | grep $QUICKSTART_DOMAIN || sudo printf "\n# VIP Quickstart\n10.86.73.80 $QUICKSTART_DOMAIN\n" | sudo tee -a /etc/hosts
+    cat /etc/hosts | grep $QUICKSTART_DOMAIN || printf "\n# VIP Quickstart\n10.86.73.80 $QUICKSTART_DOMAIN\n" | sudo tee -a /etc/hosts
     echo ""
 fi
 
