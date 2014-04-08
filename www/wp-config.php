@@ -35,13 +35,16 @@ if ( ! defined( 'DB_PASSWORD' ) )
     define('DB_PASSWORD', 'wordpress');
 
 /** MySQL hostname */
-define('DB_HOST', 'localhost');
+if ( ! defined( 'DB_HOST' ) )
+  define('DB_HOST', 'localhost');
 
 /** Database Charset to use in creating database tables. */
-define('DB_CHARSET', 'utf8');
+if ( ! defined( 'DB_CHARTSET' ) )
+  define('DB_CHARSET', 'utf8');
 
 /** The Database Collate type. Don't change this if in doubt. */
-define('DB_COLLATE', '');
+if ( ! defined( 'DB_COLLATE' ) )
+  define('DB_COLLATE', '');
 
 /**#@-*/
 
@@ -51,7 +54,8 @@ define('DB_COLLATE', '');
  * You can have multiple installations in one database if you give each a unique
  * prefix. Only numbers, letters, and underscores please!
  */
-$table_prefix  = 'wp_';
+if ( empty($table_prefix) ) 
+    $table_prefix  = 'wp_';
 
 /**
  * WordPress Localized Language, defaults to English.
@@ -71,8 +75,11 @@ if ( ! defined( 'WPLANG' ) )
  * It is strongly recommended that plugin and theme developers use WP_DEBUG
  * in their development environments.
  */
-define('WP_DEBUG', true);
-define('SAVEQUERIES', true);
+if ( ! defined( 'WP_DEBUG' ) )
+    define('WP_DEBUG', true);
+
+if ( ! defined( 'SAVEQUERIES' ) )
+    define('SAVEQUERIES', true);
 
 if ( ! defined( 'JETPACK_DEV_DEBUG' ) )
     define('JETPACK_DEV_DEBUG', true);
