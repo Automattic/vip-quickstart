@@ -748,6 +748,18 @@ class RepoMonitor extends Dashboard_Plugin {
 			$args['repo_status'] = $this->scan_svn_repo( $args['repo_path'], $allow_interactive, $credentials );
 		} elseif ( 'git' == $args['repo_type'] ) {
 			$args['repo_status'] = $this->scan_git_repo( $args['repo_path'] );
+		} elseif ( 'autodetect' == $args['repo_type'] ) {
+			$args['repo_status'] = $this->scan_git_repo( $args['repo_path'] );
+			$args['repo_type']   = 'git';
+
+			if ( is_wp_error( $args['repo_status'] ) ) {
+				$args['repo_status'] = $this->scan_svn_repo( $args['repo_path'], $allow_interactive, $credentials );
+				$args['repo_type']   = 'svn';
+
+				if ( is_wp_error( $args['repo_status'] ) ) {
+					$args['repo_status'] = new WP_Error( 3, __( 'Error: Could not autodetect repo type.', 'quickstart-dashboard' ) );
+				}
+			}
 		} else {
 			return new WP_Error( 1, sprintf( __( 'Error: Unknown repo type %s.', 'quickstart-dashboard' ), $args['repo_type'] ) );
 		}
