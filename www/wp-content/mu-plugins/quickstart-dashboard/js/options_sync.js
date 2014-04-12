@@ -1,5 +1,5 @@
-(function( $ ) {
-	$( document ).ready( function() {
+function options_sync_preview() {
+	jQuery( function( $ ) {
 		/**
 		 * Checks the dependencies for all of the files to be imported
 		 */
@@ -113,4 +113,124 @@
 			check_action_dependencies();
 		} );
 	} );
-})(jQuery);
+}
+
+function options_sync_package_downloader() {
+	jQuery( function( $ ) {
+		var current_state = -1;
+		var status_action_interval = false;
+		var request_package_interval = 15000;
+		var states = [ 'request-package', 'download-package', 'generate-preview' ];
+		next_state();
+
+		function update_status_row() {
+			var status = states[current_state];
+
+			// Mark the old status row as complete
+			$( '#options-sync-status-table .active .status-column' ).html( 'Done.' );
+			$( '#options-sync-status-table .active' ).removeClass( 'active' );
+
+			// Mark the new active row
+			$( '#options-sync-status-table .' + status ).show().addClass( 'active' );
+			$( '#options-sync-status-table .' + status + ' .status-column span' ).addClass('spinner').show();
+		}
+
+		function do_status_actions() {
+			var request = $.ajax( ajaxurl, {
+				data: {
+					action: 'qs_options_sync-' + states[current_state],
+					_wpnonce: $( '#wpnonce' ).val(),
+				},
+				dataType: 'json',
+			} );
+
+			switch ( current_state ) {
+				case 0:
+					if ( !status_action_interval ) {
+						status_action_interval = setInterval( do_status_actions, request_package_interval );
+					}
+
+					// We're requesting the package. Every 15 seconds check the package status
+					request.complete( parse_package_generation_status_response );
+					break;
+
+				case 1:
+					// Download the package
+					request.complete( parse_package_download_response );
+					break;
+
+				case 2:
+					// Get the next url
+					request.complete( parse_package_generate_preview_response );
+					break;
+			}
+		}
+
+		function parse_package_generation_status_response( full_response ) {
+			console.log( full_response );
+			var response = full_response.responseJSON;
+
+			if ( ! response.success ) {
+				handle_failure();
+				return;
+			}
+
+			if ( response.data.package_generation_complete ) {
+				// Package generation is complete, move on to the next step
+				next_state();
+			} else {
+				// Package generation is not yet complete.
+			}
+		}
+
+		function parse_package_download_response( full_response ) {
+			console.log( full_response );
+			var response = full_response.responseJSON;
+
+			if ( ! response.success ) {
+				handle_failure();
+				return;
+			}
+
+			next_state();
+		}
+
+		function parse_package_generate_preview_response( full_response ) {
+			console.log( full_response );
+			var response = full_response.responseJSON;
+
+			if ( ! response.success || typeof response.data.preview_url === 'undefined' ) {
+				handle_failure();
+				return;
+			}
+
+			window.location.replace( response.data.preview_url );
+		}
+
+		function next_state() {
+			++current_state;
+
+			if ( status_action_interval ) {
+				clearInterval( status_action_interval );
+				status_action_interval = false;
+			}
+
+			update_status_row();
+
+			do_status_actions();
+		}
+
+		function handle_failure() {
+			current_state = -1;
+
+			if ( status_action_interval ) {
+				clearInterval( status_action_interval );
+				status_action_interval = false;
+			}
+
+			var status = states[current_state];
+			$( '#options-sync-status-table .active .status-column' ).html( 'Failed.' );
+			$( '#options-sync-status-table .active' ).removeClass( 'active' ).addClass( 'failed' );
+		}
+	} );
+}
