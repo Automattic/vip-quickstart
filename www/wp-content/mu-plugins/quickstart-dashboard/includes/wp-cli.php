@@ -151,11 +151,13 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 	 *     wp dashboard add_repo Quickstart /srv
 	 *     wp dashboard add_repo --svn WordPress /srv/www/wp
 	 *
-	 * @synopsis <name> <path> [--warn] [--svn] [--username] [--password]
+	 * @synopsis <name> <path> [--warn] [--svn] [--autodetect] [--username] [--password]
 	 */
 	function add_repo( $args, $assoc_args ) {
 		$type = 'git';
-		if ( $assoc_args['svn'] ) {
+		if ( $assoc_args['autodetect'] ) {
+			$type = 'autodetect';
+		} elseif ( $assoc_args['svn'] ) {
 			$type = 'svn';
 		}
 
@@ -188,6 +190,15 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 		if ( is_wp_error( $result ) ) {
 			WP_CLI::error( $result->get_error_message() );
 			return;
+		}
+
+		if ( $assoc_args['autodetect'] ) {
+			foreach ( $repo_monitor->get_repos() as $r ) {
+				if ( $r['repo_id'] == $result ) {
+					WP_CLI::line( 'Repo type detected: ' . WP_CLI::colorize( $r['repo_type'] ) );
+					break;
+				}
+			}
 		}
 
 		WP_CLI::success( "Repo added with id $result!" );
