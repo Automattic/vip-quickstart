@@ -2,7 +2,10 @@
 
 class VIPOptionsSync extends Dashboard_Plugin {
 	private $action_descriptions = null;
-	
+	private $wpcom_endpoints = array(
+		'vip-sites' => 'https://public-api.wordpress.com/rest/v1/vip-sites',
+	);
+
 	/**
 	 * This object describes the WordPress relational database. Specifically it
 	 * describes foreign key relationships within the database.
@@ -60,13 +63,17 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	}
 
 	function admin_menu() {
-		add_submenu_page( null, $this->name(), $this->name(), 'manage-options', 'dashboard_options_sync', array( $this, 'show_sync_page' ) );
+		add_submenu_page( 'vip-dashboard', $this->name(), $this->name(), 'manage-options', 'dashboard_options_sync', array( $this, 'show_sync_page' ) );
 	}
 
 	function admin_init() {
 		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'dashboard_options_sync' && isset( $_REQUEST['action'] ) ) {
 			session_start();
 		}
+
+		add_action( 'wp_ajax_qs_options_sync-request-package', array( $this, 'ajax_request_package' ) );
+		add_action( 'wp_ajax_qs_options_sync-download-package', array( $this, 'ajax_download_package' ) );
+		add_action( 'wp_ajax_qs_options_sync-generate-preview', array( $this, 'ajax_generate_preview' ) );
 	}
 	
 	function admin_enqueue_scripts() {
@@ -94,28 +101,49 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		if ( isset( $_REQUEST['action'] ) ) {
 			if ( $_REQUEST['action'] == 'import' ) {
 				check_admin_referer( 'dashboard-options-sync' );
-				$filepath = $_REQUEST['options-sync-path'];
-				$preview = ! isset( $_REQUEST['no-preview'] );
+				$site = intval( $_REQUEST['options-sync-source-site'] );
 				$show_main_ui = false;
-				
-				if ( $preview ) {
-					$this->preview_import_bundle( $filepath );
+
+				// Check if we need to download the package
+				$package_info = get_transient( 'qs_os_current_package_info' );
+				if ( false === $package_info || $package_info['site'] !== $site || is_null( $package_info['filepath'] ) || !file_exists( $package_info['filepath'] ) ) {
+					// We do not already have the package -- show the async update page
+					set_transient( 'qs_os_current_package_info', array( 'site' => $site, 'filepath' => null ) );
+					$this->show_async_download_page( $site );
+				} elseif ( isset( $_REQUEST['preview'] ) ) {
+					$this->preview_import_bundle( $package_info['filepath'] );
 				} else {
-					// Check that the session var checks out, meaning that the user
-					// has gone through the correct process to import this file
-					if ( empty( $_SESSION['options-sync-path'] ) || ( $_SESSION['options-sync-path'] !== $filepath ) ) {
-						wp_nonce_ays( 'dashboard-options-sync' );
-						return;
-					}
-
-//					unset( $_SESSION['options-sync-path'] );
-
-					$this->import_bundle( $filepath );
+					delete_transient( 'qs_os_current_package_info' );
+					$this->import_bundle( $package_info['filepath'] );
 				}
 			}
 		}
 
+		$access_token = Quickstart_Dashboard::get_instance()->get_wpcom_access_token();
+		if ( empty( $access_token ) ) {
+			// Show an error message if we aren't connected to wp.com
+			$show_main_ui = false;
+
+			?>
+<div class="error updated"><p><?php _e( 'You must connect Quickstart to WordPress.com before you can sync.', 'quickstart-dashboard' ); ?></p></div>
+			<?php
+		}
+
 		if ( $show_main_ui ) {
+			// If we're showing the main UI, delete the transiet to reset state.
+			delete_transient( 'qs_os_current_package_info' );
+
+			// Fetch the users' VIP sites
+			$sites = $this->get_vip_sites( $access_token );
+
+			if ( is_wp_error( $sites ) ) {
+				?>
+<div class="error updated"><p><?php echo esc_html( $sites->get_error_message() ); ?></p></div></div>
+				<?php
+
+				return;
+			}
+
 			?>
 			<form action="<?php menu_page_url( 'dashboard_options_sync' ) ?>" method="POST">
 				<?php wp_nonce_field( 'dashboard-options-sync' ); ?>
@@ -123,8 +151,14 @@ class VIPOptionsSync extends Dashboard_Plugin {
 
 				<table class="form-table">
 					<tr>
-						<td><label for="options-sync-path">WP.com Export File Path:</label></td>
-						<td><input type="text" name="options-sync-path" id="options-sync-path" value="/srv/www/wp-content/uploads/2014/03/03/viptest.wordpress.com.tar.gz" /></td>
+						<td><label for="options-sync-source-site"><?php _e( 'Choose VIP Site:' ); ?></label></td>
+						<td>
+							<select name="options-sync-source-site" id="options-sync-source-site" value="">
+							<?php foreach ( $sites as $site_id => $site ): ?>
+								<option value="<?php echo esc_attr( intval( $site_id ) ) ?>"><?php echo esc_attr( $site['name'] ) ?> (<?php echo esc_attr( $site['URL'] ) ?>)</option>
+							<?php endforeach; ?>
+							</select>
+						</td>
 					</tr>
 				</table>
 
@@ -136,6 +170,146 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		echo '</div>';
 	}
 
+	function show_async_download_page( $site ) {
+		?>
+<table id="options-sync-status-table">
+	<tr class="request-package"><td><?php _e( 'Requesting package (this may take a minute)', 'quickstart-dashboard' ); ?></td><td class="status-column"><span></span></td></tr>
+	<tr class="download-package"><td><?php _e( 'Downloading package', 'quickstart-dashboard' ); ?></td><td class="status-column"><span></span></td></tr>
+	<tr class="generate-preview"><td><?php _e( 'Generating preview...', 'quickstart-dashboard' ); ?></td><td class="status-column"><span></span></td></tr>
+</table>
+<script type="text/javascript"> jQuery( function() { options_sync_package_downloader(); } ); </script>
+		<?php
+	}
+
+	function ajax_request_package() {
+		if ( !current_user_can( 'manage-options') ) {
+			wp_send_json_error( 'You have insufficient permissions to do this.' );
+		}
+
+		// Get the package we're supposed to be grabbing
+		$package_info = get_transient( 'qs_os_current_package_info' );
+		if ( false === $package_info || !isset( $package_info['site'] ) ) {
+			wp_send_json_error( 'You have not supplied package information. Please try again.' );
+		}
+
+		// Everything looks in order. Make the request
+		$request_args = array(
+			'headers' => array( 'Authorization' => 'Bearer ' . Quickstart_Dashboard::get_instance()->get_wpcom_access_token(), ),
+		);
+
+		$base_url = add_query_arg( array( 'destination_url' => site_url(), ), $this->wpcom_endpoints['vip-sites'] . "/{$package_info['site']}/clone" );
+		$request = wp_remote_get( $base_url, $request_args );
+
+		if ( is_wp_error( $request ) ) {
+			wp_send_json_error( $request );
+		}
+
+		if ( intval( $request['response']['code'] ) !== 200 ) {
+			wp_send_json_error( $request['response'] );
+		}
+
+		$response_json = json_decode( $request['body'], true );
+
+		// Save the package info if the generation is complete
+		if ( $response_json['complete'] ) {
+			$package_info['package_url'] = $response_json['package'];
+			$package_info['package_psk'] = $response_json['key'];
+			set_transient( 'qs_os_current_package_info', $package_info );
+		}
+
+		wp_send_json_success( array( 'package_generation_complete' => $response_json['complete'], ) );
+	}
+
+	function ajax_download_package() {
+		if ( !current_user_can( 'manage-options') ) {
+			wp_send_json_error( 'You have insufficient permissions to do this.' );
+		}
+
+		// Get the package we're supposed to be grabbing
+		$package_info = get_transient( 'qs_os_current_package_info' );
+		if ( false === $package_info || !isset( $package_info['site'] ) || empty( $package_info['package_url'] ) || empty( $package_info['package_psk'] ) ) {
+			delete_transient( 'qs_os_current_package_info' );
+			wp_send_json_error( 'You have not supplied package information. Please try again.' );
+		}
+
+		// Compute the url signature
+		$url = parse_url( $package_info['package_url'] );
+
+		if ( false === $url ) {
+			delete_transient( 'qs_os_current_package_info' );
+			wp_send_json_error( 'Bad package url. Please try again.' );
+		}
+
+		$signature = hash_hmac( 'sha256', rawurlencode( $url['path'] ), $package_info['package_psk'] );
+		
+		// Download the package
+		$download_result = download_url( add_query_arg( array( 'signature' => $signature ), $package_info['package_url'] ) );
+
+		if ( is_wp_error( $download_result ) ) {
+			wp_send_json_error( $download_result );
+		}
+
+		// The package appears to be downloaded, save its path
+		$package_info['filepath'] = $download_result;
+		set_transient( 'qs_os_current_package_info', $package_info );
+
+		wp_send_json_success();
+	}
+
+	function ajax_generate_preview() {
+		if ( !current_user_can( 'manage-options') ) {
+			wp_send_json_error( 'You have insufficient permissions to do this.' );
+		}
+
+		// Get the package we're supposed to be grabbing
+		$package_info = get_transient( 'qs_os_current_package_info' );
+		if ( false === $package_info || !isset( $package_info['filepath'] ) ) {
+			delete_transient( 'qs_os_current_package_info' );
+			wp_send_json_error( 'You have not supplied package information. Please try again.' );
+		}
+
+		wp_send_json_success(
+			array(
+				'preview_url' => add_query_arg( array(
+					'preview'				   => 1,
+					'action'				   => 'import',
+					'page'					   => 'dashboard_options_sync',
+					'_wpnonce'				   => wp_create_nonce( 'dashboard-options-sync' ),
+					'options-sync-source-site' => $package_info['site'],
+				), get_admin_url( null, 'admin.php' ) ),
+			)
+		);
+	}
+
+	/**
+	 * Gets a list of available VIP Sites from WordPress.com for cloning.
+	 * 
+	 * @param string $access_token
+	 * @return array|WP_Error
+	 */
+	function get_vip_sites( $access_token ) {
+		$request = wp_remote_get( $this->wpcom_endpoints['vip-sites'], array(
+			'headers' => array( 'Authorization' => 'Bearer ' . $access_token, ),
+		) );
+
+		if ( is_wp_error( $request ) ) {
+			return new WP_Error( 'query_vip_sites_error', __( 'Could not query VIP Sites from WordPress.com', 'quickstart-dashboard' ) );
+		}
+
+		$sites = json_decode( $request['body'], true );
+
+		if ( ! isset( $sites['sites'] ) ) {
+			echo '<pre>' . json_encode( $sites ). '</pre>';
+			return new WP_Error( 'improper_api_response', __( 'An incorrect response was received from WordPress.com. Please try again later.', 'quickstart-dashboard' ) );
+		}
+
+		if ( isset( $sites['error'] ) ) {
+			return new WP_Error( 'vip_api_error', __( 'An error occured querying VIP Sites from WordPress.com: %s', 'quickstart-dashboard' ), $sites['message'] );
+		}
+
+		return $sites['sites'];
+	}
+
 	/**
 	 * Shows the user what will happen when a bundle is imported.
 	 * 
@@ -143,7 +317,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	 */
 	function preview_import_bundle( $filepath ) {
 		$destination = $this->get_extracted_filename( $filepath );
-		
+
 		// Extract the file
 		if ( ! $this->is_file_extracted( $filepath ) ) {
 			$extract_result = $this->extract_file( $filepath, $destination );
@@ -192,14 +366,17 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		$os_table->disable_output_escaping();
 		$os_table->prepare_items();
 
-		$_SESSION['options-sync-path'] = esc_attr( $_REQUEST['options-sync-path'] );
+		// Compute the url to go to
+		$post_url = add_query_arg( array(
+			'action'				   => 'import',
+			'options-sync-source-site' => intval( $_REQUEST['options-sync-source-site'] ),
+		), menu_page_url( 'dashboard_options_sync', false ) );
 
 		?>
 		<h3><?php _e( 'Actions to be Undertaken:', 'quickstart-dashboard' ); ?></h3>
-		<form action="<?php menu_page_url( 'dashboard-options-sync' ); ?>" method="POST">
+		<form action="<?php echo esc_html( $post_url ); ?>" method="POST">
 			<input type="hidden" id="action" name="action" value="import" />
 			<input type="hidden" id="no-preview" name="no-preview" value="1" />
-			<input type="hidden" name="options-sync-path" id="options-sync-path" value="<?php echo $_SESSION['options-sync-path']; ?>" />
 			<?php wp_nonce_field( 'dashboard-options-sync'  ) ?>
 			<?php $os_table->display(); ?>
 			<p>
@@ -207,6 +384,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 				<a class="button-secondary" href="<?php menu_page_url( 'vip-dashboard' ) ?>"><?php _e( 'Cancel', 'quickstart-dashboard' ); ?></a>
 			</p>
 		</form>
+		<script type="text/javascript"> jQuery( function() { options_sync_preview(); } ); </script>
 		<?php
 	}
 	
@@ -280,6 +458,8 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		unset( $files[1] ); // '..'
 		
 		$import_table_prefix = $this->compute_table_prefix( $files );
+
+		do_action( 'qs_options_sync_pre_import' );
 
 		// Import each file
 		$results = array();
@@ -433,6 +613,11 @@ class VIPOptionsSync extends Dashboard_Plugin {
 				'data'   => $result,
 			);
 		}
+
+		// Finally, unlink the file
+		unlink( $filepath );
+
+		do_action( 'qs_options_sync_post_import' );
 
 		$table = new DashboardDataTable( $cols, $table_results );
 		$table->show_check_column( false );
@@ -903,7 +1088,17 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	}
 
 	private function get_extracted_filename( $filepath ) {
-		return preg_replace( '/(\.zip|\.tar\.gz)$/', '/', $filepath );
+		$filename = preg_replace( '/(\.zip|\.tar\.gz)$/', '/', $filepath );
+
+		if ( $filename === $filepath ) {
+			$filename .= '_ext';
+		}
+
+		if ( $filename[strlen( $filename ) - 1] !== '/' ) {
+			$filename .= '/';
+		}
+
+		return $filename;
 	}
 
 	private function extract_file( $filepath, $destination = null ) {
