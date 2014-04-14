@@ -47,7 +47,11 @@ class RepoMonitor extends Dashboard_Plugin {
 		add_action( 'wp_ajax_repomonitor_list_repos', array( $this, 'ajax_list_repos' ) );
 		add_action( 'wp_ajax_repomonitor_scan_repo', array( $this, 'ajax_scan_repo' ) );
 		add_action( 'wp_ajax_repomonitor_update_repo', array( $this, 'ajax_update_repo' ) );
-		
+
+		// These actions are done to ensure that repos aren't deleted when we do an options sync
+		add_action( 'qs_options_sync_pre_import', array( $this, 'preserve_repos_on_options_sync' ) );
+		add_action( 'qs_options_sync_post_import', array( $this, 'restore_repos_on_options_sync' ) );
+
 		// Add the cron job to check for updates
 		if ( ! wp_next_scheduled( 'repomonitor_scan_repos' ) ) {
 			wp_schedule_event( time(), 'qs-dashboard-15-min-cron-interval', 'repomonitor_scan_repos' );
@@ -148,6 +152,24 @@ class RepoMonitor extends Dashboard_Plugin {
 		$table = new RepoMonitorWidgetTable( $this );
 		$table->prepare_items();
 		$table->display();
+	}
+
+	function preserve_repos_on_options_sync() {
+		$this->load_repos();
+	}
+
+	function restore_repos_on_options_sync() {
+		// Get the old repos
+		$repos = $this->repos;
+
+		// Force a re-load from the DB
+		$this->load_repos();
+		$this->repos = $this->get_repos();
+
+		// Re-add each repo
+		foreach ( $repos as $repo ) {
+			$this->add_repo( $repo );
+		}
 	}
 	
 	function ajax_list_repos() {
