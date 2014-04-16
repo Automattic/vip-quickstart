@@ -66,7 +66,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 	function admin_init() {
 		// If we have a wpcom access token and we've never scanned the users' VIP themes before, do so
 		$this->access_token = Quickstart_Dashboard::get_instance()->get_wpcom_access_token();
-		if ( !empty( $this->access_token ) && ! $this->has_scanned_vip_themes() ) {
+		if (true|| !empty( $this->access_token ) && ! $this->has_scanned_vip_themes() ) {
 			$this->scan_vip_themes();
 		}
 
@@ -343,20 +343,21 @@ class VIPThemeHelper extends Dashboard_Plugin {
 	}
 
 	function scan_vip_themes() {
-		$curl = curl_init( $this->wpcom_endpoints['vip-themes'] );
-		curl_setopt( $curl, CURLOPT_HTTPHEADER, array( 'Authorization: Bearer ' . $this->access_token ) );
-		curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
-		$result = curl_exec( $curl );
+		$request_args = array(
+			'headers' => array( 'Authorization' => 'Bearer ' . $this->access_token, ),
+		);
 
-		if ( false === $result ) {
+		$result = wp_remote_get( $this->wpcom_endpoints['vip-themes'], $request_args );
+
+		if ( is_wp_error( $result ) ) {
 			?>
-			<div class="error"><p><?php _e( 'Error: Could not query VIP Themes from WordPress.com.', 'quickstart-dashboard' ); ?></p></div>
+			<div class="error"><p><?php echo esc_html( sprintf( __( 'Error: Could not query VIP Themes from WordPress.com: %s', 'quickstart-dashboard' ), $result->get_error_message() ) ); ?></p></div>
 			<?php
 
 			return;
 		}
 
-		$themes = json_decode( $result, true );
+		$themes = json_decode( $result['body'], true );
 		
 		if ( ! isset( $themes['themes'] ) ) {
 			?>
