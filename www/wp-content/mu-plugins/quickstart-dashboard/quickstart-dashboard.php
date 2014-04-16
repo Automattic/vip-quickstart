@@ -130,33 +130,33 @@ class Quickstart_Dashboard {
 		}
 
 		// Go ahead and get the access token
-		$curl = curl_init( $this->wpcom_api_endpoints['token'] );
-		curl_setopt( $curl, CURLOPT_POST, true );
-		curl_setopt( $curl, CURLOPT_POSTFIELDS, array(
-			'client_id' => urlencode( $this->get_wpcom_client_id() ),
-			'redirect_uri' => $this->get_wpcom_redirect_uri(),
-			'client_secret' => urlencode( $this->get_wpcom_client_secret() ),
-			'code' => urlencode( $_GET['code'] ),
-			'grant_type' => 'authorization_code',
-		) );
-		curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1);
-		$auth = curl_exec( $curl );
+		$request_args = array(
+			'body' => array(
+				'client_id' => urlencode( $this->get_wpcom_client_id() ),
+				'redirect_uri' => $this->get_wpcom_redirect_uri(),
+				'client_secret' => urlencode( $this->get_wpcom_client_secret() ),
+				'code' => urlencode( $_GET['code'] ),
+				'grant_type' => 'authorization_code',
+			)
+		);
 
-		if ( false === $auth ) {
+		$auth = wp_remote_post( $this->wpcom_api_endpoints['token'], $request_args );
+
+		if ( is_wp_error( $auth ) ) {
 			?>
-			<div class="error"><p><?php _e( 'An error occured retrieving the access token from WordPress.com. Please try again.', 'quickstart-dashboard' ); ?></p></div>
+			<div class="error"><p><?php echo esc_html( sprintf( __( 'An error occured retrieving the access token from WordPress.com: %s', 'quickstart-dashboard' ), $auth->get_error_message() ) ); ?></p></div>
 			<?php
 
 			return;
 		}
 
-		$secret = json_decode($auth);
+		$secret = json_decode( $auth['body'] );
 		
 		if ( !isset( $secret->access_token ) ) {
 			?>
 			<div class="error">
 				<p><?php _e( 'An error occured retrieving the access token from WordPress.com. The data received was: ', 'quickstart-dashboard' ); ?></p>
-				<pre><?php echo esc_html( $auth ); ?></pre>
+				<pre><?php echo esc_html( $auth['body'] ); ?></pre>
 			</div>
 			<?php
 
