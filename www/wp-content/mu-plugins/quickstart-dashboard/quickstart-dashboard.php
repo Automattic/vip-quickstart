@@ -303,7 +303,8 @@ class Quickstart_Dashboard {
 	}
 	
 	function get_wpcom_client_id() {
-		return (string) apply_filters( 'dashboard_wpcom_client_id', get_option( 'dashboard_wpcom_client_id', '' ) );
+		$id = get_option( 'dashboard_wpcom_client_id', defined( 'DASHBOARD_WP_CLIENT_ID' ) ? DASHBOARD_WP_CLIENT_ID : '' );
+		return (string) apply_filters( 'dashboard_wpcom_client_id', $id );
 	}
 	
 	function set_wpcom_client_id( $client_id ) {
@@ -311,7 +312,8 @@ class Quickstart_Dashboard {
 	}
 	
 	function get_wpcom_client_secret() {
-		return (string) apply_filters( 'dashboard_wpcom_client_secret', get_option( 'dashboard_wpcom_client_secret', '' ) );
+		$secret = get_option( 'dashboard_wpcom_client_secret', defined( 'DASHBOARD_WP_CLIENT_SECRET' ) ? DASHBOARD_WP_CLIENT_SECRET : '' );
+		return (string) apply_filters( 'dashboard_wpcom_client_secret', $secret );
 	}
 	
 	function set_wpcom_client_secret( $secret ) { 
