@@ -179,8 +179,7 @@ class Quickstart_Dashboard {
 		if ( wp_is_mobile() )
 			wp_enqueue_script( 'jquery-touch-punch' );
 
-		wp_enqueue_style( 'quickstart-dashboard', get_bloginfo( 'wpurl' ) . '/wp-content/mu-plugins/quickstart-dashboard/css/dashboard.css' );
-		wp_enqueue_style( 'noticons', '//s0.wordpress.com/i/noticons/noticons.css' );
+		wp_enqueue_style( 'quickstart-dashboard', get_bloginfo( 'wpurl' ) . '/wp-content/mu-plugins/quickstart-dashboard/css/dashboard.css', array( 'dashicons' ) );
 	}
     
     function admin_menu() {

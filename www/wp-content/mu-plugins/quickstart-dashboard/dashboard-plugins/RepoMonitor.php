@@ -143,7 +143,7 @@ class RepoMonitor extends Dashboard_Plugin {
 	}
 
 	function dashboard_setup() {
-		$update_link = ' <a class="widget_update" title="' . __( 'Check for updates', 'quickstart-dashboard' ) . '"><span class="noticon noticon-refresh"></span></a>';
+		$update_link = ' <a class="widget_update" title="' . __( 'Check for updates', 'quickstart-dashboard' ) . '"><span class="dashicons dashicons-update"></span></a>';
         wp_add_dashboard_widget( 'quickstart_dashboard_repomonitor', $this->name() . $update_link, array( $this, 'show' ) );
     }
 
