@@ -938,6 +938,10 @@ class RepoMonitor extends Dashboard_Plugin {
 		$unstaged = array();
 		$untracked = array();
 		foreach ( $output as $line ) {
+			if ( empty( $line ) ) {
+				continue;
+			}
+
 			// Question marks occur for files that have not been added
 			if ( $untracked_char == $line[0] || $untracked_char == $line[1] ) {
 				$untracked[] = trim( substr( $line, 2 ) );
