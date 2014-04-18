@@ -26,7 +26,8 @@ class VIPThemeHelper extends Dashboard_Plugin {
 	}
 
 	function dashboard_setup() {
-        wp_add_dashboard_widget( 'quickstart_dashboard_vipthemehelper', __( 'VIP Themes', 'quickstart-dashboard' ), array( $this, 'show' ) );
+		$update_link = ' <a class="widget_update" title="' . __( 'Check for updates', 'quickstart-dashboard' ) . '"><span class="dashicons dashicons-update"></span></a>';
+        wp_add_dashboard_widget( 'quickstart_dashboard_vipthemehelper', __( 'VIP Themes', 'quickstart-dashboard' ) . $update_link, array( $this, 'show' ) );
     }
 
 	function show() {
@@ -34,6 +35,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 			return;
 		}
 
+		echo '<div id="themehelper-update-box" class="widget-update-box"></div>';
 		if ( ! empty( $this->access_token ) ) {
 			$table = new ThemeHelperWidgetTable( $this );
 			$table->prepare_items();
@@ -64,10 +66,19 @@ class VIPThemeHelper extends Dashboard_Plugin {
 	}
 
 	function admin_init() {
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+		add_action( 'wp_ajax_vipthemehelpher_update_themes', array( $this, 'ajax_update_themes' ) );
+
 		// If we have a wpcom access token and we've never scanned the users' VIP themes before, do so
 		$this->access_token = Quickstart_Dashboard::get_instance()->get_wpcom_access_token();
 		if (true|| !empty( $this->access_token ) && ! $this->has_scanned_vip_themes() ) {
-			$this->scan_vip_themes();
+			$result = $this->scan_vip_themes();
+
+			if ( is_wp_error( $result ) ) {
+				?>
+				<div class="error"><p><?php echo esc_html( $result->get_error_message() ); ?></p></div>
+				<?php
+			}
 		}
 
 		// Check if we're supposed to be downloading and activating a theme right now
@@ -87,6 +98,20 @@ class VIPThemeHelper extends Dashboard_Plugin {
 					<?php
 				}
 			}
+		}
+	}
+
+	function admin_enqueue_scripts() {
+		if ( isset( $_REQUEST['page'] ) && 'vip-dashboard' == $_REQUEST['page'] ) {
+			wp_enqueue_script( 'vipthemehelper_js', get_bloginfo( 'wpurl' ) . '/wp-content/mu-plugins/quickstart-dashboard/js/vipthemehelper.js', array( 'jquery' ) );
+			wp_localize_script( 'vipthemehelper_js', 'vipthemehelper_settings', array(
+				'translations'	=> array(
+					'action_done'	 => __( 'Done.', 'quickstart-dashboard' ),
+					'action_fail'	 => __( 'Failed.', 'quickstart-dashboard' ),
+					'get_vip_themes' => __( 'Updating VIP Themes from WordPress.com', 'quickstart-dashboard' ),
+					'needs_refresh'  => __( 'New VIP themes were detected. Please reload the page to see them.', 'quickstart-dashboard' ),
+				),
+			) );
 		}
 	}
 
@@ -350,32 +375,17 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		$result = wp_remote_get( $this->wpcom_endpoints['vip-themes'], $request_args );
 
 		if ( is_wp_error( $result ) ) {
-			?>
-			<div class="error"><p><?php echo esc_html( sprintf( __( 'Error: Could not query VIP Themes from WordPress.com: %s', 'quickstart-dashboard' ), $result->get_error_message() ) ); ?></p></div>
-			<?php
-
-			return;
+			return new WP_Error( 'could_not_query_dotcom', sprintf( __( 'Error: Could not query VIP Themes from WordPress.com: %s', 'quickstart-dashboard' ), $result->get_error_message() ) );
 		}
 
 		$themes = json_decode( $result['body'], true );
 		
 		if ( ! isset( $themes['themes'] ) ) {
-			?>
-			<div class="error">
-				<p><?php _e( 'An error occured querying VIP Themes from WordPress.com:', 'quickstart-dashboard' ); ?></p>
-				<pre><?php echo esc_html( $result ); ?></pre>
-			</div>
-			<?php
-
-			return;
+			return new WP_Error( 'unexpected_result', sprintf( __( 'Error: Could not query VIP Themes from WordPress.com: %s', 'quickstart-dashboard' ), $result['body'] ) );
 		}
 		
 		if ( isset( $themes['error'] ) ) {
-			?>
-			<div class="error"><p><?php printf( __( 'An error occured querying VIP Themes from WordPress.com: %s', 'quickstart-dashboard' ), $themes['message'] ); ?></p></div>
-			<?php
-
-			return;
+			return new WP_Error( 'query_error_occured', sprintf( __( 'An error occured querying VIP Themes from WordPress.com: %s', 'quickstart-dashboard' ), $themes['message'] ) );
 		}
 
 		$current_theme = wp_get_theme();
@@ -423,6 +433,60 @@ class VIPThemeHelper extends Dashboard_Plugin {
 
 		update_option( 'qs_vipthemehelper_has_scanned_themes', true );
 		$this->set_vip_scanned_themes( $scanned_themes );
+		return true;
+	}
+
+	function ajax_update_themes() {
+		if ( !current_user_can( 'manage_options' ) || !wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-themes' ) ) {
+			wp_send_json_error( array( 'error' => __( 'You do not have sufficient permissions to access this page.', 'quickstart-dashboard' ) ) );
+		}
+
+		// Check that we're connected to .com
+		if ( empty( $this->access_token ) ) {
+			$this->access_token = Quickstart_Dashboard::get_instance()->get_wpcom_access_token();
+		}
+
+		if ( empty( $this->access_token ) ) {
+			// We aren't connected to .com
+			wp_send_json_error( new WP_Error( 'not_connected_to_wpcom', __( 'Could not fetch VIP Themes because quickstart dashboard is not connected to WordPress.com' ) ) );
+		}
+
+		// Query the server for a list of vip themes for the current user
+		$result = $this->scan_vip_themes();
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( $result );
+		}
+
+		// Put the data into a more consumable format
+		$themes = $this->get_vip_scanned_themes();
+		foreach ( $themes as $slug => $theme ) {
+			$theme['actions'] = array();
+
+			if ( ! $theme['installed'] ) {
+				$theme['actions']['install'] = array( $this->get_theme_action_link( $slug, true, false ), __( 'Install', 'quickstart-dashboard' ) );
+				$theme['actions']['install_activate'] = array( $this->get_theme_action_link( $slug, true, true ), __( 'Install and Activate', 'quickstart-dashboard' ) );
+			} elseif ( ! $theme['activated'] ) {
+				$theme['actions']['activate'] = array( $this->get_theme_action_link( $slug, false, true ), __( 'Activate', 'quickstart-dashboard' ) );
+			}
+
+			$wp_theme = wp_get_theme( $theme['stylesheet'] );
+
+			if ( ! empty( $theme['stylesheet'] ) && $wp_theme->exists() ) {
+				$themes[$slug] = array_merge( $theme, array(
+					'slug'		  => $slug,
+					'theme_name'  => $wp_theme->display( 'Name' ),
+					'description' => $wp_theme->display( 'Description' ),
+				) );
+			} else {
+				$themes[$slug] = array_merge( $theme, array(
+					'slug'		  => $slug,
+					'theme_name'  => $slug,
+					'description' => '',
+				) );
+			}
+		}
+
+		wp_send_json_success( $themes );
 	}
 
 	function get_vip_scanned_themes() {
@@ -485,7 +549,7 @@ class ThemeHelperWidgetTable extends DashboardWidgetTable {
 			$row_classes[] = 'active';
 		}
 
-		echo '<tr class="' . implode( ' ', $row_classes ) . '">';
+		echo '<tr id="viptheme-' . $item['slug'] . '-status" class="' . implode( ' ', $row_classes ) . '">';
 		$this->single_row_columns( $item );
 		echo '</tr>';
 	}
