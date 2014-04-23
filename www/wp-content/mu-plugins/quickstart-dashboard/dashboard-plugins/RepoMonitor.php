@@ -29,11 +29,11 @@ class RepoMonitor extends Dashboard_Plugin {
 	function name() {
 		return __( 'Repo Monitor', 'quickstart-dashboard' );
 	}
-    
-    function init() {
+
+	function init() {
 		$this->create_post_type();
 		
-        add_action( 'quickstart_dashboard_setup', array( $this, 'dashboard_setup' ) );
+		add_action( 'quickstart_dashboard_setup', array( $this, 'dashboard_setup' ) );
 		add_action( 'repomonitor_scan_repos', array( $this, 'scan_repositories' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_notices', array( $this, 'print_admin_notice' ) );
@@ -41,7 +41,7 @@ class RepoMonitor extends Dashboard_Plugin {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		
 		add_filter( 'cron_schedules', array( $this, 'repo_15_min_cron_interval' ) );
-    }
+	}
 	
 	function admin_init() {
 		add_action( 'wp_ajax_repomonitor_list_repos', array( $this, 'ajax_list_repos' ) );
@@ -144,8 +144,8 @@ class RepoMonitor extends Dashboard_Plugin {
 
 	function dashboard_setup() {
 		$update_link = ' <a class="widget_update" title="' . __( 'Check for updates', 'quickstart-dashboard' ) . '"><span class="dashicons dashicons-update"></span></a>';
-        wp_add_dashboard_widget( 'quickstart_dashboard_repomonitor', $this->name() . $update_link, array( $this, 'show' ) );
-    }
+		wp_add_dashboard_widget( 'quickstart_dashboard_repomonitor', $this->name() . $update_link, array( $this, 'show' ) );
+	}
 
 	function show() {
 		echo '<div id="repomonitor-update-box" class="widget-update-box"></div>';
@@ -437,7 +437,7 @@ class RepoMonitor extends Dashboard_Plugin {
 		
 		chdir( $repo_path );
 
-        // Execute info command to get info about local repo
+		// Execute info command to get info about local repo
 		$command_args = array();
 		if ( ! $allow_interactive ) {
 			$command_args[] = '--non-interactive';
@@ -451,28 +451,28 @@ class RepoMonitor extends Dashboard_Plugin {
 			$command_args[] = '--password=' . escapeshellarg( $credentials['password'] );
 		}
 		
-        exec( sprintf( 'svn info %s', implode( ' ', $command_args ) ), $output, $return_value );
+		exec( sprintf( 'svn info %s', implode( ' ', $command_args ) ), $output, $return_value );
 
-        if ( 0 != $return_value ) {
-            return new WP_Error( 
-                $return_value, 
-                sprintf( __( 'Error fetching svn info. SVN returned %s', 'quickstart-dashboard' ), $return_value )
-            );
-        }
-        
-        $info = $this->parse_svn_info( $output );
-        
+		if ( 0 != $return_value ) {
+			return new WP_Error(
+				$return_value,
+				sprintf( __( 'Error fetching svn info. SVN returned %s', 'quickstart-dashboard' ), $return_value )
+			);
+		}
+
+		$info = $this->parse_svn_info( $output );
+
 		$command_args[] = '-u';
 		
 		// Execute status command to get file into
 		exec( sprintf( 'svn status %s', implode( ' ', $command_args ) ), $output, $return_value );
-        
-        if ( 0 != $return_value ) {
-            return new WP_Error( 
-                $return_value, 
-                sprintf( __( 'Error fetching svn status. SVN returned %s', 'quickstart-dashboard' ), $return_value )
-            );
-        }
+
+		if ( 0 != $return_value ) {
+			return new WP_Error(
+				$return_value,
+				sprintf( __( 'Error fetching svn status. SVN returned %s', 'quickstart-dashboard' ), $return_value )
+			);
+		}
 		
 		// Go back to the previous working directory
 		chdir( $cwd );
@@ -480,59 +480,59 @@ class RepoMonitor extends Dashboard_Plugin {
 		$status = array_merge( $this->parse_svn_status( $output ), $info );
 		$status['scan_time'] = time();
 
-        return $status;
+		return $status;
 	}
 
-    private function parse_svn_info( $output ) {
-        $status = array(
-            'local_revision' => -1,
-            'repo_url'       => '',
-        );
+	private function parse_svn_info( $output ) {
+		$status = array(
+			'local_revision' => -1,
+			'repo_url'       => '',
+		);
 
-        foreach ( $output as $line ) {
-            if ( strpos( $line, 'URL:' ) === 0 ) {
-                $status['repo_url'] = trim( substr( $line, 4 ) );
-            } else if ( strpos( $line, 'Revision:' ) === 0 ) {
-                $status['local_revision'] = intval( trim( substr( $line, 9 ) ) );
-            }
-        }
+		foreach ( $output as $line ) {
+			if ( strpos( $line, 'URL:' ) === 0 ) {
+				$status['repo_url'] = trim( substr( $line, 4 ) );
+			} else if ( strpos( $line, 'Revision:' ) === 0 ) {
+				$status['local_revision'] = intval( trim( substr( $line, 9 ) ) );
+			}
+		}
 
-        return $status;
-    }
+		return $status;
+	}
 
-    private function parse_svn_status( $output ) {
-        $status = array(
-            'files_out_of_date' => array(),
-            'locally_modified'  => array(),
-            'remote_revision'   => -1,
-        );
+	private function parse_svn_status( $output ) {
+		$status = array(
+			'files_out_of_date' => array(),
+			'locally_modified'  => array(),
+			'remote_revision'   => -1,
+		);
 
-        foreach ( $output as $line ) {
-            // Parse line of output from svn status command
-            if ( !preg_match( '/(?<args>(\W|[ACDIMRX?!~CML+SX*]){9})\W*(?<filerev>\d*)\W*(?<filename>(\S)*)/', $line, $matches) ) {
-                // Check if this line shows the remote revision
-                if ( preg_match( '/revision:\W*(?<remote_revision>\d*)/', $line, $matches ) ) {
-                    $status['remote_revision'] = intval( $matches['remote_revision'] );
+		foreach ( $output as $line ) {
+			// Parse line of output from svn status command
+			if ( !preg_match( '/(?<args>(\W|[ACDIMRX?!~CML+SX*]){9})\W*(?<filerev>\d*)\W*(?<filename>(\S)*)/', $line, $matches) ) {
+				// Check if this line shows the remote revision
+				if ( preg_match( '/revision:\W*(?<remote_revision>\d*)/', $line, $matches ) ) {
+					$status['remote_revision'] = intval( $matches['remote_revision'] );
 
-                    // The remote revision line is the last line of meaningful output, exit the loop
-                    break;
-                }
-                continue;
-            }
+					// The remote revision line is the last line of meaningful output, exit the loop
+					break;
+				}
+				continue;
+			}
 
-            // Check for a locally modified file
-            if ( ( !ctype_space($matches['args'][0]) && 'X' != $matches['args'][0] ) || !ctype_space( $matches['args'][1] ) ) {
-                $status['locally_modified'][] = $matches['filename'];
-            }
+			// Check for a locally modified file
+			if ( ( !ctype_space($matches['args'][0]) && 'X' != $matches['args'][0] ) || !ctype_space( $matches['args'][1] ) ) {
+				$status['locally_modified'][] = $matches['filename'];
+			}
 
-            // Check the ninth column to see if the file is out of date WRT the server
-            if ( isset( $matches['args'][9] ) && !ctype_space( $matches['args'][9] ) ) {
-                $status['files_out_of_date'][] = $matches['filename'];
-            }
-        }
+			// Check the ninth column to see if the file is out of date WRT the server
+			if ( isset( $matches['args'][9] ) && !ctype_space( $matches['args'][9] ) ) {
+				$status['files_out_of_date'][] = $matches['filename'];
+			}
+		}
 
-        return $status;
-    }
+		return $status;
+	}
 
 	/**
 	 * Returns whether or not the repo is considered in need of updating from the
@@ -562,7 +562,7 @@ class RepoMonitor extends Dashboard_Plugin {
 
 		// Variables to load output into
 		$output = array();
-        $update_output = array();
+		$update_output = array();
 		$return_value = -1;
 
 		// Go to repository directory
@@ -576,22 +576,22 @@ class RepoMonitor extends Dashboard_Plugin {
 		// Start by updating remotes
 		exec( 'git remote update origin', $update_output, $return_value );
 
-        if ( 0 != $return_value ) {
-            return new WP_Error(
-                $return_value,
-                sprintf( __( 'Error fetching remote "origin". git returned %s', 'quickstart-dashboard' ), $return_value )
-            );
-        }
+		if ( 0 != $return_value ) {
+			return new WP_Error(
+				$return_value,
+				sprintf( __( 'Error fetching remote "origin". git returned %s', 'quickstart-dashboard' ), $return_value )
+			);
+		}
 
 		// Now check the repo status
 		exec( 'git status -u no', $output, $return_value );
 
-        if ( 0 != $return_value ) {
-            return new WP_Error(
-                $return_value,
-                sprintf( __( 'Error fetching git status. git returned %s', 'quickstart-dashboard' ), $return_value )
-            );
-        }
+		if ( 0 != $return_value ) {
+			return new WP_Error(
+				$return_value,
+				sprintf( __( 'Error fetching git status. git returned %s', 'quickstart-dashboard' ), $return_value )
+			);
+		}
 
 		// Go back to the previous working directory
 		chdir( $cwd );
@@ -629,65 +629,65 @@ class RepoMonitor extends Dashboard_Plugin {
 			);
 		}
 
-        //'(?<branch>[a-zA-Z\/]+)'(\s|\S)*diverged(\s|\S)*(?<firstcount>[0-9]+)(\s|\S)*(?<secondcount>[0-9]+)
+		//'(?<branch>[a-zA-Z\/]+)'(\s|\S)*diverged(\s|\S)*(?<firstcount>[0-9]+)(\s|\S)*(?<secondcount>[0-9]+)
 
-        // Check if branch diverged
-        if ( preg_match( "/'(?<branch>[a-zA-Z\/]+)'(\s|\S)*diverged(\s|\S)*(?<firstcount>[0-9]+)(\s|\S)*(?<secondcount>[0-9]+)/i", $status, $matches ) ) {
+		// Check if branch diverged
+		if ( preg_match( "/'(?<branch>[a-zA-Z\/]+)'(\s|\S)*diverged(\s|\S)*(?<firstcount>[0-9]+)(\s|\S)*(?<secondcount>[0-9]+)/i", $status, $matches ) ) {
 			$status_var['diverged'] = array(
 				'branch'              => $matches['branch'],
 				'local_commit_count'  => $matches['firstcount'],
-                'remote_commit_count' => $matches['secondcount'],
+				'remote_commit_count' => $matches['secondcount'],
 			);
 		}
 
 		return $status_var;
 	}
 
-    /**
-     * Formats a status array into a human-readable string
-     *
-     * @param array $status A status array from parse_git_status_text().
-     * @param string $repo_type The type of repo that generate the status text
-     * @return string The textual representation of the repo status
-     */
-    function get_status_text( $status, $repo_type = 'git' ) {
-        if ( is_wp_error( $status ) ) {
-            return $status->get_error_message();
-        }
+	/**
+	 * Formats a status array into a human-readable string
+	 *
+	 * @param array $status A status array from parse_git_status_text().
+	 * @param string $repo_type The type of repo that generate the status text
+	 * @return string The textual representation of the repo status
+	 */
+	function get_status_text( $status, $repo_type = 'git' ) {
+		if ( is_wp_error( $status ) ) {
+			return $status->get_error_message();
+		}
 
 		if ( empty( $status ) ) {
 			return __( 'Repo not yet scanned.', 'quickstart-dashboard' );
 		}
 
-        switch ($repo_type) {
-            case 'git':
-                $text = __( sprintf( 'Branch %s ', esc_attr( $status['on_branch'] ) ), 'quickstart-dashboard' );
+		switch ($repo_type) {
+			case 'git':
+				$text = __( sprintf( 'Branch %s ', esc_attr( $status['on_branch'] ) ), 'quickstart-dashboard' );
 
-                if ( $status['behind'] !== false ) {
-                    $text .= __(
-                        sprintf( 'behind remote branch %s by %s commits.',
-                            esc_attr( $status['behind']['branch'] ),
-                            number_format( $status['behind']['num_commits'] )
-                        ),
-                        'quickstart-dashboard'
-                    );
-                } elseif ( $status['diverged'] !== false ) {
-                    $text .= __(
-                        sprintf( '%s commits ahead and %s commits behind remote branch %s.',
-                            number_format( $status['diverged']['local_commit_count'] ),
-                            number_format( $status['diverged']['remote_commit_count'] ),
-                            esc_attr( $status['diverged']['branch'] )
-                        ),
-                        'quickstart-dashboard'
-                    );
-                } else {
+				if ( $status['behind'] !== false ) {
+					$text .= __(
+						sprintf( 'behind remote branch %s by %s commits.',
+							esc_attr( $status['behind']['branch'] ),
+							number_format( $status['behind']['num_commits'] )
+						),
+						'quickstart-dashboard'
+					);
+				} elseif ( $status['diverged'] !== false ) {
+					$text .= __(
+						sprintf( '%s commits ahead and %s commits behind remote branch %s.',
+							number_format( $status['diverged']['local_commit_count'] ),
+							number_format( $status['diverged']['remote_commit_count'] ),
+							esc_attr( $status['diverged']['branch'] )
+						),
+						'quickstart-dashboard'
+					);
+				} else {
 					$text .= __( 'up to date.', 'quickstart-dashboard' );
 				}
 
-                return $text;
+				return $text;
 
-            case 'svn':
-                $text = '';
+			case 'svn':
+				$text = '';
 				
 				if ( !isset( $status['local_revision'] ) || !isset( $status['remote_revision'] ) ) {
 					return sprintf( 
@@ -696,36 +696,36 @@ class RepoMonitor extends Dashboard_Plugin {
 					);
 				}
 
-                // Base status text
-                if ( $status['local_revision'] == $status['remote_revision'] ) {
-                    // Revisions are the same
-                    $text .= __( 'Working copy up to date', 'quickstart-dashboard' );
-                } else {
-                    $text .= __( 'Working copy needs update', 'quickstart-dashboard' );
-                }
+				// Base status text
+				if ( $status['local_revision'] == $status['remote_revision'] ) {
+					// Revisions are the same
+					$text .= __( 'Working copy up to date', 'quickstart-dashboard' );
+				} else {
+					$text .= __( 'Working copy needs update', 'quickstart-dashboard' );
+				}
 
-                // Local file modifications
-                if ( empty( $status['locally_modified'] ) ) {
-                    // No locally modified files
-                    $text .= __( ' with no local changes', 'quickstart-dashboard' );
-                } else {
-                    $text .= sprintf(
-                        __( ' with %s local changes', 'quickstart-dashboard' ),
-                        number_format( count( $status['locally_modified'] ) )
-                    );
-                }
+				// Local file modifications
+				if ( empty( $status['locally_modified'] ) ) {
+					// No locally modified files
+					$text .= __( ' with no local changes', 'quickstart-dashboard' );
+				} else {
+					$text .= sprintf(
+						__( ' with %s local changes', 'quickstart-dashboard' ),
+						number_format( count( $status['locally_modified'] ) )
+					);
+				}
 
-                // Files needing updates
-                if ( !empty( $status['files_out_of_date'] ) ) {
-                    $text .= sprintf(
-                        __( ' and %s remote changes', 'quickstart-dashboard' ),
-                        number_format( count( $status['files_out_of_date'] ) )
-                    );
-                }
+				// Files needing updates
+				if ( !empty( $status['files_out_of_date'] ) ) {
+					$text .= sprintf(
+						__( ' and %s remote changes', 'quickstart-dashboard' ),
+						number_format( count( $status['files_out_of_date'] ) )
+					);
+				}
 
-                return $text;
-        }
-    }
+				return $text;
+		}
+	}
 
 	/**
 	 * Adds a repo to be tracked by the RepoMonitor. The repo must already exist.
@@ -1077,15 +1077,15 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 	 */
 	private $repo_monitor = null;
 
-    function __construct( $repo_monitor ) {
+	function __construct( $repo_monitor ) {
 		$this->repo_monitor = $repo_monitor;
 
-        parent::__construct( array(
-            'singular'  => 'repo',
-            'plural'    => 'repos',
-            'ajax'      => false
-        ) );
-    }
+		parent::__construct( array(
+			'singular'  => 'repo',
+			'plural'    => 'repos',
+			'ajax'      => false
+		) );
+	}
 
 	function get_table_classes() {
 		$classes = parent::get_table_classes();
@@ -1122,25 +1122,25 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 		}
 	}
 
-    function column_default( $item, $column_name ){
+	function column_default( $item, $column_name ){
 		$retval = '';
-        switch( $column_name ){
+		switch( $column_name ){
 			case 'status':
 				$retval = sprintf( '<span class="vip-dashboard-repo-status">%s</span>', esc_html( $this->repo_monitor->get_status_text( $item[$column_name], $item['repo_type'] ) ) );
 				break;
 			case 'repo_type':
 				$retval = sprintf( '<span class="vip-dashboard-repo-type">%s</span>', esc_html( $item['repo_type'] ) );
 				break;
-            default:
-                $retval = $item[$column_name];
-        }
+			default:
+				$retval = $item[$column_name];
+		}
 
 		return $retval;
-    }
+	}
 
-    function column_repo_friendly_name( $item ){
-        //Build row actions
-        $actions = array();
+	function column_repo_friendly_name( $item ){
+		//Build row actions
+		$actions = array();
 
 		// Show the update action only if the repo needs and update and we can update it
 		if ( $item['warn']  && $item['can_update'] ) {
@@ -1153,53 +1153,53 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 			);
 		}
 
-        //Return the title contents
+		//Return the title contents
 		return sprintf( '<strong>%s</strong>%s', esc_html( $item['repo_friendly_name'] ), $this->row_actions( $actions, true ) );
-    }
+	}
 
-    function column_cb( $item ){
-        return sprintf(
-            '<input type="checkbox" name="%1$s[]" value="%2$s" />',
-            /*$1%s*/ esc_attr( $this->_args['singular'] ),
-            /*$2%s*/ esc_attr( $item['repo_id'] )
-        );
-    }
+	function column_cb( $item ){
+		return sprintf(
+			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
+			/*$1%s*/ esc_attr( $this->_args['singular'] ),
+			/*$2%s*/ esc_attr( $item['repo_id'] )
+		);
+	}
 
-    function get_columns(){
+	function get_columns(){
 		$cols = array(
-            'cb'				 => '<input type="checkbox" />', //Render a checkbox instead of text
-            'repo_friendly_name' => __( 'Repo', 'quickstart-dashboard' ),
+			'cb'				 => '<input type="checkbox" />', //Render a checkbox instead of text
+			'repo_friendly_name' => __( 'Repo', 'quickstart-dashboard' ),
 			'repo_type'			 => '', // Don't show anything in the header
 			'status'			 => __( 'Status', 'quickstart-dashboard' ),
-        );
+		);
 
-        return apply_filters( 'viprepomonitor_table_get_columns', $cols );
-    }
+		return apply_filters( 'viprepomonitor_table_get_columns', $cols );
+	}
 
-    function get_sortable_columns() {
-        return apply_filters( 'viprepomonitor_table_get_sortable_columns', array() );
-    }
+	function get_sortable_columns() {
+		return apply_filters( 'viprepomonitor_table_get_sortable_columns', array() );
+	}
 
-    function get_bulk_actions() {
-        return apply_filters( 'viprepomonitor_table_bulk_actions', array(
+	function get_bulk_actions() {
+		return apply_filters( 'viprepomonitor_table_bulk_actions', array(
 			'update' => __( 'Update', 'quickstart-dashboard' ),
 		) );
-    }
+	}
 
-    function process_bulk_action() {
+	function process_bulk_action() {
 		do_action( 'viprepomonitor_table_do_bulk_actions' );
-    }
+	}
 
-    function prepare_items() {
-        $per_page = 10;
-        $columns = $this->get_columns();
-        $hidden = array();
-        $sortable = $this->get_sortable_columns();
-        $this->_column_headers = array( $columns, $hidden, $sortable );
-        $this->process_bulk_action();
+	function prepare_items() {
+		$per_page = 10;
+		$columns = $this->get_columns();
+		$hidden = array();
+		$sortable = $this->get_sortable_columns();
+		$this->_column_headers = array( $columns, $hidden, $sortable );
+		$this->process_bulk_action();
 		
-        $total_items = 0;
-        $this->items = array();
+		$total_items = 0;
+		$this->items = array();
 		foreach ( $this->repo_monitor->get_repos() as $repo ) {
 			$status = $this->repo_monitor->get_repo_status( $repo['repo_id'] );
 			$warn = $repo['warn_out_of_date'] && $this->repo_monitor->repo_out_of_date( $status, $repo['repo_type'] );
@@ -1213,10 +1213,10 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
 			$total_items += 1;
 		}
 
-        $this->set_pagination_args( array(
-            'total_items' => $total_items,
-            'per_page'    => $per_page,
-            'total_pages' => ceil($total_items/$per_page),
-        ) );
-    }
+		$this->set_pagination_args( array(
+			'total_items' => $total_items,
+			'per_page'    => $per_page,
+			'total_pages' => ceil($total_items/$per_page),
+		) );
+	}
 }

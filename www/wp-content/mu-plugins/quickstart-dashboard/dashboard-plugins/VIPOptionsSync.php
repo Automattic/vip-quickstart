@@ -357,10 +357,10 @@ class VIPOptionsSync extends Dashboard_Plugin {
 
 		// Setup the data table
 		$cols = array(
-            'file'		  => __( 'File', 'quickstart-dashboard' ),
+			'file'		  => __( 'File', 'quickstart-dashboard' ),
 			'action'	  => __( 'Action', 'quickstart-dashboard' ),
 			'description' => __( 'Description', 'quickstart-dashboard' ),
-        );
+		);
 
 		$os_table = new DashboardDataTable( $cols, $table_items );
 		$os_table->disable_output_escaping();

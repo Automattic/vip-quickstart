@@ -1,7 +1,7 @@
 <?php
 
 if( ! class_exists( 'WP_List_Table' ) ){
-    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
 class DashboardDataTable extends DashboardWidgetTable {
@@ -14,12 +14,12 @@ class DashboardDataTable extends DashboardWidgetTable {
 		$this->items = $items;
 		$this->columns = $cols;
 
-        parent::__construct( array(
-            'singular'  => 'action',
-            'plural'    => 'actions',
-            'ajax'      => false
-        ) );
-    }
+		parent::__construct( array(
+			'singular'  => 'action',
+			'plural'    => 'actions',
+			'ajax'      => false
+		) );
+	}
 
 	function disable_output_escaping() {
 		$this->escape_output = false;
@@ -54,7 +54,7 @@ class DashboardDataTable extends DashboardWidgetTable {
 
 	function column_default( $item, $column_name ){
 		return $this->escape_output ? esc_html( $item['data'][$column_name] ) : $item['data'][$column_name];
-    }
+	}
 
 	function column_cb( $item ){
 		// Try and figure out this items' id
@@ -67,12 +67,12 @@ class DashboardDataTable extends DashboardWidgetTable {
 			$id = $item['data'][$this->_args['singular'] . '_id'];
 		}
 
-        return sprintf(
-            '<input type="checkbox" name="%1$s[]" value="%2$s" />',
-            /*$1%s*/ $this->_args['singular'],
-            /*$2%s*/ $id
-        );
-    }
+		return sprintf(
+			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
+			/*$1%s*/ $this->_args['singular'],
+			/*$2%s*/ $id
+		);
+	}
 
 	function get_columns() {
 		if ( $this->show_check_column ) {
@@ -83,22 +83,22 @@ class DashboardDataTable extends DashboardWidgetTable {
 		} else {
 			return $this->columns;
 		}
-    }
+	}
 
 	function prepare_items() {
-        $columns = $this->get_columns();
-        $hidden = array();
-        $sortable = $this->get_sortable_columns();
-        $this->_column_headers = array( $columns, $hidden, $sortable );
+		$columns = $this->get_columns();
+		$hidden = array();
+		$sortable = $this->get_sortable_columns();
+		$this->_column_headers = array( $columns, $hidden, $sortable );
 
 		$total_items = count( $this->items );
 		$per_page = 10;
-        $this->set_pagination_args( array(
-            'total_items' => $total_items,
-            'per_page'    => $per_page,
-            'total_pages' => ceil( $total_items/$per_page ),
-        ) );
-    }
+		$this->set_pagination_args( array(
+			'total_items' => $total_items,
+			'per_page'    => $per_page,
+			'total_pages' => ceil( $total_items/$per_page ),
+		) );
+	}
 
 	function single_row( $item ) {
 		$row_classes = parent::get_row_classes();
