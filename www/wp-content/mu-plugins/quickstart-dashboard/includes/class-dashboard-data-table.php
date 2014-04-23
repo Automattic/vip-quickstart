@@ -69,8 +69,8 @@ class DashboardDataTable extends DashboardWidgetTable {
 
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
-			/*$1%s*/ $this->_args['singular'],
-			/*$2%s*/ $id
+			/*$1%s*/ esc_attr( $this->_args['singular'] ),
+			/*$2%s*/ esc_attr( $id )
 		);
 	}
 
