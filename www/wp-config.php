@@ -23,13 +23,16 @@ if ( file_exists( __DIR__ . '/local-config.php' ) )
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', 'wordpress');
+if ( ! defined( 'DB_NAME' ) )
+    define('DB_NAME', 'wordpress');
 
 /** MySQL database username */
-define('DB_USER', 'wordpress');
+if ( ! defined( 'DB_USER' ) )
+    define('DB_USER', 'wordpress');
 
 /** MySQL database password */
-define('DB_PASSWORD', 'wordpress');
+if ( ! defined( 'DB_PASSWORD' ) )
+    define('DB_PASSWORD', 'wordpress');
 
 /** MySQL hostname */
 define('DB_HOST', 'localhost');
@@ -82,10 +85,12 @@ define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
 define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/wp-content' );
 
 define('MULTISITE', true);
-define('DOMAIN_CURRENT_SITE', 'vip.dev');
 define('PATH_CURRENT_SITE', '/');
 define('SITE_ID_CURRENT_SITE', 1);
 define('BLOG_ID_CURRENT_SITE', 1);
+
+if ( ! defined( 'DOMAIN_CURRENT_SITE' ) )
+    define('DOMAIN_CURRENT_SITE', $_SERVER['HTTP_HOST']);
 
 if ( ! defined( 'SUBDOMAIN_INSTALL' ) )
     define('SUBDOMAIN_INSTALL', false);

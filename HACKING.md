@@ -2,6 +2,10 @@
 
 Here's an introduction to developing VIP Quickstart. If you have any additional questions, feel free to open an issue so we can write the proper documentation.
 
+## Testing
+
+At this point we only only test that the syntax is correct with puppet-lint.
+
 ## Structure
 
 * bin - Scripts
@@ -17,6 +21,7 @@ Here's an introduction to developing VIP Quickstart. If you have any additional 
         * themes/vip/plugins - The VIP shared plugins directory
     * local-config.php - A local WordPress configuration file that's not under version control
     * wp-cli.yml - The WP-CLI config
+    * wp-tests - SVN checkout of WordPress-Tests from http://develop.svn.wordpress.org/trunk/
 
 ## Bin scripts
 

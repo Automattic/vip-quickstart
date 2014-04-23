@@ -1,4 +1,44 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# =====================================
+# Set cwd to vip-quickstart
+# =====================================
+DIR="$( dirname $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ) )"
+ORIG=`pwd`
+cd $DIR
+
+# =====================================
+# Setup command line flags
+# =====================================
+SERVER=false
+
+for i in "$@"
+do
+case $i in
+    --server)
+        SERVER=true
+    ;;
+    --domain=*)
+        QUICKSTART_DOMAIN=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+    *)
+        # unknown option
+    ;;
+esac
+done
+
+
+# =====================================
+# Setup other options
+# =====================================
+IS_INSTALLED=false
+
+if [ false == $SERVER ]; then
+    IS_INSTALLED=`vagrant ssh -c 'which wp && wp core is-installed'`
+else
+    IS_INSTALLED=`which wp && wp core is-installed`
+fi
+
 
 # =====================================
 # VIP Quickstart
@@ -15,27 +55,21 @@ echo '
 # =====================================
 # Check for requirements
 # =====================================
-HAS_GIT=`which git`
-HAS_VAGRANT=`which vagrant`
-HAS_VBOX=`which VBoxManage`
-
-if [[ ! $HAS_GIT || ! $HAS_VAGRANT || ! $HAS_VBOX ]]; then
-    echo "Please install the requirements"
-
-    if [ ! $HAS_GIT ]; then
+if [ false == $SERVER ]; then
+    if [[ ! `which git` || ! `which vagrant` || ! `which VBoxManage` ]]; then
+        echo "Please install the requirements"
         echo "* Git"
-    fi
-
-    if [ ! $HAS_VAGRANT ]; then
-	    echo "* Vagrant"
-	fi
-
-    if [ ! $HAS_VBOX ]; then
+        echo "* Vagrant"
         echo "* VirtualBox"
+        exit 1
     fi
-
-    echo ""
-    exit
+else
+    if [[ ! `which git` || ! `which puppet` ]]; then
+        echo "Please install the requirements"
+        echo "* Git"
+        echo "* Puppet"
+        exit 1
+    fi
 fi
 
 # =====================================
@@ -45,6 +79,21 @@ sudo -k
 sudo -p "Enter your password to continue:" whoami 1>/dev/null || exit
 echo ""
 
+
+# =====================================
+# Ask for domain
+# =====================================
+if [[ -z "$QUICKSTART_DOMAIN" && ! $IS_INSTALLED ]]; then
+    echo "=================================="
+    echo "= Domain Setup"
+    echo "=================================="
+
+    read -e -p "What domain would you like to use? [vip.dev]:" QUICKSTART_DOMAIN
+    QUICKSTART_DOMAIN="${QUICKSTART_DOMAIN:-vip.dev}"
+    echo ""
+fi
+
+
 # =====================================
 # Automatically update the repo
 # =====================================
@@ -53,71 +102,74 @@ echo "= Updating VIP Quickstart"
 echo "=================================="
 
 git pull
+git submodule sync
 git submodule update --init --recursive
 echo ""
-
-if [ `which svn` ]; then
-    # =====================================
-    # Checkout the VIP shared plugins repo
-    # =====================================
-    echo "=================================="
-    echo "= Updating VIP Shared plugins"
-    echo "=================================="
-
-    if [ -d "www/wp-content/themes/vip/plugins" ]; then
-    	svn up www/wp-content/themes/vip/plugins
-    else
-    	mkdir -p www/wp-content/themes/vip/plugins
-    	svn co https://vip-svn.wordpress.com/plugins/ www/wp-content/themes/vip/plugins
-    fi
-    echo ""
-else
-     # TODO: Verify username and password are correct before continuing
-    echo -n "Enter your WordPress.com username: "
-    read username
-    echo -n "Enter your WordPress.com password: "
-    read -s password
-    echo ""
-    echo ""
-fi
 
 
 # =====================================
 # Start the VM (always provision, even if it's already running)
 # =====================================
 echo "=================================="
-echo "= Provisioning the VM"
+echo "= Provisioning"
 echo "=================================="
+if [ false == $SERVER ]; then
+    [[ -n $QUICKSTART_DOMAIN ]] && export QUICKSTART_DOMAIN="$QUICKSTART_DOMAIN"
 
-vagrant reload --no-provision
-vagrant up --no-provision
-SVN_USERNAME="$username" SVN_PASSWORD="$password" vagrant provision
+    vagrant reload --no-provision
+    vagrant up --no-provision
+    vagrant provision
+elif [[ -n "$QUICKSTART_DOMAIN" ]]; then
+    export FACTER_quickstart_domain="$QUICKSTART_DOMAIN"
+
+    puppet apply --modulepath=/srv/puppet/modules --templatedir=/srv/puppet/files /srv/puppet/manifests/init.pp
+fi
 echo ""
+
+
+# =====================================
+# Chown the web directory to the web user
+# =====================================
+if [[ true == $SERVER ]]; then
+    echo "=================================="
+    echo "= Fixing file ownership"
+    echo "=================================="
+    chown -R vagrant:vagrant /srv/www
+fi
 
 
 # =====================================
 # Add vip.dev entry to hosts file
 # =====================================
-echo "=================================="
-echo "= Configuring the hosts file"
-echo "=================================="
+if [[ -n $QUICKSTART_DOMAIN && false == $SERVER ]]; then
+    echo "=================================="
+    echo "= Configuring the hosts file"
+    echo "=================================="
 
-cat /etc/hosts | grep vip.dev || sudo printf "\n# VIP Quickstart\n10.86.73.80 vip.dev\n" | sudo tee -a /etc/hosts
-echo ""
+    cat /etc/hosts | grep $QUICKSTART_DOMAIN || printf "\n# VIP Quickstart\n10.86.73.80 $QUICKSTART_DOMAIN\n" | sudo tee -a /etc/hosts
+    echo ""
+fi
 
 
 # =====================================
 # Outro/next steps
 # =====================================
-echo "=================================="
-echo "= Next Steps"
-echo "=================================="
+if [[ ! $IS_INSTALLED ]]; then
+    echo "=================================="
+    echo "= Next Steps"
+    echo "=================================="
 
-echo "* Go to http://vip.dev in your browser"
-echo ""
+    echo "* Go to http://$QUICKSTART_DOMAIN in your browser"
+    echo ""
+fi
 
 
 # =====================================
 # Kill sudo timestamp
 # =====================================
 sudo -k
+
+# =====================================
+# Reset cwd
+# =====================================
+cd $ORIG

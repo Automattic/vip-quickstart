@@ -7,14 +7,16 @@
 # WordPress directory
 /www/wp
 /www/local-config.php
+/www/wp-cli.yml
 
 # wp-content directory
 /www/wp-content/plugins
 /www/wp-content/themes
 /www/wp-content/uploads
+/www/wp-content/local-sunrise.php
 
-# WP CLI Directory
-/www/wp-cli
+# tests
+/www/wp-tests
 
 # phpMyAdmin
 /www/phpmyadmin
@@ -22,3 +24,6 @@
 # IDEs
 /nbproject
 /.idea
+
+# Logs
+www/wp-content/debug.log

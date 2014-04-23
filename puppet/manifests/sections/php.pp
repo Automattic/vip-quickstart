@@ -1,62 +1,61 @@
+# PHP 5.4 + extensions
 include php
+include apt
+
+apt::source { 'php54':
+  location    => 'http://ppa.launchpad.net/ondrej/php5-oldstable/ubuntu',
+  release     => 'precise',
+  repos       => 'main',
+  key         => '14aa40ec0831756756d7f66c4f4ea0aae5267a6c',
+  key_server  => 'hkp://keyserver.ubuntu.com:80',
+  include_src => true
+}
 
 class {
-	'php::composer':;
-	'php::fpm':
-		provider => 'apt';
-	'php::dev':
-		provider => 'apt';
-	'php::pear':
-		provider => 'apt';
-	'php::extension::imagick':
-		package => 'php5-imagick',
-		provider => 'apt';
-	# 'php::extension::xdebug':
-	# 	package => 'php5-xdebug',
-	# 	provider => 'apt';
-	'php::extension::mcrypt':
-		package => 'php5-mcrypt',
-		provider => 'apt';
-	'php::extension::mysql':
-		package => 'php5-mysql',
-		provider => 'apt';
-	'php::extension::curl':
-		package => 'php5-curl',
-		provider => 'apt';
-	'php::extension::gd':
-		package => 'php5-gd',
-		provider => 'apt';
-	'php::extension::apc':
-		ensure => absent,
-		notify => Service['php5-fpm'],
-		package => 'php-apc',
-		provider => 'apt';
+  'php::cli':
+    ensure  => latest,
+    require => Apt::Source['php54'];
+  'php::composer':;
+  'php::dev':
+    ensure  => latest,
+    require => Apt::Source['php54'];
+  'php::fpm':;
+  'php::pear':;
+  'php::phpunit':;
+
+  # Extensions
+  'php::extension::apc':
+    ensure => absent;
+  'php::extension::curl':;
+  'php::extension::gd':;
+  'php::extension::imagick':;
+  'php::extension::mcrypt':;
+  'php::extension::memcache':;
+  'php::extension::mysql':;
+  'php::extension::xdebug':;
+}
+
+# Install PHP_CodeSniffer and the WordPress coding standard
+package { 'pear.php.net/PHP_CodeSniffer':
+  ensure   => 'installed',
+  provider => 'pear',
+}
+
+vcsrepo { '/usr/share/php/PHP/CodeSniffer/Standards/WordPress':
+  source   => 'https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards',
+  provider => 'git',
+  ensure   => 'present',
+  require  => Package['pear.php.net/PHP_CodeSniffer'],
 }
 
 php::fpm::conf { 'www': user => 'vagrant' }
 
 file { '/etc/php5/conf.d/apc.ini': ensure => absent }
 
-package { 'memcached': ensure => present }
-package { 'php5-memcache': ensure => present }
-package { 'phpmyadmin':
-	ensure => present,
-	require => Package['nginx']
-}
-
-# TODO: Make this not gross
-package { 'php5-xdebug': ensure => 'present' }
-exec { 'configure php5-xdebug':
-	command => 'echo "zend_extension=`sudo find / -name \'xdebug.so\' | head -1`" | sudo tee -a /etc/php5/conf.d/xdebug.ini',
-	unless => 'test -f /etc/php5/conf.d/xdebug.ini && cat /etc/php5/conf.d/xdebug.ini | grep zend_extension',
-	notify => Service['php5-fpm'],
-	require => Package['php5-xdebug']
-}
-
 # Turn on html_errors
 exec { 'html_errors = On':
-	command => 'sed -i "s/html_errors = Off/html_errors = On/g" /etc/php5/fpm/php.ini',
-	unless => 'cat /etc/php5/fpm/php.ini | grep "html_errors = On"',
-	user => root,
-	notify => Service['php5-fpm']
+  command => 'sed -i "s/html_errors = Off/html_errors = On/g" /etc/php5/fpm/php.ini',
+  unless  => 'cat /etc/php5/fpm/php.ini | grep "html_errors = On"',
+  user    => root,
+  notify  => Service['php5-fpm']
 }
