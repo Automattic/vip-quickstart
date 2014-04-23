@@ -410,7 +410,7 @@ class RepoMonitor extends Dashboard_Plugin {
 		$args = array(
 			'orderby' => 'ID',
 			'order' => 'ASC',
-			'posts_per_page' => -1,
+			'posts_per_page' => 100,
 			'post_type' => self::REPO_CPT,
 		);
 
