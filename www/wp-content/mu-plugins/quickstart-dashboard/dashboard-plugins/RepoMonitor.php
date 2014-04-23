@@ -886,7 +886,7 @@ class RepoMonitor extends Dashboard_Plugin {
 
 		// Save the result
 		$this->repo_update_cache[$repo['repo_id']] = $can_update;
-		update_post_meta( $repo['repo_id'], 'repomonitor_can_update_repo', $can_update );
+		update_post_meta( intval( $repo['repo_id'] ), 'repomonitor_can_update_repo', (bool) $can_update );
 		
 		return $can_update;
 	}
@@ -1160,8 +1160,8 @@ class RepoMonitorWidgetTable extends DashboardWidgetTable {
     function column_cb( $item ){
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
-            /*$1%s*/ $this->_args['singular'],
-            /*$2%s*/ $item['repo_id']
+            /*$1%s*/ esc_attr( $this->_args['singular'] ),
+            /*$2%s*/ esc_attr( $item['repo_id'] )
         );
     }
 
