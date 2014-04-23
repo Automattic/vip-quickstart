@@ -43,16 +43,16 @@ class Quickstart_Dashboard {
 
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
-        add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'admin_notices', array( $this, 'show_admin_notices' ) );
-        
-        if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
-            // Need to load plugins here instead of admin_init so they have a chance to register submenu pages
-            $this->load_plugins();
-            $this->init_plugins();
-        }
-        
+
+		if ( is_admin() || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
+			// Need to load plugins here instead of admin_init so they have a chance to register submenu pages
+			$this->load_plugins();
+			$this->init_plugins();
+		}
+
 		do_action( 'quickstart_dashboard_loaded' );
 	}
 
@@ -182,36 +182,36 @@ class Quickstart_Dashboard {
 		wp_enqueue_script( 'quickstart-dashboard', get_bloginfo( 'wpurl' ) . '/wp-content/mu-plugins/quickstart-dashboard/js/quickstart_dashboard.js', array( 'jquery' ) );
 		wp_enqueue_style( 'quickstart-dashboard', get_bloginfo( 'wpurl' ) . '/wp-content/mu-plugins/quickstart-dashboard/css/dashboard.css', array( 'dashicons' ) );
 	}
-    
-    function admin_menu() {
-        add_menu_page( __( 'VIP Dashboard', 'quickstart-dashboard' ), __( 'VIP', 'quickstart-dashboard' ), 'manage_options', 'vip-dashboard', null, 'dashicons-cloud', 3 );
+
+	function admin_menu() {
+		add_menu_page( __( 'VIP Dashboard', 'quickstart-dashboard' ), __( 'VIP', 'quickstart-dashboard' ), 'manage_options', 'vip-dashboard', null, 'dashicons-cloud', 3 );
 		add_submenu_page( 'vip-dashboard', __( 'VIP Dashboard', 'quickstart-dashboard' ), __( 'Dashboard', 'quickstart-dashboard' ), 'manage_options', 'vip-dashboard', array( $this, 'vip_admin_page' ), 'dashicons-cloud', 3 );
 		add_submenu_page( null, __( 'Dashboard Credentials', 'quickstart-dashboard' ), __( 'Dashboard Credentials', 'quickstart-dashboard' ), 'manage_options', 'dashboard-credentials', array( $this, 'dashboard_credentials_page' ) );
-        
-        do_action( 'quickstart_dashboard_admin_menu' );
-    }
-    
-    function vip_admin_page() {
-        // Include the WP Dashboard API
-        require_once( ABSPATH . 'wp-admin/includes/dashboard.php' );
-        
-        do_action( 'quickstart_dashboard_setup' );
-        
-        settings_errors();
-        
-        ?>
-        <div class="wrap">
-            <div id="icon-vip" class="icon32"><br /></div>
-            <h2><?php _e( 'VIP Quickstart Dashboard', 'quickstart-dashboard' ); ?></h2>
-            <div id="dashboard-widgets-wrap" class="quickstart-dashboard-widgets-wrap">
-                <?php wp_dashboard(); // Main call that displays the widgets ?>
-                <div class="clear"></div>
-            </div>
-        </div>
-        <?php
-        
-        do_action( 'quickstart_admin_page' );
-    }
+
+		do_action( 'quickstart_dashboard_admin_menu' );
+	}
+
+	function vip_admin_page() {
+		// Include the WP Dashboard API
+		require_once( ABSPATH . 'wp-admin/includes/dashboard.php' );
+
+		do_action( 'quickstart_dashboard_setup' );
+
+		settings_errors();
+
+		?>
+		<div class="wrap">
+			<div id="icon-vip" class="icon32"><br /></div>
+			<h2><?php _e( 'VIP Quickstart Dashboard', 'quickstart-dashboard' ); ?></h2>
+			<div id="dashboard-widgets-wrap" class="quickstart-dashboard-widgets-wrap">
+				<?php wp_dashboard(); // Main call that displays the widgets ?>
+				<div class="clear"></div>
+			</div>
+		</div>
+		<?php
+
+		do_action( 'quickstart_admin_page' );
+	}
 	
 	function dashboard_credentials_page() {
 		if ( !current_user_can( 'manage_options' ) ) {
@@ -219,10 +219,10 @@ class Quickstart_Dashboard {
 		}
 		
 		?>
-        <div class="wrap">
-            <div id="icon-vip" class="icon32"><br /></div>
-            <h2><?php _e( 'Dashboard Credentials', 'quickstart-dashboard' ); ?></h2>
-            <h3><?php _e( 'WordPress.com OAuth Credentials', 'quickstart-dashboard' ); ?></h3>
+		<div class="wrap">
+			<div id="icon-vip" class="icon32"><br /></div>
+			<h2><?php _e( 'Dashboard Credentials', 'quickstart-dashboard' ); ?></h2>
+			<h3><?php _e( 'WordPress.com OAuth Credentials', 'quickstart-dashboard' ); ?></h3>
 			<p><?php _e( 'The WordPress.com OAuth credentials are used to query information about your VIP sites, get your VIP themes, and provide other connected goodness.' ); ?></p>
 			<p><?php printf( __( 'If you do not already have WordPress.com OAuth credentials, you can get them by creating an application on the <a href="%s" target="_blank">WordPress.com Developer Site</a>.' ), 'https://developer.wordpress.com/apps/' ); ?></p>
 			<form action="<?php menu_page_url( 'dashboard-credentials' ); ?>" method="POST">
@@ -242,8 +242,8 @@ class Quickstart_Dashboard {
 					<a class="button-secondary" href="<?php menu_page_url( 'vip-dashboard' ); ?>"><?php _e( 'Cancel', 'quickstart-dashboard' ); ?></a>
 				</p>
 			</form>
-        </div>
-        <?php
+		</div>
+		<?php
 	}
 
 	function show_admin_notices() {
@@ -353,12 +353,12 @@ class Quickstart_Dashboard {
 
 		return $this->plugins;
 	}
-    
-    function init_plugins() {
-        foreach ( $this->plugins as $plugin ) {
+
+	function init_plugins() {
+		foreach ( $this->plugins as $plugin ) {
 			$plugin->init();
 		}
-    }
+	}
 
 	/**
 	 * Scans the plugin directory for quickstart dashboard plugins.
