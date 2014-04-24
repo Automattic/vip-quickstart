@@ -40,7 +40,21 @@ exec { 'wp install /srv/www/wp':
 # Install GitHub Plugins
 $github_plugin_keys = keys( $github_plugins )
 gitplugin { $github_plugin_keys:
-    git_urls => $github_plugins
+    git_urls   => $github_plugins,
+}
+
+repomonitor_repo { '/srv/www/wp-content/plugins/vip-scanner':
+  repo_name => 'VIP Scanner',
+  require   => Gitplugin[$github_plugin_keys]
+}
+
+repomonitor_repo { '/srv/www/wp-content/plugins/jetpack':
+  repo_name => 'Jetpack',
+  require   => Gitplugin[$github_plugin_keys]
+}
+
+repomonitor_repo { '/srv':
+  repo_name => 'Quickstart'
 }
 
 # Install plugins
@@ -90,10 +104,20 @@ vcsrepo { '/srv/www/wp':
   provider => svn,
 }
 
+repomonitor_repo { '/srv/www/wp':
+  repo_name => 'WordPress',
+  require   => Vcsrepo['/srv/www/wp']
+}
+
 vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
   ensure   => 'present',
   source   => 'https://vip-svn.wordpress.com/plugins/',
   provider => svn,
+}
+
+repomonitor_repo { '/srv/www/wp-content/themes/vip/plugins':
+  repo_name => 'VIP Plugins',
+  require   => Vcsrepo['/srv/www/wp-content/themes/vip/plugins']
 }
 
 vcsrepo { '/srv/www/wp-content/themes/pub':
@@ -102,10 +126,20 @@ vcsrepo { '/srv/www/wp-content/themes/pub':
   provider => svn,
 }
 
+repomonitor_repo { '/srv/www/wp-content/themes/pub':
+  repo_name => 'Public Themes',
+  require   => Vcsrepo['/srv/www/wp-content/themes/pub']
+}
+
 vcsrepo { '/srv/www/wp-tests':
   ensure   => 'present',
   source   => 'http://develop.svn.wordpress.org/trunk/',
   provider => svn,
+}
+
+repomonitor_repo { '/srv/www/wp-tests':
+  repo_name => 'WordPress Tests',
+  require   => Vcsrepo['/srv/www/wp-tests']
 }
 
 # Create a local config
