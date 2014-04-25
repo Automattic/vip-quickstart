@@ -1,5 +1,9 @@
 <?php
 
+require_once WP_CONTENT_DIR . '/themes/vip/plugins/vip-do-not-include-on-wpcom/wpcom-vip-plugins-ui/wpcom-vip-plugins-ui.php';
+
+add_filter( 'wpcom_vip_plugins_ui_parent_menu_slug', function() { return 'vip-dashboard'; });
+
 // Add X-hacker header
 add_action( 'send_headers', function() {
 	header( "X-hacker: If you're reading this, you should visit automattic.com/jobs and apply to join the fun, mention this header." );
