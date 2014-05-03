@@ -32,8 +32,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     puppet.manifest_file  = "init.pp"
     puppet.options = ['--templatedir', '/vagrant/puppet/files']
     puppet.facter = {
-      "svn_username"      => ENV['SVN_USERNAME'],
-      "svn_password"      => ENV['SVN_PASSWORD'],
       "quickstart_domain" => ENV['QUICKSTART_DOMAIN'],
     }
   end
