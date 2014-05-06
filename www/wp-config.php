@@ -3,8 +3,9 @@
 /**
  * Local mods
  */
-if ( file_exists( __DIR__ . '/local-config.php' ) )
-    require __DIR__ . '/local-config.php';
+if ( file_exists( __DIR__ . '/local-config.php' ) ) {
+	require __DIR__ . '/local-config.php';
+}
 
 /**
  * The base configurations of the WordPress.
@@ -23,25 +24,28 @@ if ( file_exists( __DIR__ . '/local-config.php' ) )
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-if ( ! defined( 'DB_NAME' ) )
-    define('DB_NAME', 'wordpress');
+if ( ! defined( 'DB_NAME' ) ) {
+	define( 'DB_NAME', 'wordpress' );
+}
 
 /** MySQL database username */
-if ( ! defined( 'DB_USER' ) )
-    define('DB_USER', 'wordpress');
+if ( ! defined( 'DB_USER' ) ) {
+	define( 'DB_USER', 'wordpress' );
+}
 
 /** MySQL database password */
-if ( ! defined( 'DB_PASSWORD' ) )
-    define('DB_PASSWORD', 'wordpress');
+if ( ! defined( 'DB_PASSWORD' ) ) {
+	define( 'DB_PASSWORD', 'wordpress' );
+}
 
 /** MySQL hostname */
-define('DB_HOST', 'localhost');
+define( 'DB_HOST', 'localhost' );
 
 /** Database Charset to use in creating database tables. */
-define('DB_CHARSET', 'utf8');
+define( 'DB_CHARSET', 'utf8' );
 
 /** The Database Collate type. Don't change this if in doubt. */
-define('DB_COLLATE', '');
+define( 'DB_COLLATE', '' );
 
 /**#@-*/
 
@@ -61,8 +65,9 @@ $table_prefix  = 'wp_';
  * de_DE.mo to wp-content/languages and set WPLANG to 'de_DE' to enable German
  * language support.
  */
-if ( ! defined( 'WPLANG' ) )
-    define('WPLANG', '');
+if ( ! defined( 'WPLANG' ) ) {
+	define( 'WPLANG', '' );
+}
 
 /**
  * For developers: WordPress debugging mode.
@@ -71,29 +76,38 @@ if ( ! defined( 'WPLANG' ) )
  * It is strongly recommended that plugin and theme developers use WP_DEBUG
  * in their development environments.
  */
-define('WP_DEBUG', true);
-define('SAVEQUERIES', true);
+if ( ! defined( 'WP_DEBUG' ) ) {
+	define( 'WP_DEBUG', true );
+}
+if ( ! defined( 'SAVEQUERIES' ) ) {
+	define( 'SAVEQUERIES', true );
+}
 
-if ( ! defined( 'JETPACK_DEV_DEBUG' ) )
-    define('JETPACK_DEV_DEBUG', true);
+if ( ! defined( 'JETPACK_DEV_DEBUG' ) ) {
+	define( 'JETPACK_DEV_DEBUG', true );
+}
 
-if ( ! defined( 'MP6_STYLE_GUIDE' ) )
-    define('MP6_STYLE_GUIDE', true);
+if ( ! defined( 'MP6_STYLE_GUIDE' ) ) {
+	define( 'MP6_STYLE_GUIDE', true );
+}
 
 /* Content Directory */
-define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
+define( 'WP_CONTENT_DIR', __DIR__ . '/wp-content' );
 define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/wp-content' );
 
-define('MULTISITE', true);
-define('PATH_CURRENT_SITE', '/');
-define('SITE_ID_CURRENT_SITE', 1);
-define('BLOG_ID_CURRENT_SITE', 1);
+define( 'MULTISITE', true );
+define( 'PATH_CURRENT_SITE', '/' );
 
-if ( ! defined( 'DOMAIN_CURRENT_SITE' ) )
-    define('DOMAIN_CURRENT_SITE', $_SERVER['HTTP_HOST']);
+define( 'SITE_ID_CURRENT_SITE', 1 );
+define( 'BLOG_ID_CURRENT_SITE', 1 );
 
-if ( ! defined( 'SUBDOMAIN_INSTALL' ) )
-    define('SUBDOMAIN_INSTALL', false);
+if ( ! defined( 'DOMAIN_CURRENT_SITE' ) ) {
+	define( 'DOMAIN_CURRENT_SITE', $_SERVER['HTTP_HOST'] );
+}
+
+if ( ! defined( 'SUBDOMAIN_INSTALL' ) ) {
+	define( 'SUBDOMAIN_INSTALL', true );
+}
 
 /* That's all, stop editing! Happy blogging. */
 
@@ -109,8 +123,9 @@ require __DIR__ . '/config/roles.php';
 require __DIR__ . '/config/vip-config.php';
 
 /** Absolute path to the WordPress directory. */
-if ( !defined( 'ABSPATH' ) )
-	define( 'ABSPATH', dirname( __FILE__ ) . '/' );
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
