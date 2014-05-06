@@ -78,6 +78,12 @@ function wp_cache_set($key, $data, $group = '', $expire = 0) {
 		return $wp_object_cache->delete($key, $group);
 }
 
+function wp_cache_switch_to_blog( $blog_id ) {
+	global $wp_object_cache;
+
+	return $wp_object_cache->switch_to_blog( $blog_id );
+}
+
 function wp_cache_add_global_groups( $groups ) {
 	global $wp_object_cache;
 
@@ -102,8 +108,6 @@ class WP_Object_Cache {
 
 	var $cache_enabled = true;
 	var $default_expiration = 0;
-
-	var $debug = false;
 
 	function add($id, $data, $group = 'default', $expire = 0) {
 		$key = $this->key($id, $group);
@@ -150,7 +154,7 @@ class WP_Object_Cache {
 	function incr($id, $n = 1, $group = 'default' ) {
 		$key = $this->key($id, $group);
 		$mc =& $this->get_mc($group);
-		$this->cache[ $key ] = $mc->increment( $key, $n );
+		$this->cache[ $key ] = $mc->increment( $key, $n );	
 		return $this->cache[ $key ];
 	}
 
@@ -185,7 +189,7 @@ class WP_Object_Cache {
 		if ( false !== $result )
 			unset($this->cache[$key]);
 
-		return $result;
+		return $result; 
 	}
 
 	function flush() {
@@ -261,7 +265,7 @@ class WP_Object_Cache {
 		return $return;
 	}
 
-	function key($key, $group) {
+	function key($key, $group) {	
 		if ( empty($group) )
 			$group = 'default';
 
@@ -307,6 +311,11 @@ class WP_Object_Cache {
 		return $result;
 	}
 
+	function switch_to_blog( $blog_id ) {
+		$blog_id = (int) $blog_id;
+		$this->blog_prefix = ( is_multisite() ? $blog_id : $table_prefix ) . ':';
+	}
+
 	function colorize_debug_line($line) {
 		$colors = array(
 			'get' => 'green',
@@ -330,22 +339,19 @@ class WP_Object_Cache {
 		echo "</p>\n";
 		echo "<h3>Memcached:</h3>";
 		foreach ( $this->group_ops as $group => $ops ) {
-			if ( !isset($_GET['debug_queries']) && 500 < count($ops) ) {
-				$ops = array_slice( $ops, 0, 500 );
+			if ( !isset($_GET['debug_queries']) && 500 < count($ops) ) { 
+				$ops = array_slice( $ops, 0, 500 ); 
 				echo "<big>Too many to show! <a href='" . add_query_arg( 'debug_queries', 'true' ) . "'>Show them anyway</a>.</big>\n";
-			}
+			} 
 			echo "<h4>$group commands</h4>";
 			echo "<pre>\n";
 			$lines = array();
 			foreach ( $ops as $op ) {
-				$lines[] = $this->colorize_debug_line($op);
+				$lines[] = $this->colorize_debug_line($op); 
 			}
 			print_r($lines);
 			echo "</pre>\n";
 		}
-
-		if ( $this->debug )
-			var_dump($this->memcache_debug);
 	}
 
 	function &get_mc($group) {
@@ -358,7 +364,7 @@ class WP_Object_Cache {
 		//error_log("Connection failure for $host:$port\n", 3, '/tmp/memcached.txt');
 	}
 
-	function __construct() {
+	function WP_Object_Cache() {
 		global $memcached_servers;
 
 		if ( isset($memcached_servers) )
