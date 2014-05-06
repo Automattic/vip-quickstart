@@ -93,7 +93,7 @@ if ( ! defined( 'DOMAIN_CURRENT_SITE' ) )
     define('DOMAIN_CURRENT_SITE', $_SERVER['HTTP_HOST']);
 
 if ( ! defined( 'SUBDOMAIN_INSTALL' ) )
-    define('SUBDOMAIN_INSTALL', false);
+    define('SUBDOMAIN_INSTALL', true);
 
 /* That's all, stop editing! Happy blogging. */
 
