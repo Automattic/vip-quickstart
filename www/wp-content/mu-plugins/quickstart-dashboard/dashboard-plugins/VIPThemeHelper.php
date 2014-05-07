@@ -324,7 +324,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 				);
 			} else {
 				$message = sprintf(
-					__( 'Quickstart Dashboard detected that you have access to <strong>%0$s</strong> VIP themes but have not installed them. <a href="%1$s">Click here to install and activate them.</a>', 'quickstart-dashboard' ),
+					__( 'Quickstart Dashboard detected that you have access to <strong>%1$s</strong> VIP themes but have not installed them. <a href="%2$s">Click here to install and activate them.</a>', 'quickstart-dashboard' ),
 					$available_theme_count,
 					$this->get_theme_action_link( 'all', true, false, $install_nonce )
 				);
