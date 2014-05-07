@@ -59,7 +59,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	}
 
 	public function name() {
-		return __( 'Options Sync', 'quickstart-dashboard' );
+		return __( 'Quickstart Sync', 'quickstart-dashboard' );
 	}
 
 	function admin_menu() {
@@ -95,7 +95,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 			wp_die( __( 'You do not have sufficient permissions to access this page.', 'quickstart-dashboard' ) );
 		}
 
-		echo '<div class="wrap"><h2>' . __( 'Options Sync', 'quickstart-dashboard' ) . '</h2>';
+		echo '<div class="wrap"><h2>' . __( 'Quickstart Sync', 'quickstart-dashboard' ) . '</h2>';
 
 		$show_main_ui = true;
 		if ( isset( $_REQUEST['action'] ) ) {
