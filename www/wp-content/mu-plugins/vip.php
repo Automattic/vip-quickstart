@@ -5,9 +5,12 @@ add_action( 'send_headers', function() {
 	header( "X-hacker: If you're reading this, you should visit automattic.com/jobs and apply to join the fun, mention this header." );
 });
 
-// Hide Plugins menu
 add_action( 'admin_menu', function() {
+	// Hide Plugins menu
 	remove_menu_page( 'plugins.php' );
+
+	// Hide Permalinks menu
+	remove_submenu_page( 'options-general.php', 'options-permalink.php' );
 });
 
 // Hide Custom Fields metabox
