@@ -19,27 +19,21 @@ VIP Quickstart is a local development environment for WordPress.com VIP develope
 *   Nginx
 *   PHPUnit
 
-## Requirements
+## Getting Started: Local Development Environment
 
-### Local
-
-* [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-* [Vagrant](http://www.vagrantup.com/downloads.html)
-* [Git](http://git-scm.com/downloads)
-
-### Server
-
-* Ubuntu 12.04
-* Git
-* Puppet
-
-## Getting Started
+### Overview
 
 The first time you run the installer will be the slowest. It’s also the most dependent on the speed of your internet connection. This is because it has to download the virtual machine image, Ubuntu package updates, the full checkout of WordPress trunk, and the full VIP Plugins repository. Subsequent runs will only update this base.
 
 If Subversion is installed to your local PATH, the init script (no matter what operating system you're using) will use that. If not, no worries; we'll just offload SVN to the VM.
 
-### Unix
+### Requirements
+
+* [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+* [Vagrant](http://www.vagrantup.com/downloads.html)
+* [Git](http://git-scm.com/downloads)
+
+### Install: Unix
 
 If you’re on a Unix-based machine with a Bash shell, setup is pretty easy:
 
@@ -49,7 +43,7 @@ If you’re on a Unix-based machine with a Bash shell, setup is pretty easy:
 
 The init script is setup such that you can run it multiple times and nothing will break. This means that you can also use it to update your environment in the future. If parts of the system are already up-to-date it will just skip those parts of the installer. So if you manually keep WordPress trunk up-to-date by running `svn up`, the init script will just show a message that the WordPress install is already at the latest changeset.
 
-### Windows
+### Install: Windows
 
 After installing all the requirements, complete the following steps to install VIP Quickstart.
 
@@ -61,16 +55,27 @@ Note: When you run the Git installer, make sure to install Git to your system PA
 
 If you receive a File cannot be loaded because the execution of scripts is disabled on this system error. Make sure you're using a PowerShell interface. Use tools -> options to manage your default shell. (Right click on the repository and choose "Open a shell here")
 
-### Server
+## Getting Started: Remote Server / QA / Staging
+
+### Overview
+
+Quickstart can be used to set up QA / Staging servers on remote hosts as well. Note that this setup does not require Vargant or VirtualBox and has only been tested with Ubuntu 12.04.
+
+### Requirements
+
+* Ubuntu 12.04
+* Git
+* Puppet
+
+### Install
 
 1. Add user with SSH key
 2. Install Puppet and Git
 3. Clone Quickstart into `/srv`
 4. /srv/bin/vip-init --server [--domain=<domain>]
 
-Since we turn off root logins and password logins via SSH, you'll need to create another use and add an SSH key so you don't get locked out of your server. `ssh-copy-id` is useful for copying ssh keys on Linux. There are similar tools for other platforms.
+Since we turn off root logins and password logins via SSH, you'll need to create another user and add an SSH key so you don't get locked out of your server. `ssh-copy-id` is useful for copying ssh keys on Linux. There are similar tools for other platforms.
 
-This has been tested with Ubuntu 12.04.
 
 ## Usernames and Passwords
 
