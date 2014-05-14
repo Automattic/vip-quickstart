@@ -34,3 +34,5 @@ function vip_scanner_email_to() {
   // Disabled email submission.
   // return 'vip-support@wordpress.com';
 }
+
+add_filter( 'global_terms_enabled', '__return_true' );
