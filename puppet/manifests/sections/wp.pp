@@ -92,16 +92,6 @@ vcsrepo { '/srv/www/wp-content/themes/pub':
   provider => svn,
 }
 
-# Network Activate some default themes
-wp::command { 'enable_and_activate_default_theme':
-  command  => 'theme enable pub/twentyfourteen --network --activate',
-  location => '/srv/www/wp',
-  require  => [
-    Exec['wp install /srv/www/wp'],
-    Vcsrepo['/srv/www/wp-content/themes/pub'],
-  ]
-}
-
 vcsrepo { '/srv/www/wp-tests':
   ensure   => 'present',
   source   => 'http://develop.svn.wordpress.org/trunk/',
