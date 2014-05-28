@@ -30,7 +30,7 @@ class DashboardDataTable extends DashboardWidgetTable {
 	}
 
 	function display() {
-		extract( $this->_args );
+		$singular = $this->_args['singular'];
 
 ?>
 <table class="wp-list-table <?php echo implode( ' ', $this->get_table_classes() ); ?>">
