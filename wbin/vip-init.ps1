@@ -57,32 +57,6 @@ git submodule sync
 git submodule update --init --recursive
 echo ""
 
-if ( Get-Command svn -errorAction SilentlyContinue ) {
-	# =====================================
-	# Checkout the VIP shared plugins repo
-	# =====================================
-	echo "=================================="
-	echo "= Updating VIP Shared plugins"
-	echo "=================================="
-
-	if ( Test-Path "www/wp-content/themes/vip" ) {
-		svn up www/wp-content/themes/vip/plugins
-	} else {
-		mkdir -Force www/wp-content/themes/vip
-		svn co https://vip-svn.wordpress.com/plugins/ www/wp-content/themes/vip/plugins
-	}
-	echo ""
-} else {
-	$username = Read-Host 'Enter your WordPress.com username'
-	$password = Read-Host 'Enter your WordPress.com password' -AsSecureString
-
-	$env:SVN_USERNAME = $username
-	$env:SVN_PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($password));
-
-	echo ""
-}
-
-
 # =====================================
 # Start the VM (always provision, even if it's already running)
 # =====================================
