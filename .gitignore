@@ -16,6 +16,7 @@
 /www/wp-content/local-sunrise.php
 
 # tests
+Gemfile.lock
 /www/wp-tests
 
 # phpMyAdmin
