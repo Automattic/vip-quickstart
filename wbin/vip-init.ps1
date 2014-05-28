@@ -90,6 +90,7 @@ echo "=================================="
 echo "= Provisioning the VM"
 echo "=================================="
 
+vagrant reload --no-provision
 vagrant up --no-provision
 vagrant provision
 echo ""
