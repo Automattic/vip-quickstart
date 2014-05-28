@@ -368,6 +368,9 @@ class VIPThemeHelper extends Dashboard_Plugin {
 	}
 
 	function scan_vip_themes() {
+		if ( empty( $this->access_token ) )
+			return;
+
 		$request_args = array(
 			'headers' => array( 'Authorization' => 'Bearer ' . $this->access_token, ),
 		);
