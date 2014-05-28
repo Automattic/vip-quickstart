@@ -10,7 +10,7 @@ abstract class DashboardWidgetTable extends WP_List_Table {
 	}
 
 	function display() {
-		extract( $this->_args );
+		$singular = $this->_args['singular'];
 
 		$this->display_tablenav( 'top' );
 
