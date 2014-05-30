@@ -95,6 +95,9 @@ if ( ! defined( 'DOMAIN_CURRENT_SITE' ) )
 if ( ! defined( 'SUBDOMAIN_INSTALL' ) )
     define('SUBDOMAIN_INSTALL', false);
 
+if ( ! defined( 'WP_DEFAULT_THEME' ) )
+	define('WP_DEFAULT_THEME', 'pub/twentyfourteen');
+
 /* That's all, stop editing! Happy blogging. */
 
 // Use the latest Jetpack user-agent detection if we have it

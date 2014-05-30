@@ -54,16 +54,6 @@ wp::plugin { $plugins:
   ]
 }
 
-# Install default theme
-exec { '/usr/bin/wp theme install twentyfourteen':
-  cwd     => '/srv/www/wp',
-  unless  => '/usr/bin/wp theme is-installed twentyfourteen',
-  require => [
-    Exec['wp install /srv/www/wp'],
-    File['/srv/www/wp-content/themes'],
-  ]
-}
-
 # Update all the plugins
 wp::command { 'plugin update --all':
   command  => 'plugin update --all',
