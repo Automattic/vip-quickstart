@@ -13,7 +13,7 @@ function wpcom_vip_quickstart_fix_domain( $url, $path, $scheme = null, $blog_id 
 
 	$host = parse_url( $url, PHP_URL_HOST );
 
-	if ( $host == $_SERVER['HTTP_HOST'] ) {
+	if ( $host != $_SERVER['HTTP_HOST'] ) {
 		$url = str_replace( $host, $_SERVER['HTTP_HOST'], $url );
 	}
 
