@@ -62,10 +62,7 @@ wp::command { 'plugin update --all':
 }
 
 # Install WP-CLI
-class { 'wp::cli':
-  ensure  => installed,
-  version => '0.15',
-}
+class { 'wp::cli': ensure  => installed }
 
 # Make sure the themes directory exists
 file { '/srv/www/wp-content/themes': ensure => 'directory' }
