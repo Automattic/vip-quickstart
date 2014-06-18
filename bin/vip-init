@@ -38,7 +38,7 @@ IS_INSTALLED=false
 
 if [ false == $SERVER ]; then
     if [[ $QUICKSTART_PROVIDER == 'vmware_fusion' ]]; then
-        IS_INSTALLED=`vagrant --provider=vmware_fusion ssh -c 'which wp && wp core is-installed'`
+        IS_INSTALLED=`vagrant ssh -c 'which wp && wp core is-installed'`
     else
         IS_INSTALLED=`vagrant ssh -c 'which wp && wp core is-installed'`
     fi
@@ -135,7 +135,7 @@ if [ false == $SERVER ]; then
 
     vagrant reload --no-provision
     vagrant up --no-provision --provider="$QUICKSTART_PROVIDER"
-    vagrant provision --provider="$QUICKSTART_PROVIDER"
+    vagrant provision
 elif [[ -n "$QUICKSTART_DOMAIN" ]]; then
     export FACTER_quickstart_domain="$QUICKSTART_DOMAIN"
 
