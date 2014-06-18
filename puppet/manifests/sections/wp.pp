@@ -8,6 +8,7 @@ $plugins = [
   'log-viewer',
   'monster-widget',
   'user-switching',
+  'wordpress-importer',
 
   # WordPress.com
   'keyring',
