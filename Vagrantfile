@@ -11,11 +11,11 @@ end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  config.vm.box = "saucy-1310-virtualbox"
-  config.vm.box_url = "https://vagrantcloud.com/puppetlabs/ubuntu-13.10-64-puppet/version/2/provider/virtualbox.box"
+  config.vm.box = "precise32"
+  config.vm.box_url = "http://files.vagrantup.com/precise32.box"
   config.vm.provider "vmware_fusion" do |v, override|
-    override.vm.box = "saucy-1310-vmware"
-    override.vm.box_url = "https://vagrantcloud.com/puppetlabs/ubuntu-13.10-64-puppet/version/2/provider/vmware_fusion.box"
+    override.vm.box = "precise64-vmware"
+    override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
   end
   config.vm.hostname = ENV['QUICKSTART_DOMAIN']
   config.vm.network :private_network, ip: "10.86.73.80"
