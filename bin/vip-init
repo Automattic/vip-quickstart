@@ -37,11 +37,7 @@ done
 IS_INSTALLED=false
 
 if [ false == $SERVER ]; then
-    if [[ $QUICKSTART_PROVIDER == 'vmware_fusion' ]]; then
-        IS_INSTALLED=`vagrant ssh -c 'which wp && wp core is-installed'`
-    else
-        IS_INSTALLED=`vagrant ssh -c 'which wp && wp core is-installed'`
-    fi
+    IS_INSTALLED=`vagrant ssh -c 'which wp && wp core is-installed'`
 else
     IS_INSTALLED=`which wp && wp core is-installed`
 fi
