@@ -1,6 +1,8 @@
 $tools = [
-    'vim',
     'ack-grep',
+    'vim',
+    'unzip',
+    'zip',
 ]
 
 package { $tools: }
