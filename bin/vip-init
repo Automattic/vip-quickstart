@@ -21,6 +21,9 @@ case $i in
     --domain=*)
         QUICKSTART_DOMAIN=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
     ;;
+    --provider=*)
+        QUICKSTART_PROVIDER=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
     *)
         # unknown option
     ;;
@@ -56,12 +59,22 @@ echo '
 # Check for requirements
 # =====================================
 if [ false == $SERVER ]; then
-    if [[ ! `which git` || ! `which vagrant` || ! `which VBoxManage` ]]; then
-        echo "Please install the requirements"
-        echo "* Git"
-        echo "* Vagrant"
-        echo "* VirtualBox"
-        exit 1
+    if [[ $QUICKSTART_PROVIDER == 'vmware_fusion' ]]; then
+        if [[ ! `which git` || ! `which vagrant` || ! `vagrant plugin list | grep vagrant-vmware-fusion` ]]; then
+            echo "Please install the requirements"
+            echo "* Git"
+            echo "* Vagrant"
+            echo "* VMWare Fusion with Vagrant provider"
+            exit 1
+        fi
+    else
+        if [[ ! `which git` || ! `which vagrant` || ! `which VBoxManage` ]]; then
+            echo "Please install the requirements"
+            echo "* Git"
+            echo "* Vagrant"
+            echo "* VirtualBox"
+            exit 1
+        fi
     fi
 else
     if [[ ! `which git` || ! `which puppet` ]]; then
@@ -117,7 +130,7 @@ if [ false == $SERVER ]; then
     [[ -n $QUICKSTART_DOMAIN ]] && export QUICKSTART_DOMAIN="$QUICKSTART_DOMAIN"
 
     vagrant reload --no-provision
-    vagrant up --no-provision
+    vagrant up --no-provision --provider="$QUICKSTART_PROVIDER"
     vagrant provision
 elif [[ -n "$QUICKSTART_DOMAIN" ]]; then
     export FACTER_quickstart_domain="$QUICKSTART_DOMAIN"
