@@ -11,6 +11,7 @@ cd $DIR
 # Setup command line flags
 # =====================================
 SERVER=false
+QUICKSTART_PROVIDER='virtualbox'
 
 for i in "$@"
 do
