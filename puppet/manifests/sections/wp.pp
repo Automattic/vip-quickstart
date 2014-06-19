@@ -4,6 +4,7 @@ $plugins = [
   'debug-bar-cron',
   'debug-bar-extender',
   'debug-bar-slow-actions',
+  'debug-bar-remote-requests',
   'log-deprecated-notices',
   'log-viewer',
   'monster-widget',
