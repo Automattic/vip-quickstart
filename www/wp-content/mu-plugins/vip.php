@@ -21,3 +21,22 @@ function vip_scanner_email_to() {
   // Disabled email submission.
   // return 'vip-support@wordpress.com';
 }
+
+// Change the default password, yo
+add_action( 'admin_notices', function() {
+	$current_user = wp_get_current_user();
+
+	if ( 'wordpress' != $current_user->user_login )
+		return;
+
+	if ( ! wp_check_password( 'wordpress', $current_user->user_pass, $current_user->ID ) )
+		return;
+
+	?>
+
+	<div class="error">
+        <p><?php _e( '<strong>Warning:</strong> Change the default password.' ); ?></p>
+    </div>
+
+	<?php
+});
