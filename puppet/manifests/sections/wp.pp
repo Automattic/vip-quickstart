@@ -99,7 +99,7 @@ file { '/srv/www/wp-content/plugins': ensure => 'directory' }
 
 # VCS Checkout
 vcsrepo { '/srv/www/wp':
-  ensure   => 'present',
+  ensure   => latest,
   source   => 'http://core.svn.wordpress.org/trunk/',
   provider => svn,
 }
@@ -110,7 +110,7 @@ repomonitor_repo { '/srv/www/wp':
 }
 
 vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
-  ensure   => 'present',
+  ensure   => latest,
   source   => 'https://vip-svn.wordpress.com/plugins/',
   provider => svn,
 }
@@ -121,7 +121,7 @@ repomonitor_repo { '/srv/www/wp-content/themes/vip/plugins':
 }
 
 vcsrepo { '/srv/www/wp-content/themes/pub':
-  ensure   => 'present',
+  ensure   => latest,
   source   => 'https://wpcom-themes.svn.automattic.com/',
   provider => svn,
 }
@@ -132,7 +132,7 @@ repomonitor_repo { '/srv/www/wp-content/themes/pub':
 }
 
 vcsrepo { '/srv/www/wp-tests':
-  ensure   => 'present',
+  ensure   => latest,
   source   => 'http://develop.svn.wordpress.org/trunk/',
   provider => svn,
 }
