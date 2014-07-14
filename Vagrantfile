@@ -9,6 +9,19 @@ if `vagrant --version` < 'Vagrant 1.5.0'
     abort('Your Vagrant is too old. Please install at least 1.5.0')
 end
 
+# Aquire the Ip Address of the Host Machine
+require 'socket'
+def local_ip
+  orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true  # turn off reverse DNS resolution temporarily
+
+  UDPSocket.open do |s|
+    s.connect '64.233.187.99', 1
+    s.addr.last
+  end
+ensure
+  Socket.do_not_reverse_lookup = orig
+end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = "precise32"
@@ -37,6 +50,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     puppet.options = ['--templatedir', '/vagrant/puppet/files']
     puppet.facter = {
       "quickstart_domain" => ENV['QUICKSTART_DOMAIN'],
+      "svn_version" => ENV['SVN_VERSION'],
+      "host_ip_address" => local_ip
     }
   end
 

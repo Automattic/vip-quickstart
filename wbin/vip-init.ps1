@@ -46,6 +46,19 @@ $env:QUICKSTART_DOMAIN = $quickstart_domain
 echo ""
 
 # =====================================
+# Request Version of SVN to use
+# =====================================
+$svn_version = Read-Host 'What version of svn would you like to use? [1.8.*]'
+
+if (-Not $svn_version) {
+    $svn_version = '1.8.*'
+}
+
+$env:SVN_VERSION = $svn_version
+
+echo ""
+
+# =====================================
 # Automatically update the repo
 # =====================================
 echo "=================================="
