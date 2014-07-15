@@ -71,6 +71,25 @@ git submodule update --init --recursive
 echo ""
 
 # =====================================
+# SVN Cleanup Before Provisioning
+# =====================================
+
+svn cleanup .\www\wp
+svn cleanup .\www\wp-content\themes\vip\plugins
+svn cleanup .\www\wp-content\themes\pub
+svn cleanup .\www\wp-tests
+
+svn up .\www\wp
+svn up .\www\wp-content\themes\vip\plugins
+svn up .\www\wp-content\themes\pub
+svn up .\www\wp-tests
+
+svn cleanup .\www\wp
+svn cleanup .\www\wp-content\themes\vip\plugins
+svn cleanup .\www\wp-content\themes\pub
+svn cleanup .\www\wp-tests
+
+# =====================================
 # Start the VM (always provision, even if it's already running)
 # =====================================
 echo "=================================="
