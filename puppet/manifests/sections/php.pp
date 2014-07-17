@@ -67,7 +67,6 @@ class php::extension::xdebug::params {
   $provider    = undef
   $inifile     = '/etc/php5/conf.d/xdebug.ini'
   $settings = {
-    remove => '.anon/zend_extension',
     set => {
       '.anon/xdebug.collect_includes' => 1,
       '.anon/xdebug.collect_params' => 1,
@@ -85,4 +84,12 @@ class php::extension::xdebug::params {
       '.anon/xdebug.var_display_max_depth' => -1,
     }
   }
+}
+
+# Turn Xdebug Off
+exec { "turn-xdebug-off":
+  command  => "php5dismod xdebug"
+}
+exec { "restart-php5-fpm":
+  command  => "service php5-fpm restart"
 }
