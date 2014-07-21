@@ -25,6 +25,7 @@ class updates {
 user { 'vagrant':
     ensure => 'present',
     system => true,
+    shell  => '/bin/bash',
     notify => Service['php5-fpm'],
 }
 
