@@ -59,3 +59,37 @@ exec { 'html_errors = On':
   user    => root,
   notify  => Service['php5-fpm']
 }
+
+# Xdebug Remote Configuration
+class php::extension::xdebug::params {
+  $ensure      = $php::params::ensure
+  $package     = 'php5-xdebug'
+  $provider    = undef
+  $inifile     = '/etc/php5/conf.d/xdebug.ini'
+  $settings = {
+    set => {
+      '.anon/xdebug.collect_includes' => 1,
+      '.anon/xdebug.collect_params' => 1,
+      '.anon/xdebug.dump_globals' => 1,
+      '.anon/xdebug.idekey' => "VIPDEBUG",
+      '.anon/xdebug.profiler_enable_trigger' => 1,
+      '.anon/xdebug.profiler_output_name' => "cachegrind.out.%t-%s",
+      '.anon/xdebug.remote_host' => "${host_ip_address}",
+      '.anon/xdebug.remote_autostart' => 1,
+      '.anon/xdebug.remote_enable' => 1,
+      '.anon/xdebug.remote_log' => "/tmp/xdebug-remote.log",
+      '.anon/xdebug.remote_port' => 9000,
+      '.anon/xdebug.var_display_max_children' => -1,
+      '.anon/xdebug.var_display_max_data' => -1,
+      '.anon/xdebug.var_display_max_depth' => -1,
+    }
+  }
+}
+
+# Turn Xdebug Off
+exec { "turn-xdebug-off":
+  command  => "php5dismod xdebug"
+}
+exec { "restart-php5-fpm":
+  command  => "service php5-fpm restart"
+}
