@@ -46,19 +46,6 @@ $env:QUICKSTART_DOMAIN = $quickstart_domain
 echo ""
 
 # =====================================
-# Request Version of SVN to use
-# =====================================
-$svn_version = Read-Host 'What version of svn would you like to use? [1.8.*]'
-
-if (-Not $svn_version) {
-    $svn_version = '1.8.*'
-}
-
-$env:SVN_VERSION = $svn_version
-
-echo ""
-
-# =====================================
 # Automatically update the repo
 # =====================================
 echo "=================================="
@@ -69,25 +56,6 @@ git pull
 git submodule sync
 git submodule update --init --recursive
 echo ""
-
-# =====================================
-# SVN Cleanup Before Provisioning
-# =====================================
-
-svn cleanup .\www\wp
-svn cleanup .\www\wp-content\themes\vip\plugins
-svn cleanup .\www\wp-content\themes\pub
-svn cleanup .\www\wp-tests
-
-svn up .\www\wp
-svn up .\www\wp-content\themes\vip\plugins
-svn up .\www\wp-content\themes\pub
-svn up .\www\wp-tests
-
-svn cleanup .\www\wp
-svn cleanup .\www\wp-content\themes\vip\plugins
-svn cleanup .\www\wp-content\themes\pub
-svn cleanup .\www\wp-tests
 
 # =====================================
 # Start the VM (always provision, even if it's already running)
