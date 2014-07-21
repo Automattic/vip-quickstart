@@ -37,6 +37,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     puppet.options = ['--templatedir', '/vagrant/puppet/files']
     puppet.facter = {
       "quickstart_domain" => ENV['QUICKSTART_DOMAIN'],
+      "svn_version" => ENV['SVN_VERSION'],
     }
   end
 
