@@ -1,6 +1,6 @@
 .quickstart-dashboard-widgets-wrap #dashboard-widgets .hndle a.widget_update {
 	text-decoration: none;
-	display: inline-block;
+	display: inline;
 	cursor:pointer;
 }
 
