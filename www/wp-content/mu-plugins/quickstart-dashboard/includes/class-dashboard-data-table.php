@@ -8,7 +8,7 @@ class DashboardDataTable extends DashboardWidgetTable {
 
 	private $columns = array();
 	private $escape_output = true;
-	private $show_check_column = true;
+	private $show_check_column = false;
 
 	function __construct( $cols, $items ) {
 		$this->items = $items;
