@@ -619,7 +619,6 @@ class ThemeHelperWidgetTable extends DashboardWidgetTable {
 	}
 
 	function prepare_items() {
-		$per_page = 10;
 		$columns = $this->get_columns();
 		$hidden = array();
 		$sortable = $this->get_sortable_columns();
@@ -648,10 +647,5 @@ class ThemeHelperWidgetTable extends DashboardWidgetTable {
 			$total_items += 1;
 		}
 
-		$this->set_pagination_args( array(
-			'total_items' => $total_items,
-			'per_page'    => $per_page,
-			'total_pages' => ceil($total_items/$per_page),
-		) );
 	}
 }
