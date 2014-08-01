@@ -19,3 +19,7 @@ function wpcom_vip_quickstart_fix_domain( $url, $path, $scheme = null, $blog_id 
 
 	return $url;
 }
+
+// Required to prevent infinite loop redirections from /wp-admin/network when the domain does not match 
+// what is in the DB, for example, in the AWS AMI
+add_filter( 'redirect_network_admin_request', '__return_false' );
