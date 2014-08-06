@@ -1,5 +1,8 @@
 <?php
 
+require __DIR__ . '/http-concat/cssconcat.php';
+require __DIR__ . '/http-concat/jsconcat.php';
+
 // Add X-hacker header
 add_action( 'send_headers', function() {
 	header( "X-hacker: If you're reading this, you should visit automattic.com/jobs and apply to join the fun, mention this header." );
