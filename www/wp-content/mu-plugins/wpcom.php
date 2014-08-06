@@ -23,3 +23,9 @@ add_filter( 'global_terms_enabled', '__return_true' );
 add_filter( 'intermediate_image_sizes', function() {
     return array();
 });
+
+// Check alloptions on every pageload
+add_action( 'init', function() {
+    $alloptions = wp_cache_get( 'alloptions', 'options' );
+    $alloptions = apply_filters( 'alloptions', $alloptions );
+});
