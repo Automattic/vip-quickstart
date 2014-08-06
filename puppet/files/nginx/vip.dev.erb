@@ -11,6 +11,15 @@ server {
  
   index index.html index.php;
  
+
+  # Don't try to rewrite static assets
+  # Just return 404
+  # The reason is pretty simple: each 404'd asset will try to pass that to WP
+  # Spawning a bunch of requests that you probably don't want and making things SLOOOOOOOW
+  location ~ \.(png|jpg|css|js)$ {
+    try_files $uri return 404;
+  }
+
   location / {
     try_files $uri $uri/ /index.php?$args;
   }
