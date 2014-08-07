@@ -1,7 +1,7 @@
 # GitPlugin clones a git repo into the www/wp-content/plugins directory and activates it in WordPress
 define gitplugin ( $git_urls ) {
     vcsrepo { "/srv/www/wp-content/plugins/${title}" :
-        ensure   => 'present',
+        ensure   => latest,
         source   => $git_urls[$title],
         provider => git,
         require  => [
@@ -10,9 +10,14 @@ define gitplugin ( $git_urls ) {
         ]
     }
 
-    wp::plugin { $title :
-        location    => '/srv/www/wp',
-        networkwide => true,
-        require     => Vcsrepo["/srv/www/wp-content/plugins/${title}"]
+    exec { "wp plugin activate ${title} --network":
+        command => "/usr/bin/wp plugin activate ${title} --network",
+        cwd     => '/srv/www/wp',
+        unless  => "/usr/bin/wp plugin is-installed ${title}",
+        onlyif  => '/usr/bin/wp core is-installed',
+        require => [
+            Class['wp::cli'],
+            Vcsrepo["/srv/www/wp-content/plugins/${title}"],
+        ],
     }
 }
