@@ -41,7 +41,6 @@ class Quickstart_Dashboard {
 
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ) );
 
-		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
@@ -54,9 +53,6 @@ class Quickstart_Dashboard {
 		}
 
 		do_action( 'quickstart_dashboard_loaded' );
-	}
-
-	function init() {
 	}
 
 	function admin_init() {
