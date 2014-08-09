@@ -9,7 +9,7 @@ Version: 1.2
 */
 
 // Do not load if our advanced-cache.php isn't loaded
-if ( ! isset( $batcache ) || ! is_object($batcache) || ! method_exists( $wp_object_cache, 'incr' ) )
+if ( ! is_object($batcache) || ! method_exists( $wp_object_cache, 'incr' ) )
 	return;
 
 $batcache->configure_groups();
@@ -26,7 +26,7 @@ function batcache_post($post_id) {
 	global $batcache;
 
 	$post = get_post($post_id);
-	if ( $post->post_type == 'revision' || get_post_status($post_id) != 'publish' )
+	if ( empty( $post ) || $post->post_type == 'revision' || get_post_status($post_id) != 'publish' )
 		return;
 
 	batcache_clear_url( get_option('home') );
@@ -42,3 +42,4 @@ function batcache_clear_url($url) {
 	wp_cache_add("{$url_key}_version", 0, $batcache->group);
 	return wp_cache_incr("{$url_key}_version", 1, $batcache->group);
 }
+
