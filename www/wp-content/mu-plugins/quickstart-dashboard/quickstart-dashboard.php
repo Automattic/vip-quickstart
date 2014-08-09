@@ -24,10 +24,7 @@ class Quickstart_Dashboard {
 	private $wpcom_access_token = '';
 	private $show_wpcom_access_notice = true;
 
-	private $wpcom_api_endpoints = array(
-		'authorize' => 'https://public-api.wordpress.com/oauth2/authorize',
-		'token'	    => 'https://public-api.wordpress.com/oauth2/token',
-	);
+	private $wpcom_api_endpoint = 'https://public-api.wordpress.com/oauth2/token';
 	
 	/**
 	 *
@@ -41,7 +38,7 @@ class Quickstart_Dashboard {
 
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ) );
 
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_init', array( $this, 'oauth_flow' ) );
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'admin_notices', array( $this, 'show_admin_notices' ) );
@@ -55,117 +52,8 @@ class Quickstart_Dashboard {
 		do_action( 'quickstart_dashboard_loaded' );
 	}
 
-	function admin_init() {
-		// Check if this user just submitted the dashboard credentials form
-		if ( isset( $_POST['dashboard-credentials-save-and-connect'] ) ) {
-			check_admin_referer( 'dashboard-credentials' );
-			if ( !current_user_can( 'manage_options' ) ) {
-				wp_die( 'You do not have sufficient permissions to access this page.' );
-			}
-			
-			// Alphanumeric characters and digits allowed in client secret.
-			$secret_valid = preg_match( '/\A[a-z0-9]+\z/i', $_POST['oauth-client-secret'] );
-			$id_valid = preg_match( '/\A[0-9]+\z/', $_POST['oauth-client-id'] );
-			
-			if ( $secret_valid && $id_valid ) {
-				// Save the enterred credentials
-				$this->set_wpcom_client_id( intval( $_POST['oauth-client-id'] ) );
-				$this->set_wpcom_client_secret( $_POST['oauth-client-secret'] );
-				
-				// Redirect the user to the auth page
-				wp_redirect( $this->get_wpcom_authorization_url() );
-			} elseif ( !$secret_valid ) {
-				?>
-				<div class="error"><p><?php _e( 'The Client Secret you entered is invalid. Client IDs may contain only alphanumerical digits.' ); ?></p></div>
-				<?php
-			} else {
-				?>
-				<div class="error"><p><?php _e( 'The Client ID you entered is invalid. Client IDs may contain only numerical digits.' ); ?></p></div>
-				<?php
-			}
-		}
-		
-		// Check if we're supposed to be connecting
-		if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'vip-dashboard'  ) {
-			// Check for the args to connect to WP.com
-			if ( isset( $_REQUEST['dashboard_wpcom_connect'] ) && $_REQUEST['dashboard_wpcom_connect'] ) {
-				wp_redirect( $this->get_wpcom_authorization_url() );
-				exit;
-			}
-
-			// Check for the authorization info from wp.com
-			if ( isset( $_REQUEST['dashboard_auth'] ) && $_REQUEST['dashboard_auth'] ) {
-				$this->do_wpcom_auth_flow();
-			}
-		}
-	}
-
 	function admin_footer_text( $text ) {
 		return '<span id="footer-thankyou">' . __( 'Thank you for creating with <a href="http://wordpress.org/">WordPress</a> and <a href="https://vip.wordpress.com/">WordPress.com VIP</a>.' ) . '</span>';
-	}
-
-	function do_wpcom_auth_flow() {
-		if ( !wp_verify_nonce( $_REQUEST['_qsnonce'], 'dashboard_wpcom_connect' ) ) {
-			wp_nonce_ays( 'dashboard_wpcom_connect' );
-		}
-
-		if ( isset( $_REQUEST['error'] ) ) {
-			?>
-			<div class="error"><p><?php _e( 'Error: You did not authorize Quickstart with WordPress.com VIP.', 'quickstart-dashboard' ); ?></p></div>
-			<?php
-
-			return;
-		}
-
-		if ( !isset( $_REQUEST['code'] ) ) {
-			?>
-			<div class="error"><p><?php _e( 'Error: Code missing from request.', 'quickstart-dashboard' ); ?></p></div>
-			<?php
-
-			return;
-		}
-
-		// Go ahead and get the access token
-		$request_args = array(
-			'body' => array(
-				'client_id' => urlencode( $this->get_wpcom_client_id() ),
-				'redirect_uri' => $this->get_wpcom_redirect_uri(),
-				'client_secret' => urlencode( $this->get_wpcom_client_secret() ),
-				'code' => urlencode( $_GET['code'] ),
-				'grant_type' => 'authorization_code',
-			)
-		);
-
-		$auth = wp_remote_post( $this->wpcom_api_endpoints['token'], $request_args );
-
-		if ( is_wp_error( $auth ) ) {
-			?>
-			<div class="error"><p><?php echo esc_html( sprintf( __( 'An error occured retrieving the access token from WordPress.com: %s', 'quickstart-dashboard' ), $auth->get_error_message() ) ); ?></p></div>
-			<?php
-
-			return;
-		}
-
-		$secret = json_decode( $auth['body'] );
-		
-		if ( !isset( $secret->access_token ) ) {
-			?>
-			<div class="error">
-				<p><?php _e( 'An error occured retrieving the access token from WordPress.com. The data received was: ', 'quickstart-dashboard' ); ?></p>
-				<pre><?php echo esc_html( $auth['body'] ); ?></pre>
-			</div>
-			<?php
-
-			return;
-		}
-		
-		$access_key = $secret->access_token;
-
-		?>
-		<div class="updated"><p><?php printf( __( 'Successfully connected to WordPress.com.', 'quickstart-dashboard' ), $access_key ); ?></p></div>
-		<?php
-
-		$this->set_wpcom_access_token( $access_key );
 	}
 
 	function admin_enqueue_scripts() {
@@ -210,6 +98,9 @@ class Quickstart_Dashboard {
 	}
 	
 	function dashboard_credentials_page() {
+		if ( ! empty( $this->wpcom_access_token ) )
+			wp_redirect( admin_url() );
+
 		if ( !current_user_can( 'manage_options' ) ) {
 			wp_die( 'You do not have sufficient permissions to access this page.' );
 		}
@@ -224,13 +115,25 @@ class Quickstart_Dashboard {
 			<form action="<?php menu_page_url( 'dashboard-credentials' ); ?>" method="POST">
 				<?php wp_nonce_field( 'dashboard-credentials' ); ?>
 				<table class="form-table">
+					<?php if ( ! self::hardcoded_client_id() ): ?>
 					<tr>
 						<th scope="row"><label for="oauth-client-id"><?php _e( 'Client ID', 'quickstart-dashboard' ) ?></label></th>
 						<td><input type="text" id="oauth-client-id" name="oauth-client-id" value="<?php echo esc_attr( $this->get_wpcom_client_id() ); ?>" /></td>
 					</tr>
+					<?php endif; ?>
+					<?php if ( ! self::hardcoded_client_secret() ): ?>
 					<tr>
 						<th scope="row"><label for="oauth-client-secret"><?php _e( 'Client Secret', 'quickstart-dashboard' ) ?></label></th>
-						<td><input type="text" id="oauth-client-secret" name="oauth-client-secret" value="<?php echo esc_attr( $this->get_wpcom_client_secret() ); ?>" /></td>
+						<td><input type="password" id="oauth-client-secret" name="oauth-client-secret" value="<?php echo esc_attr( $this->get_wpcom_client_secret() ); ?>" /></td>
+					</tr>
+					<?php endif; ?>
+					<tr>
+						<th scope="row"><label for="wpcom_username"><?php _e( 'WordPress.com Username', 'quickstart-dashboard' ) ?></label></th>
+						<td><input type="text" id="wpcom_username" name="wpcom_username" /></td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="wpcom_password"><?php _e( 'WordPress.com Password', 'quickstart-dashboard' ) ?></label></th>
+						<td><input type="password" id="wpcom_password" name="wpcom_password" /></td>
 					</tr>
 				</table>
 				<p>
@@ -240,6 +143,47 @@ class Quickstart_Dashboard {
 			</form>
 		</div>
 		<?php
+	}
+
+	function oauth_flow() {
+		if ( ! empty( $this->wpcom_access_token ) )
+			return;
+
+		if ( ! isset( $_POST['dashboard-credentials-save-and-connect'] ) )
+			return;
+
+		check_admin_referer( 'dashboard-credentials' );
+
+		if ( isset( $_POST['oauth-client-id'] ) )
+			$this->set_wpcom_client_id( sanitize_text_field( $_POST['oauth-client-id'] ) );
+
+		if ( isset( $_POST['oauth-client-secret'] ) )
+			$this->set_wpcom_client_secret( sanitize_text_field( $_POST['oauth-client-secret'] ) );
+
+		$request_args = array(
+			'body' => array(
+				'client_id' => urlencode( $this->get_wpcom_client_id() ),
+				'client_secret' => urlencode( $this->get_wpcom_client_secret() ),
+				'grant_type' => 'password',
+				'username' => $_POST['wpcom_username'],
+				'password' => $_POST['wpcom_password'],
+			)
+		);
+
+		$auth = wp_remote_post( $this->wpcom_api_endpoint, $request_args );
+
+		$response_code = $auth['response']['code'];
+		$auth = json_decode( $auth['body'] );
+
+		if ( 200 != $response_code ) {
+			var_dump( $auth );
+			exit;
+		}
+
+		if ( ! isset( $auth->access_token ) )
+			wp_die( 'No token?' );
+
+		$this->set_wpcom_access_token( $auth->access_token );
 	}
 
 	function show_admin_notices() {
@@ -290,16 +234,12 @@ class Quickstart_Dashboard {
 		return add_query_arg( $query_args, menu_page_url( 'vip-dashboard', false ) );
 	}
 
-	function get_wpcom_authorization_url() {
-		return add_query_arg( array(
-			'client_id'		=> urlencode( $this->get_wpcom_client_id() ),
-			'redirect_uri'  => urlencode( $this->get_wpcom_redirect_uri() ),
-			'response_type' => 'code',
-		), $this->wpcom_api_endpoints['authorize'] );
-	}
-	
 	function get_wpcom_client_id() {
-		$id = get_option( 'dashboard_wpcom_client_id', defined( 'DASHBOARD_WP_CLIENT_ID' ) ? DASHBOARD_WP_CLIENT_ID : '' );
+		if ( self::hardcoded_client_id() )
+			$id = self::hardcoded_client_id();
+		else
+			$id = get_option( 'dashboard_wpcom_client_id' );
+
 		return (string) apply_filters( 'dashboard_wpcom_client_id', $id );
 	}
 	
@@ -308,7 +248,11 @@ class Quickstart_Dashboard {
 	}
 	
 	function get_wpcom_client_secret() {
-		$secret = get_option( 'dashboard_wpcom_client_secret', defined( 'DASHBOARD_WP_CLIENT_SECRET' ) ? DASHBOARD_WP_CLIENT_SECRET : '' );
+		if ( self::hardcoded_client_secret() )
+			$secret = self::hardcoded_client_secret();
+		else
+			$secret = get_option( 'dashboard_wpcom_client_secret' );
+
 		return (string) apply_filters( 'dashboard_wpcom_client_secret', $secret );
 	}
 	
@@ -316,6 +260,19 @@ class Quickstart_Dashboard {
 		update_option( 'dashboard_wpcom_client_secret', $secret );
 	}
 
+	static function hardcoded_client_id() {
+		if ( defined( 'DASHBOARD_WP_CLIENT_ID' ) )
+			return DASHBOARD_WP_CLIENT_ID;
+
+		return false;
+	}
+
+	static function hardcoded_client_secret() {
+		if ( defined( 'DASHBOARD_WP_CLIENT_SECRET' ) )
+			return DASHBOARD_WP_CLIENT_SECRET;
+
+		return false;
+	}
 	/**
 	 * Gets the current Quickstart_Dashboard instance.
 	 * @return Quickstart_Dashboard
