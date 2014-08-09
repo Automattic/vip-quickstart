@@ -19,9 +19,7 @@ require_once( dirname( __FILE__ ) . '/includes/class-dashboard-data-table.php' )
 
 class Quickstart_Dashboard {
 
-	private static $instance;
-	
-	private $wpcom_access_token = '';
+	private $wpcom_access_token;
 	private $show_wpcom_access_notice = true;
 
 	private $wpcom_api_endpoint = 'https://public-api.wordpress.com/oauth2/token';
@@ -33,9 +31,7 @@ class Quickstart_Dashboard {
 	private $plugins = array();
 
 	function __construct() {
-		// Load the WP.com access token
-		$this->wpcom_access_token = get_option( 'qs_dashboard_wpcom_access_token', '' );
-
+		$this->wpcom_access_token = self::get_wpcom_access_token();
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ) );
 
 		add_action( 'admin_init', array( $this, 'oauth_flow' ) );
@@ -118,13 +114,13 @@ class Quickstart_Dashboard {
 					<?php if ( ! self::hardcoded_client_id() ): ?>
 					<tr>
 						<th scope="row"><label for="oauth-client-id"><?php _e( 'Client ID', 'quickstart-dashboard' ) ?></label></th>
-						<td><input type="text" id="oauth-client-id" name="oauth-client-id" value="<?php echo esc_attr( $this->get_wpcom_client_id() ); ?>" /></td>
+						<td><input type="text" id="oauth-client-id" name="oauth-client-id" value="<?php echo esc_attr( self::get_wpcom_client_id() ); ?>" /></td>
 					</tr>
 					<?php endif; ?>
 					<?php if ( ! self::hardcoded_client_secret() ): ?>
 					<tr>
 						<th scope="row"><label for="oauth-client-secret"><?php _e( 'Client Secret', 'quickstart-dashboard' ) ?></label></th>
-						<td><input type="password" id="oauth-client-secret" name="oauth-client-secret" value="<?php echo esc_attr( $this->get_wpcom_client_secret() ); ?>" /></td>
+						<td><input type="password" id="oauth-client-secret" name="oauth-client-secret" value="<?php echo esc_attr( self::get_wpcom_client_secret() ); ?>" /></td>
 					</tr>
 					<?php endif; ?>
 					<tr>
@@ -162,8 +158,8 @@ class Quickstart_Dashboard {
 
 		$request_args = array(
 			'body' => array(
-				'client_id' => urlencode( $this->get_wpcom_client_id() ),
-				'client_secret' => urlencode( $this->get_wpcom_client_secret() ),
+				'client_id' => urlencode( self::get_wpcom_client_id() ),
+				'client_secret' => urlencode( self::get_wpcom_client_secret() ),
 				'grant_type' => 'password',
 				'username' => $_POST['wpcom_username'],
 				'password' => $_POST['wpcom_password'],
@@ -187,14 +183,14 @@ class Quickstart_Dashboard {
 	}
 
 	function show_admin_notices() {
-		if ( $this->show_wpcom_access_notice && ( !$this->has_oauth_credentials() || empty( $this->wpcom_access_token ) ) ) {
+		if ( $this->show_wpcom_access_notice && ( ! self::has_oauth_credentials() || empty( $this->wpcom_access_token ) ) ) {
 			echo '<div class="error"><p>' . $this->get_connect_wpcom_message() . '</p></div>';
 		}
 	}
 	
-	function get_connect_wpcom_message() {
+	static function get_connect_wpcom_message() {
 		// Check whether we need credentials or just need to be connected
-		if ( !$this->has_oauth_credentials() ) {
+		if ( ! self::has_oauth_credentials() ) {
 			$connect_url = menu_page_url( 'dashboard-credentials', false );
 		} else {
 			$connect_url = add_query_arg( array( 'dashboard_wpcom_connect' => true ), menu_page_url( 'vip-dashboard', false ) );
@@ -203,9 +199,9 @@ class Quickstart_Dashboard {
 		return sprintf( __( 'Please <a href="%s">connect Quickstart</a> with WordPress.com VIP to enable enhanced features.', 'quickstart-dashboard' ), $connect_url );
 	}
 	
-	function has_oauth_credentials() {
-		$client_id = $this->get_wpcom_client_id();
-		$client_secret = $this->get_wpcom_client_secret();
+	static function has_oauth_credentials() {
+		$client_id = self::get_wpcom_client_id();
+		$client_secret = self::get_wpcom_client_secret();
 		
 		return !empty( $client_id ) && !empty( $client_secret );
 	}
@@ -219,8 +215,8 @@ class Quickstart_Dashboard {
 		$this->set_wpcom_access_token( '' );
 	}
 
-	function get_wpcom_access_token() {
-		return $this->wpcom_access_token;
+	static function get_wpcom_access_token() {
+		return get_option( 'qs_dashboard_wpcom_access_token' );
 	}
 
 	function get_wpcom_redirect_uri() {
@@ -234,7 +230,7 @@ class Quickstart_Dashboard {
 		return add_query_arg( $query_args, menu_page_url( 'vip-dashboard', false ) );
 	}
 
-	function get_wpcom_client_id() {
+	static function get_wpcom_client_id() {
 		if ( self::hardcoded_client_id() )
 			$id = self::hardcoded_client_id();
 		else
@@ -247,7 +243,7 @@ class Quickstart_Dashboard {
 		update_option( 'dashboard_wpcom_client_id', $client_id );
 	}
 	
-	function get_wpcom_client_secret() {
+	static function get_wpcom_client_secret() {
 		if ( self::hardcoded_client_secret() )
 			$secret = self::hardcoded_client_secret();
 		else
@@ -272,18 +268,6 @@ class Quickstart_Dashboard {
 			return DASHBOARD_WP_CLIENT_SECRET;
 
 		return false;
-	}
-	/**
-	 * Gets the current Quickstart_Dashboard instance.
-	 * @return Quickstart_Dashboard
-	 */
-	static function get_instance() {
-		if ( ! isset( self::$instance ) ) {
-			$class_name = __CLASS__;
-			self::$instance = new $class_name;
-		}
-		
-		return self::$instance;
 	}
 
 	function get_plugins() {
@@ -359,4 +343,4 @@ class Quickstart_Dashboard {
 }
 
 // Bootsrap the dashboard
-Quickstart_Dashboard::get_instance();
+new Quickstart_Dashboard;

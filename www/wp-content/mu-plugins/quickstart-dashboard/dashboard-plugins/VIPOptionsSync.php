@@ -119,7 +119,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 			}
 		}
 
-		$access_token = Quickstart_Dashboard::get_instance()->get_wpcom_access_token();
+		$access_token = Quickstart_Dashboard::get_wpcom_access_token();
 		if ( empty( $access_token ) ) {
 			// Show an error message if we aren't connected to wp.com
 			$show_main_ui = false;
@@ -194,7 +194,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 
 		// Everything looks in order. Make the request
 		$request_args = array(
-			'headers' => array( 'Authorization' => 'Bearer ' . Quickstart_Dashboard::get_instance()->get_wpcom_access_token(), ),
+			'headers' => array( 'Authorization' => 'Bearer ' . Quickstart_Dashboard::get_wpcom_access_token(), ),
 		);
 
 		$base_url = add_query_arg( array( 'destination_url' => site_url(), ), $this->wpcom_endpoints['vip-sites'] . "/{$package_info['site']}/clone" );
