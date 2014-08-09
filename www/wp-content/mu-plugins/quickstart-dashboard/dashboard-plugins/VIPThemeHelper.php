@@ -42,7 +42,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 			$table->display(); 
 		} else {
 			// No access token, print a message
-			echo '<p>' . Quickstart_Dashboard::get_instance()->get_connect_wpcom_message() . '</p>';
+			echo '<p>' . Quickstart_Dashboard::get_connect_wpcom_message() . '</p>';
 		}
 	}
 
@@ -70,7 +70,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		add_action( 'wp_ajax_vipthemehelpher_update_themes', array( $this, 'ajax_update_themes' ) );
 
 		// If we have a wpcom access token and we've never scanned the users' VIP themes before, do so
-		$this->access_token = Quickstart_Dashboard::get_instance()->get_wpcom_access_token();
+		$this->access_token = Quickstart_Dashboard::get_wpcom_access_token();
 		if (true|| !empty( $this->access_token ) && ! $this->has_scanned_vip_themes() ) {
 			$result = $this->scan_vip_themes();
 
@@ -158,7 +158,8 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		$this->set_vip_scanned_themes( $themes );
 		
 		// Add the theme directory to the RepoMonitor
-		$plugins = Quickstart_Dashboard::get_instance()->get_plugins();
+		global $quickstart_dashboard;
+		$plugins = $quickstart_dashboard->get_plugins();
 		if ( isset( $plugins['RepoMonitor'] ) ) {
 			$wp_theme = wp_get_theme( $themes[$theme]['stylesheet'] );
 
@@ -446,7 +447,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 
 		// Check that we're connected to .com
 		if ( empty( $this->access_token ) ) {
-			$this->access_token = Quickstart_Dashboard::get_instance()->get_wpcom_access_token();
+			$this->access_token = Quickstart_Dashboard::get_wpcom_access_token();
 		}
 
 		if ( empty( $this->access_token ) ) {

@@ -18,7 +18,7 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 	 */
 	function load_plugins( $args, $assoc_args ) {
 		WP_CLI::line( 'Loading plugins...' );
-		$instance = Quickstart_Dashboard::get_instance();
+		$instance = new Quickstart_Dashboard;
 
 		$plugins = $instance->load_plugins();
 
@@ -240,7 +240,7 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 	 * @return RepoMonitor|bool The RepoMonitor plugin or false on failure
 	 */
 	private function load_repo_monitor() {
-		$instance = Quickstart_Dashboard::get_instance();
+		$instance = new Quickstart_Dashboard;
 		$plugins = $instance->load_plugins();
 		
 		if ( ! isset( $plugins['RepoMonitor'] ) ) {
