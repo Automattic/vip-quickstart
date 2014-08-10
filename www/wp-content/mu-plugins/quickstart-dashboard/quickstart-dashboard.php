@@ -170,13 +170,12 @@ class Quickstart_Dashboard {
 
 		$auth = wp_remote_post( $this->wpcom_api_endpoint, $request_args );
 
-		$response_code = $auth['response']['code'];
-		$auth = json_decode( $auth['body'] );
-
-		if ( 200 != $response_code ) {
-			var_dump( $auth );
+		if ( is_wp_error( $auth ) || $auth['response']['code'] != 200 ) {
+			wp_die( "Couldn't fetch access token" );
 			exit;
 		}
+
+		$auth = json_decode( $auth['body'] );
 
 		if ( ! isset( $auth->access_token ) )
 			wp_die( 'No token?' );
