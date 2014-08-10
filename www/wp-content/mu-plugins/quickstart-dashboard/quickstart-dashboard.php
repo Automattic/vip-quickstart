@@ -189,13 +189,7 @@ class Quickstart_Dashboard {
 	}
 	
 	static function get_connect_wpcom_message() {
-		// Check whether we need credentials or just need to be connected
-		if ( ! self::has_oauth_credentials() ) {
-			$connect_url = menu_page_url( 'dashboard-credentials', false );
-		} else {
-			$connect_url = add_query_arg( array( 'dashboard_wpcom_connect' => true ), menu_page_url( 'vip-dashboard', false ) );
-		}
-		
+		$connect_url = menu_page_url( 'dashboard-credentials', false );
 		return sprintf( __( 'Please <a href="%s">connect Quickstart</a> with WordPress.com VIP to enable enhanced features.', 'quickstart-dashboard' ), $connect_url );
 	}
 	
