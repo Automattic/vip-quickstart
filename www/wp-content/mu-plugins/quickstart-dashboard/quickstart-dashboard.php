@@ -139,8 +139,10 @@ class Quickstart_Dashboard {
 	}
 
 	function oauth_flow() {
-		if ( ! empty( $this->wpcom_access_token ) && isset( $_GET['page'] ) && 'dashboard-credentials' == $_GET['page'] )
+		if ( ! empty( $this->wpcom_access_token ) && isset( $_GET['page'] ) && 'dashboard-credentials' == $_GET['page'] ) {
 			wp_redirect( admin_url( 'admin.php?page=vip-dashboard' ) );
+			exit;
+		}
 
 		if ( ! isset( $_POST['dashboard-credentials-save-and-connect'] ) )
 			return;
