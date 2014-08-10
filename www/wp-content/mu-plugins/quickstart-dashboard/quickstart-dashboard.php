@@ -94,9 +94,6 @@ class Quickstart_Dashboard {
 	}
 	
 	function dashboard_credentials_page() {
-		if ( ! empty( $this->wpcom_access_token ) )
-			wp_redirect( admin_url() );
-
 		if ( !current_user_can( 'manage_options' ) ) {
 			wp_die( 'You do not have sufficient permissions to access this page.' );
 		}
@@ -142,8 +139,8 @@ class Quickstart_Dashboard {
 	}
 
 	function oauth_flow() {
-		if ( ! empty( $this->wpcom_access_token ) )
-			return;
+		if ( ! empty( $this->wpcom_access_token ) && isset( $_GET['page'] ) && 'dashboard-credentials' == $_GET['page'] )
+			wp_redirect( admin_url( 'admin.php?page=vip-dashboard' ) );
 
 		if ( ! isset( $_POST['dashboard-credentials-save-and-connect'] ) )
 			return;
