@@ -39,8 +39,8 @@ The first time you run the installer will be the slowest. It’s also the most d
 
 1.  Clone the [VIP Quickstart Github repo](https://github.com/Automattic/vip-quickstart)
 2.  Run `vagrant up`
-3.  Set 10.86.73.80 in your hosts file or configure [Zeroconf](#zeroconf)
-4.  Go to http://vip.dev in your browser, login with username: wordpress, password: wordpress
+3.  Set "10.86.73.80 vip.local" in your hosts file or configure [Zeroconf](#zeroconf)
+4.  Go to http://vip.local in your browser, login with username: wordpress, password: wordpress
 
 ### Windows
 
