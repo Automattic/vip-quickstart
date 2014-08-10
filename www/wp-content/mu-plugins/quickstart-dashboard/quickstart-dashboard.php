@@ -149,6 +149,9 @@ class Quickstart_Dashboard {
 
 		check_admin_referer( 'dashboard-credentials' );
 
+		if ( ! current_user_can( 'manage_options' ) )
+			return;
+
 		if ( isset( $_POST['oauth-client-id'] ) )
 			$this->set_wpcom_client_id( sanitize_text_field( $_POST['oauth-client-id'] ) );
 
