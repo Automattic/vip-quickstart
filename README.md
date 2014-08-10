@@ -37,31 +37,15 @@ VIP Quickstart is a local development environment for WordPress.com VIP develope
 
 The first time you run the installer will be the slowest. It’s also the most dependent on the speed of your internet connection. This is because it has to download the virtual machine image, Ubuntu package updates, the full checkout of WordPress trunk, and the full VIP Plugins repository. Subsequent runs will only update this base.
 
-If Subversion is installed to your local PATH, the init script (no matter what operating system you're using) will use that. If not, no worries; we'll just offload SVN to the VM.
-
-### Unix
-
-If you’re on a Unix-based machine with a Bash shell, setup is pretty easy:
-
 1.  Clone the [VIP Quickstart Github repo](https://github.com/Automattic/vip-quickstart)
-2.  Run the VIP init script: `./bin/vip-init`
+2.  Run `vagrant up`
 3.  Set 10.86.73.80 in your hosts file or configure [Zeroconf](#zeroconf)
 4.  Go to http://vip.dev in your browser, login with username: wordpress, password: wordpress
 
-The init script is setup such that you can run it multiple times and nothing will break. This means that you can also use it to update your environment in the future. If parts of the system are already up-to-date it will just skip those parts of the installer. So if you manually keep WordPress trunk up-to-date by running `svn up`, the init script will just show a message that the WordPress install is already at the latest changeset.
-
 ### Windows
 
-After installing all the requirements, complete the following steps to install VIP Quickstart.
-
-Note: When you run the Git installer, make sure to install Git to your system PATH as the VIP Quickstart installer requires it.
-
-1.  Clone the [VIP Quickstart Github repo](https://github.com/Automattic/vip-quickstart)
-2.  Run the `vip-init.bat` file in `wbin`
-3.  Set 10.86.73.80 in your hosts file or configure [Zeroconf](#zeroconf)
-4.  Go to http://vip.dev in your browser
-
-If you receive a File cannot be loaded because the execution of scripts is disabled on this system error. Make sure you're using a PowerShell interface. Use tools -> options to manage your default shell. (Right click on the repository and choose "Open a shell here")
+* Note: When you run the Git installer, make sure to install Git to your system PATH as the VIP Quickstart installer requires it.
+* If you receive a File cannot be loaded because the execution of scripts is disabled on this system error. Make sure you're using a PowerShell interface. Use tools -> options to manage your default shell. (Right click on the repository and choose "Open a shell here")
 
 ### Server
 
