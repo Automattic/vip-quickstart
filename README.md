@@ -45,7 +45,8 @@ If you’re on a Unix-based machine with a Bash shell, setup is pretty easy:
 
 1.  Clone the [VIP Quickstart Github repo](https://github.com/Automattic/vip-quickstart)
 2.  Run the VIP init script: `./bin/vip-init`
-3.  Go to http://vip.dev in your browser, login with username: wordpress, password: wordpress
+3.  Set 10.86.73.80 in your hosts file or configure [Zeroconf](#zeroconf)
+4.  Go to http://vip.dev in your browser, login with username: wordpress, password: wordpress
 
 The init script is setup such that you can run it multiple times and nothing will break. This means that you can also use it to update your environment in the future. If parts of the system are already up-to-date it will just skip those parts of the installer. So if you manually keep WordPress trunk up-to-date by running `svn up`, the init script will just show a message that the WordPress install is already at the latest changeset.
 
@@ -57,7 +58,8 @@ Note: When you run the Git installer, make sure to install Git to your system PA
 
 1.  Clone the [VIP Quickstart Github repo](https://github.com/Automattic/vip-quickstart)
 2.  Run the `vip-init.bat` file in `wbin`
-3.  Go to http://vip.dev in your browser
+3.  Set 10.86.73.80 in your hosts file or configure [Zeroconf](#zeroconf)
+4.  Go to http://vip.dev in your browser
 
 If you receive a File cannot be loaded because the execution of scripts is disabled on this system error. Make sure you're using a PowerShell interface. Use tools -> options to manage your default shell. (Right click on the repository and choose "Open a shell here")
 
@@ -71,6 +73,20 @@ If you receive a File cannot be loaded because the execution of scripts is disab
 Since we turn off root logins and password logins via SSH, you'll need to create another use and add an SSH key so you don't get locked out of your server. `ssh-copy-id` is useful for copying ssh keys on Linux. There are similar tools for other platforms.
 
 This has been tested with Ubuntu 12.04.
+
+## Zeroconf
+
+### OS X
+
+You already have Zeroconf set up.
+
+### Windows
+
+If you have iTunes, you already have this. Otherwise, you need to install [Bonjour](http://support.apple.com/kb/DL999).
+
+### Ubuntu
+
+`sudo apt-get install avahi-dnsconfd`
 
 ## Usernames and Passwords
 
