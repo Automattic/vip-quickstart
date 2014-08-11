@@ -8,6 +8,8 @@ server {
  
   access_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= @name %>.access.log;
   error_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= @name %>.error.log;
+  
+  client_max_body_size 100M;
  
   index index.html index.php;
  
