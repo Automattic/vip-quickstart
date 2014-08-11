@@ -93,5 +93,5 @@ function sanity_check_alloptions_notify( $size, $alloptions, $blocked = false ) 
 		$msg = "Site will be blocked from loading if option sizes get too much bigger.";
 
 	$log = esc_url( $_SERVER['HTTP_HOST'] ) . " - {$wpdb->blogid} options is up to " . number_format( $size ) . ' ' . $msg . ' #vipoptions'; 
-	error_log( $msg );
+	error_log( $log );
 }
