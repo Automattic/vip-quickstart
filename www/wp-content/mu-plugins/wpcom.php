@@ -1,7 +1,9 @@
 <?php
 
-require __DIR__ . '/http-concat/cssconcat.php';
-require __DIR__ . '/http-concat/jsconcat.php';
+if ( ! defined( 'QUICKSTART_DISABLE_CONCAT' ) || ! QUICKSTART_DISABLE_CONCAT ) {
+    require __DIR__ . '/http-concat/cssconcat.php';
+    require __DIR__ . '/http-concat/jsconcat.php';
+}
 
 // Add X-hacker header
 add_action( 'send_headers', function() {
