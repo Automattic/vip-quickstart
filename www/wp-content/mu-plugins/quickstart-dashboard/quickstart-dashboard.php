@@ -252,15 +252,15 @@ class Quickstart_Dashboard {
 	}
 
 	static function hardcoded_client_id() {
-		if ( defined( 'DASHBOARD_WP_CLIENT_ID' ) )
-			return DASHBOARD_WP_CLIENT_ID;
+		if ( defined( 'QUICKSTART_DASHBOARD_WP_CLIENT_ID' ) )
+			return QUICKSTART_DASHBOARD_WP_CLIENT_ID;
 
 		return false;
 	}
 
 	static function hardcoded_client_secret() {
-		if ( defined( 'DASHBOARD_WP_CLIENT_SECRET' ) )
-			return DASHBOARD_WP_CLIENT_SECRET;
+		if ( defined( 'QUICKSTART_DASHBOARD_WP_CLIENT_SECRET' ) )
+			return QUICKSTART_DASHBOARD_WP_CLIENT_SECRET;
 
 		return false;
 	}
