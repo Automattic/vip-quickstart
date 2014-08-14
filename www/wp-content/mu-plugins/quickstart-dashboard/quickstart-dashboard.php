@@ -18,6 +18,7 @@ require_once( dirname( __FILE__ ) . '/includes/class-dashboard-widget-table.php'
 require_once( dirname( __FILE__ ) . '/includes/class-dashboard-data-table.php' );
 
 class Quickstart_Dashboard {
+	const OPTION = 'quickstart-dashboard';
 
 	private $wpcom_access_token;
 	private $show_wpcom_access_notice = true;
@@ -334,6 +335,22 @@ class Quickstart_Dashboard {
 		}
 
 		return class_exists( $plugin ) && is_subclass_of( $plugin, 'Dashboard_Plugin' ) ;
+	}
+
+	private static function get_option( $name, $default = false ) {
+		$option = get_option( self::OPTION );
+
+		if ( ! isset( $option[$name] ) )
+			return $default;
+
+		return $option[$name];
+	}
+
+	private static function update_option( $name, $value ) {
+		$option = get_option( self::OPTION );
+		$option[$name] = $value;
+		update_option( self::OPTION, $option );
+		return $value;
 	}
 }
 
