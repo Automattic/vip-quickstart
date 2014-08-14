@@ -79,10 +79,20 @@ vcsrepo { '/srv/www/wp':
   provider => svn,
 }
 
+cron { '/srv/www/wp':
+  command => '/usr/bin/svn up /srv/www/wp > /dev/null 2>&1',
+  hour    => '*/30',
+}
+
 vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
   ensure   => latest,
   source   => 'https://vip-svn.wordpress.com/plugins/',
   provider => svn,
+}
+
+cron { '/srv/www/wp-content/themes/vip/plugins':
+  command => '/usr/bin/svn up /srv/www/wp-content/themes/vip/plugins > /dev/null 2>&1',
+  hour    => '*/30',
 }
 
 vcsrepo { '/srv/www/wp-content/themes/pub':
