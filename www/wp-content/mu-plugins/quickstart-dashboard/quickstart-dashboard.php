@@ -20,7 +20,6 @@ require_once( dirname( __FILE__ ) . '/includes/class-dashboard-data-table.php' )
 class Quickstart_Dashboard {
 	const OPTION = 'quickstart-dashboard';
 
-	private $wpcom_access_token;
 	private $show_wpcom_access_notice = true;
 
 	private $wpcom_api_endpoint = 'https://public-api.wordpress.com/oauth2/token';
@@ -32,7 +31,6 @@ class Quickstart_Dashboard {
 	private $plugins = array();
 
 	function __construct() {
-		$this->wpcom_access_token = self::get_wpcom_access_token();
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ) );
 
 		add_action( 'admin_init', array( $this, 'oauth_flow' ) );
@@ -112,13 +110,13 @@ class Quickstart_Dashboard {
 					<?php if ( ! self::hardcoded_client_id() ): ?>
 					<tr>
 						<th scope="row"><label for="oauth-client-id"><?php _e( 'Client ID', 'quickstart-dashboard' ) ?></label></th>
-						<td><input type="text" id="oauth-client-id" name="oauth-client-id" value="<?php echo esc_attr( self::get_wpcom_client_id() ); ?>" /></td>
+						<td><input type="text" id="oauth-client-id" name="oauth-client-id" /></td>
 					</tr>
 					<?php endif; ?>
 					<?php if ( ! self::hardcoded_client_secret() ): ?>
 					<tr>
 						<th scope="row"><label for="oauth-client-secret"><?php _e( 'Client Secret', 'quickstart-dashboard' ) ?></label></th>
-						<td><input type="password" id="oauth-client-secret" name="oauth-client-secret" value="<?php echo esc_attr( self::get_wpcom_client_secret() ); ?>" /></td>
+						<td><input type="password" id="oauth-client-secret" name="oauth-client-secret" /></td>
 					</tr>
 					<?php endif; ?>
 					<tr>
@@ -140,7 +138,9 @@ class Quickstart_Dashboard {
 	}
 
 	function oauth_flow() {
-		if ( ! empty( $this->wpcom_access_token ) && isset( $_GET['page'] ) && 'dashboard-credentials' == $_GET['page'] ) {
+		$wpcom_access_token = self::get_wpcom_access_token();
+
+		if ( ! empty( $wpcom_access_token ) && isset( $_GET['page'] ) && 'dashboard-credentials' == $_GET['page'] ) {
 			wp_redirect( admin_url( 'admin.php?page=vip-dashboard' ) );
 			exit;
 		}
@@ -153,16 +153,24 @@ class Quickstart_Dashboard {
 		if ( ! current_user_can( 'manage_options' ) )
 			return;
 
-		if ( isset( $_POST['oauth-client-id'] ) )
-			$this->set_wpcom_client_id( sanitize_text_field( $_POST['oauth-client-id'] ) );
+		if ( self::hardcoded_client_id() )
+			$oauth_id = self::hardcoded_client_id();
+		else if ( isset( $_POST['oauth-client-id'] ) )
+			$oauth_id = $_POST['oauth-client-id'];
+		else
+			wp_die( 'No client ID set' );
 
-		if ( isset( $_POST['oauth-client-secret'] ) )
-			$this->set_wpcom_client_secret( sanitize_text_field( $_POST['oauth-client-secret'] ) );
+		if ( self::hardcoded_client_secret() )
+			$oauth_secret = self::hardcoded_client_secret();
+		else if ( isset( $_POST['oauth-client-secret'] ) )
+			$oauth_secret = $_POST['oauth-client-secret'];
+		else
+			wp_die( 'No client secret set' );
 
 		$request_args = array(
 			'body' => array(
-				'client_id' => urlencode( self::get_wpcom_client_id() ),
-				'client_secret' => urlencode( self::get_wpcom_client_secret() ),
+				'client_id' => urlencode( $oauth_id ),
+				'client_secret' => urlencode( $oauth_secret ),
 				'grant_type' => 'password',
 				'username' => $_POST['wpcom_username'],
 				'password' => $_POST['wpcom_password'],
@@ -181,11 +189,16 @@ class Quickstart_Dashboard {
 		if ( ! isset( $auth->access_token ) )
 			wp_die( 'No token?' );
 
-		$this->set_wpcom_access_token( $auth->access_token );
+		self::set_wpcom_access_token( $auth->access_token );
+
+		wp_redirect( admin_url( 'admin.php?page=vip-dashboard' ) );
+		exit;
 	}
 
 	function show_admin_notices() {
-		if ( $this->show_wpcom_access_notice && ( ! self::has_oauth_credentials() || empty( $this->wpcom_access_token ) ) ) {
+		$wpcom_access_token = self::get_wpcom_access_token();
+
+		if ( $this->show_wpcom_access_notice && ( empty( $wpcom_access_token ) ) ) {
 			echo '<div class="error"><p>' . $this->get_connect_wpcom_message() . '</p></div>';
 		}
 	}
@@ -195,24 +208,16 @@ class Quickstart_Dashboard {
 		return sprintf( __( 'Please <a href="%s">connect Quickstart</a> with WordPress.com VIP to enable enhanced features.', 'quickstart-dashboard' ), $connect_url );
 	}
 	
-	static function has_oauth_credentials() {
-		$client_id = self::get_wpcom_client_id();
-		$client_secret = self::get_wpcom_client_secret();
-		
-		return !empty( $client_id ) && !empty( $client_secret );
-	}
-
-	function set_wpcom_access_token( $new_token ) {
-		$this->wpcom_access_token = $new_token;
-		update_option( 'qs_dashboard_wpcom_access_token', $this->wpcom_access_token );
+	static function set_wpcom_access_token( $new_token ) {
+		self::update_option( 'access_token', $new_token );
 	}
 
 	function invalidate_wpcom_access_token() {
-		$this->set_wpcom_access_token( '' );
+		self::set_wpcom_access_token( '' );
 	}
 
 	static function get_wpcom_access_token() {
-		return get_option( 'qs_dashboard_wpcom_access_token' );
+		return self::get_option( 'access_token' );
 	}
 
 	function get_wpcom_redirect_uri() {
@@ -221,35 +226,9 @@ class Quickstart_Dashboard {
 			'_qsnonce'		 => wp_create_nonce( 'dashboard_wpcom_connect' ),
 		);
 
-		update_option( 'qs_dashboard_wpcom_connect_nonce', $query_args['_qsnonce'] );
+		self::update_option( 'connect_nonce', $query_args['_qsnonce'] );
 
 		return add_query_arg( $query_args, menu_page_url( 'vip-dashboard', false ) );
-	}
-
-	static function get_wpcom_client_id() {
-		if ( self::hardcoded_client_id() )
-			$id = self::hardcoded_client_id();
-		else
-			$id = get_option( 'dashboard_wpcom_client_id' );
-
-		return (string) apply_filters( 'dashboard_wpcom_client_id', $id );
-	}
-	
-	function set_wpcom_client_id( $client_id ) {
-		update_option( 'dashboard_wpcom_client_id', $client_id );
-	}
-	
-	static function get_wpcom_client_secret() {
-		if ( self::hardcoded_client_secret() )
-			$secret = self::hardcoded_client_secret();
-		else
-			$secret = get_option( 'dashboard_wpcom_client_secret' );
-
-		return (string) apply_filters( 'dashboard_wpcom_client_secret', $secret );
-	}
-	
-	function set_wpcom_client_secret( $secret ) { 
-		update_option( 'dashboard_wpcom_client_secret', $secret );
 	}
 
 	static function hardcoded_client_id() {
