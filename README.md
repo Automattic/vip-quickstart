@@ -72,6 +72,10 @@ Since we turn off root logins and password logins via SSH, you'll need to create
 
 This has been tested with Ubuntu 12.04.
 
+## Configuration
+
+* `QUICKSTART_DISABLE_CONCAT` - CSS and Javascript concatention are turned off if this is true.
+
 ## Usernames and Passwords
 
 ### MySQL

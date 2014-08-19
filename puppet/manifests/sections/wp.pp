@@ -4,10 +4,12 @@ $plugins = [
   'debug-bar-cron',
   'debug-bar-extender',
   'debug-bar-slow-actions',
+  'debug-bar-remote-requests',
   'log-deprecated-notices',
   'log-viewer',
   'monster-widget',
   'user-switching',
+  'wordpress-importer',
 
   # WordPress.com
   'keyring',
@@ -62,10 +64,7 @@ wp::command { 'plugin update --all':
 }
 
 # Install WP-CLI
-class { 'wp::cli':
-  ensure  => installed,
-  version => '0.15',
-}
+class { 'wp::cli': ensure  => installed }
 
 # Make sure the themes directory exists
 file { '/srv/www/wp-content/themes': ensure => 'directory' }
@@ -75,25 +74,35 @@ file { '/srv/www/wp-content/plugins': ensure => 'directory' }
 
 # VCS Checkout
 vcsrepo { '/srv/www/wp':
-  ensure   => 'present',
+  ensure   => latest,
   source   => 'http://core.svn.wordpress.org/trunk/',
   provider => svn,
 }
 
+cron { '/srv/www/wp':
+  command => '/usr/bin/svn up /srv/www/wp > /dev/null 2>&1',
+  hour    => '*/30',
+}
+
 vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
-  ensure   => 'present',
+  ensure   => latest,
   source   => 'https://vip-svn.wordpress.com/plugins/',
   provider => svn,
 }
 
+cron { '/srv/www/wp-content/themes/vip/plugins':
+  command => '/usr/bin/svn up /srv/www/wp-content/themes/vip/plugins > /dev/null 2>&1',
+  hour    => '*/30',
+}
+
 vcsrepo { '/srv/www/wp-content/themes/pub':
-  ensure   => 'present',
+  ensure   => latest,
   source   => 'https://wpcom-themes.svn.automattic.com/',
   provider => svn,
 }
 
 vcsrepo { '/srv/www/wp-tests':
-  ensure   => 'present',
+  ensure   => latest,
   source   => 'http://develop.svn.wordpress.org/trunk/',
   provider => svn,
 }
