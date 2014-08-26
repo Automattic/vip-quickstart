@@ -12,7 +12,6 @@ VIP Quickstart is a local development environment for WordPress.com VIP develope
 *   WordPress trunk
 *   WordPress.com VIP Shared Plugins repository
 *   WordPress multisite
-*   WordPress Developer Plugin and all VIP recommended plugins
 *   WordPress unit tests
 *   Custom WordPress.com modifications
 *   WP-CLI
