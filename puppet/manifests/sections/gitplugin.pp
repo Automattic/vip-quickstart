@@ -10,14 +10,9 @@ define gitplugin ( $git_urls ) {
         ]
     }
 
-    exec { "wp plugin activate ${title} --network":
-        command => "/usr/bin/wp plugin activate ${title} --network",
-        cwd     => '/srv/www/wp',
-        unless  => "/usr/bin/wp plugin is-installed ${title}",
-        onlyif  => '/usr/bin/wp core is-installed',
-        require => [
-            Class['wp::cli'],
-            Vcsrepo["/srv/www/wp-content/plugins/${title}"],
-        ],
+    wp::command { "plugin activate ${title}":
+        command  => "plugin activate ${title} --network",
+        location => '/srv/www/wp',
+        require  => Vcsrepo["/srv/www/wp-content/plugins/${title}"],
     }
 }
