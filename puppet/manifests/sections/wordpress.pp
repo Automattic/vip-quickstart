@@ -4,10 +4,13 @@ $plugins = [
   'debug-bar-cron',
   'debug-bar-extender',
   'debug-bar-slow-actions',
+  'debug-bar-query-count-alert',
+  'debug-bar-remote-requests',
   'log-deprecated-notices',
   'log-viewer',
   'monster-widget',
   'user-switching',
+  'wordpress-importer',
 
   # WordPress.com
   'keyring',
@@ -68,16 +71,6 @@ wp::plugin { $plugins:
   ]
 }
 
-# Install default theme
-exec { '/usr/bin/wp theme install twentyfourteen':
-  cwd     => '/srv/www/wp',
-  unless  => '/usr/bin/wp theme is-installed twentyfourteen',
-  require => [
-    Exec['wp install /srv/www/wp'],
-    File['/srv/www/wp-content/themes'],
-  ]
-}
-
 # Update all the plugins
 wp::command { 'plugin update --all':
   command  => 'plugin update --all',
@@ -86,10 +79,7 @@ wp::command { 'plugin update --all':
 }
 
 # Install WP-CLI
-class { 'wp::cli':
-  ensure  => installed,
-  version => '0.15',
-}
+class { 'wp::cli': ensure  => installed }
 
 # Make sure the themes directory exists
 file { '/srv/www/wp-content/themes': ensure => 'directory' }
@@ -109,6 +99,11 @@ repomonitor_repo { '/srv/www/wp':
   require   => Vcsrepo['/srv/www/wp']
 }
 
+cron { '/srv/www/wp':
+  command => '/usr/bin/svn up /srv/www/wp > /dev/null 2>&1',
+  hour    => '*/30',
+}
+
 vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
   ensure   => latest,
   source   => 'https://vip-svn.wordpress.com/plugins/',
@@ -118,6 +113,11 @@ vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
 repomonitor_repo { '/srv/www/wp-content/themes/vip/plugins':
   repo_name => 'VIP Plugins',
   require   => Vcsrepo['/srv/www/wp-content/themes/vip/plugins']
+}
+
+cron { '/srv/www/wp-content/themes/vip/plugins':
+  command => '/usr/bin/svn up /srv/www/wp-content/themes/vip/plugins > /dev/null 2>&1',
+  hour    => '*/30',
 }
 
 vcsrepo { '/srv/www/wp-content/themes/pub':
