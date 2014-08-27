@@ -85,6 +85,7 @@ define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
 define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/wp-content' );
 
 define('MULTISITE', true);
+define('SUNRISE', true);
 define('PATH_CURRENT_SITE', '/');
 define('SITE_ID_CURRENT_SITE', 1);
 define('BLOG_ID_CURRENT_SITE', 1);
@@ -94,6 +95,9 @@ if ( ! defined( 'DOMAIN_CURRENT_SITE' ) )
 
 if ( ! defined( 'SUBDOMAIN_INSTALL' ) )
     define('SUBDOMAIN_INSTALL', false);
+
+if ( ! defined( 'WP_DEFAULT_THEME' ) )
+	define('WP_DEFAULT_THEME', 'pub/twentyfourteen');
 
 /* That's all, stop editing! Happy blogging. */
 
