@@ -129,7 +129,7 @@ class Quickstart_Dashboard {
 					</tr>
 				</table>
 				<p>
-					<input type="submit" class="button-primary" name="dashboard-credentials-save-and-connect" value="<?php _e( 'Save Credentials and Connect to WordPress.com', 'quickstart-dashboard' ); ?>" />
+					<input type="submit" class="button-primary" name="dashboard-credentials-and-connect" value="<?php _e( 'Connect', 'quickstart-dashboard' ); ?>" />
 					<a class="button-secondary" href="<?php menu_page_url( 'vip-dashboard' ); ?>"><?php _e( 'Cancel', 'quickstart-dashboard' ); ?></a>
 				</p>
 			</form>
@@ -145,7 +145,7 @@ class Quickstart_Dashboard {
 			exit;
 		}
 
-		if ( ! isset( $_POST['dashboard-credentials-save-and-connect'] ) )
+		if ( ! isset( $_POST['dashboard-credentials-and-connect'] ) )
 			return;
 
 		check_admin_referer( 'dashboard-credentials' );
