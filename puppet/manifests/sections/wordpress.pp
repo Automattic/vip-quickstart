@@ -120,6 +120,17 @@ cron { '/srv/www/wp-content/themes/vip/plugins':
   hour    => '*/30',
 }
 
+vcsrepo { '/srv/www/wp-content/themes/pub/twentyfourteen':
+  ensure       => latest,
+  source     => 'https://wpcom-themes.svn.automattic.com/twentyfourteen',
+  provider => svn,
+}
+
+repomonitor_repo { '/srv/www/wp-content/themes/pub/twentyfourteen':
+  repo_name => 'Public Themes',
+  require => Vcsrepo['/srv/www/wp-content/themes/pub/twentyfourteen']
+}
+
 vcsrepo { '/srv/www/wp-tests':
   ensure   => latest,
   source   => 'http://develop.svn.wordpress.org/trunk/',
