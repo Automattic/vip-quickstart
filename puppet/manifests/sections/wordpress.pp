@@ -120,17 +120,6 @@ cron { '/srv/www/wp-content/themes/vip/plugins':
   hour    => '*/30',
 }
 
-vcsrepo { '/srv/www/wp-content/themes/pub':
-  ensure   => latest,
-  source   => 'https://wpcom-themes.svn.automattic.com/',
-  provider => svn,
-}
-
-repomonitor_repo { '/srv/www/wp-content/themes/pub':
-  repo_name => 'Public Themes',
-  require   => Vcsrepo['/srv/www/wp-content/themes/pub']
-}
-
 vcsrepo { '/srv/www/wp-tests':
   ensure   => latest,
   source   => 'http://develop.svn.wordpress.org/trunk/',
