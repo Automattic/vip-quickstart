@@ -121,14 +121,14 @@ cron { '/srv/www/wp-content/themes/vip/plugins':
 }
 
 vcsrepo { '/srv/www/wp-content/themes/pub/twentyfourteen':
-  ensure       => latest,
-  source     => 'https://wpcom-themes.svn.automattic.com/twentyfourteen',
+  ensure   => latest,
+  source   => 'https://wpcom-themes.svn.automattic.com/twentyfourteen',
   provider => svn,
 }
 
 repomonitor_repo { '/srv/www/wp-content/themes/pub/twentyfourteen':
   repo_name => 'Twenty Fourteen',
-  require => Vcsrepo['/srv/www/wp-content/themes/pub/twentyfourteen']
+  require   => Vcsrepo['/srv/www/wp-content/themes/pub/twentyfourteen']
 }
 
 vcsrepo { '/srv/www/wp-tests':
