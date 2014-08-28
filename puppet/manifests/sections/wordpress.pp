@@ -57,7 +57,8 @@ repomonitor_repo { '/srv/www/wp-content/plugins/jetpack':
 }
 
 repomonitor_repo { '/srv':
-  repo_name => 'Quickstart'
+  repo_name => 'Quickstart',
+  type      => 'git',
 }
 
 # Install plugins
