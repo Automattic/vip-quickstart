@@ -127,7 +127,7 @@ vcsrepo { '/srv/www/wp-content/themes/pub/twentyfourteen':
 }
 
 repomonitor_repo { '/srv/www/wp-content/themes/pub/twentyfourteen':
-  repo_name => 'Public Themes',
+  repo_name => 'Twenty Fourteen',
   require => Vcsrepo['/srv/www/wp-content/themes/pub/twentyfourteen']
 }
 
