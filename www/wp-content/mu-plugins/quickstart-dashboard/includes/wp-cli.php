@@ -151,7 +151,7 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 	 *     wp dashboard add_repo Quickstart /srv
 	 *     wp dashboard add_repo --svn WordPress /srv/www/wp
 	 *
-	 * @synopsis <name> <path> [--warn] [--type=<type>] [--username] [--password]
+	 * @synopsis <name> <path> [--warn] [--type=<type>] [--username=<username>] [--password=<password>]
 	 */
 	function add_repo( $args, $assoc_args ) {
 		if ( isset( $assoc_args['type'] ) ) {
