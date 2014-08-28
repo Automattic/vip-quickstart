@@ -1,6 +1,6 @@
 <?php
 
-WP_CLI::add_command( 'dashboard', 'Quickstart_Dashboard_CLI' );
+WP_CLI::add_command( 'quickstart', 'Quickstart_Dashboard_CLI' );
 
 class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 	/**
@@ -61,9 +61,9 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp dashboard scan_repo --name=quickstart
-	 *     wp dashboard scan_repo /srv
-	 *     wp dashboard scan_repo --id=1
+	 *     wp quickstart scan_repo --name=quickstart
+	 *     wp quickstart scan_repo /srv
+	 *     wp quickstart scan_repo --id=1
 	 *
 	 * @synopsis [<path>] [--id=<id>] [--name=<name>]
 	 */
@@ -148,8 +148,8 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp dashboard add_repo Quickstart /srv
-	 *     wp dashboard add_repo --svn WordPress /srv/www/wp
+	 *     wp quickstart add_repo Quickstart /srv
+	 *     wp quickstart add_repo --svn WordPress /srv/www/wp
 	 *
 	 * @synopsis <name> <path> [--warn] [--type=<type>] [--username=<username>] [--password=<password>]
 	 */
@@ -210,8 +210,8 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp dashboard list_repos
-	 *     wp dashboard list_repos --id
+	 *     wp quickstart list_repos
+	 *     wp quickstart list_repos --id
 	 *
 	 * @synopsis [--id] [--only-ids]
 	 */

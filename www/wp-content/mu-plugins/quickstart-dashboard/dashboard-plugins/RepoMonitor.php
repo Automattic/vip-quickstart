@@ -692,7 +692,7 @@ class RepoMonitor extends Dashboard_Plugin {
 				if ( !isset( $status['local_revision'] ) || !isset( $status['remote_revision'] ) ) {
 					return sprintf( 
 						__( 'Status information not available. Please try manually scanning the repo using %s', 'quickstart-dashboard' ),
-						'<code>wp dashboard scan_repo</code>'
+						'<code>wp quickstart scan_repo</code>'
 					);
 				}
 
@@ -844,7 +844,7 @@ class RepoMonitor extends Dashboard_Plugin {
 				}
 			}
 
-			$command = "/usr/bin/wp dashboard scan_repo {$repo['repo_path']}";
+			$command = "/usr/bin/wp quickstart scan_repo {$repo['repo_path']}";
 			$success = file_put_contents( $hook_path, "# Quickstart Dashboard Repo Monitor\n$command", FILE_APPEND );
 			if ( false === $success ) {
 				return new WP_Error( $success, sprintf( __( 'Unable to append to hook hook file %s.', 'quickstart-dashboard' ), $slug ) );
