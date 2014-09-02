@@ -9,7 +9,6 @@ At this point we only only test that the syntax is correct with puppet-lint.
 ## Structure
 
 * bin - Scripts
-* logs - Reserved for a shared directory with the VM that gets mapped to `/var/log`
 * puppet - All Puppet manifests, modules, and template
 * wbin - Short for Windows bin. Windows ports of the scripts necessary for VIP Quickstart.
 * www - The web root, this is where all WordPress files live.
