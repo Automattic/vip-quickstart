@@ -25,6 +25,7 @@ $github_plugins = {
     # WordPress.com
     'jetpack'        => 'https://github.com/Automattic/jetpack',
     'media-explorer' => 'https://github.com/Automattic/media-explorer',
+    'writing-helper' => 'https://github.com/automattic/writing-helper',
 }
 
 # Install WordPress
