@@ -99,9 +99,9 @@ cron { '/srv/www/wp-content/themes/vip/plugins':
   user    => 'vagrant',
 }
 
-vcsrepo { '/srv/www/wp-content/themes/pub':
+vcsrepo { '/srv/www/wp-content/themes/pub/twentyfourteen':
   ensure   => latest,
-  source   => 'https://wpcom-themes.svn.automattic.com/',
+  source   => 'https://wpcom-themes.svn.automattic.com/twentyfourteen',
   provider => svn,
 }
 
