@@ -223,9 +223,9 @@ class Quickstart_Dashboard_CLI extends WP_CLI_Command {
 		}
 
 		$format_str = '%2$s: %3$s';
-		if ( $assoc_args['id'] ) {
+		if ( isset( $assoc_args['id'] ) && $assoc_args['id'] ) {
 			$format_str = '(%1$s) ' . $format_str;
-		} elseif ( $assoc_args['only-ids'] ) {
+		} elseif ( isset( $assoc_args['only-ids'] ) && $assoc_args['only-ids'] ) {
 			$format_str = '%1$s';
 		}
 
