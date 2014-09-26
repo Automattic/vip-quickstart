@@ -56,11 +56,6 @@ repomonitor_repo { '/srv/www/wp-content/plugins/jetpack':
   require   => Gitplugin[$github_plugin_keys]
 }
 
-repomonitor_repo { '/srv':
-  repo_name => 'Quickstart',
-  type      => 'git',
-}
-
 # Install plugins
 wp::plugin { $plugins:
   location    => '/srv/www/wp',
