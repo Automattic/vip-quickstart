@@ -2,6 +2,8 @@
 
 For full documentation, see [http://vip.wordpress.com/documentation/quickstart/](http://vip.wordpress.com/documentation/quickstart/).
 
+Check out the [Getting Started Guide](http://vip.wordpress.com/getting-started-guide/) for more information on getting started with WordPress.com VIP.
+
 ## Overview
 
 VIP Quickstart is a local development environment for WordPress.com VIP developers. The goal is to provide developers with an environment that closely mirrors WordPress.com along with all the tools we recommend developers use.
