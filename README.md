@@ -1,8 +1,6 @@
-# VIP Quickstart
+![VIP Quickstart](http://vip.wordpress.com/wp-content/themes/a8c/wpcomvip3/img/illustrations/developmenttools-03.svg)
 
 For full documentation, see [http://vip.wordpress.com/documentation/quickstart/](http://vip.wordpress.com/documentation/quickstart/).
-
-Check out the [Getting Started Guide](http://vip.wordpress.com/getting-started-guide/) for more information on getting started with WordPress.com VIP.
 
 ## Overview
 
