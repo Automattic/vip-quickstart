@@ -1,13 +1,15 @@
 $pmc_themes = ['pmc-plugins']
 
 $pmc_sites = [
-	{ slug => 'variety',       theme => 'pmc-variety' },
-	{ slug => 'tvline',        theme => 'pmc-tvline' },
+	{ slug => 'bgr',           theme => 'bgr' },
+	{ slug => 'variety',       theme => 'pmc-variety-2014' },
+	{ slug => 'tvline',        theme => 'pmc-tvline-2014' },
 	{ slug => 'awardsline',    theme => 'pmc-awardsline' },
 	{ slug => 'movieline',     theme => 'pmc-movieline' },
 	{ slug => 'variety411',    theme => 'pmc-411' },
 	{ slug => 'hollywoodlife', theme => 'pmc-hollywoodlife' },
 	{ slug => 'varietylatino', theme => 'pmc-variety-latino' },
+	{ slug => 'deadline',      theme => 'pmc-deadline' },
 ]
 
 define pmc::clone-theme {
