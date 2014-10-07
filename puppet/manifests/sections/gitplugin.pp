@@ -1,7 +1,7 @@
 # GitPlugin clones a git repo into the www/wp-content/plugins directory and activates it in WordPress
 define gitplugin ( $git_urls ) {
     vcsrepo { "/srv/www/wp-content/plugins/${title}" :
-        ensure   => latest,
+        ensure   => present,
         source   => $git_urls[$title],
         provider => git,
         require  => [
