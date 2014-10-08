@@ -6,6 +6,17 @@ cd `dirname "$0"`
 export HTTP_USER_AGENT="WP_CLI"
 export HTTP_HOST="vip.dev"
 
+if [ ! -d "/srv/www/wp-content/themes/vip/pmc-plugins" ]
+then
+	printf "\nDownloading pmc-plugins...\n"
+	if [ ! -f /home/vagrant/.ssh/bitbucket.org_id_rsa.pub ]
+	then
+		printf "\nSkipping this step, SSH key has not been created.\n"
+	else
+		git clone git@bitbucket.org:penskemediacorp/pmc-plugins.git /srv/www/wp-content/themes/vip/pmc-plugins
+	fi
+fi
+
 while IFS=$',\n\r' read site_slug site_name site_theme
 do           
 	[[ $site_slug = \#* ]] && continue
