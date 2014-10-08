@@ -1,3 +1,7 @@
+Param(    
+    [alias("domain")] $quickstart_domain
+)
+
 cls
 
 @'
@@ -35,7 +39,9 @@ echo "=================================="
 echo "= Domain Setup"
 echo "=================================="
 
-$quickstart_domain = Read-Host 'What domain would you like to use? [vip.dev]'
+if (-Not $quickstart_domain) {
+	$quickstart_domain = Read-Host 'What domain would you like to use? [vip.dev]'
+}
 
 if (-Not $quickstart_domain) {
 	$quickstart_domain = 'vip.dev'
