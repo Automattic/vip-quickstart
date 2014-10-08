@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# =====================================
+# Set cwd to vip-quickstart
+# =====================================
+DIR="$( dirname $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ) )"
+ORIG=`pwd`
+cd $DIR
+
+vip-init
+
+vagrant ssh -c /srv/pmc/setup-sites.sh
+
+# =====================================
+# Reset cwd
+# =====================================
+cd $ORIG

@@ -25,7 +25,7 @@ do
 	
 	STATUS=`/usr/bin/wp --path=/srv/www/wp site list | grep /${site_slug}/`
 	if [ "" == "${STATUS}" ]; then
-		/usr/bin/wp --path=/srv/www/wp site create --slug=${site_slug} --title=${site_theme}
+		/usr/bin/wp --path=/srv/www/wp site create --slug=${site_slug} --title=${site_name}
 	fi
 	
 	STATUS=`/usr/bin/wp --path=/srv/www/wp --url=vip.dev/${site_slug} theme status | grep "A vip/${site_theme} "`
