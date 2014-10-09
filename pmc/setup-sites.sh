@@ -25,12 +25,13 @@ then
 	fi
 fi
 
-HOSTS=''
-
 while IFS=$',\n\r' read site_slug site_name site_theme
 do           
 	[[ $site_slug = \#* ]] && continue
-	HOSTS="${HOSTS} ${site_slug}.vip.dev"
+	
+	if [ "" != "$1" ]; then
+		[[ "$1" != "${site_slug}" ]] && continue
+	fi
 	
 	repo=${site_theme}
 	echo "Setting up site: ${site_slug}"
@@ -59,4 +60,5 @@ do
 	
 done < ./sites
 
+HOSTS="`/usr/bin/wp --path=/srv/www/wp site list --fields=domain --format=csv | sed -e 's/^domain$//g' | tr '\n' ' '`"
 sed -e '$a\' -e "10.86.73.80 ${HOSTS} # vip-quickstart pmc setup-sites.sh" -e "/# vip-quickstart pmc setup-sites.sh/d" -i /srv/pmc/hosts
