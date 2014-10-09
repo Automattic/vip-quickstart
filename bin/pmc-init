@@ -7,9 +7,12 @@ DIR="$( dirname $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ) )"
 ORIG=`pwd`
 cd $DIR
 
-vip-init
-
+./vip-init
+cd ..
+cp -f /etc/hosts pmc/hosts.backup
+cp -f /etc/hosts pmc/hosts
 vagrant ssh -c /srv/pmc/setup-sites.sh
+cp -f pmc/hosts /etc/hosts 
 
 # =====================================
 # Reset cwd

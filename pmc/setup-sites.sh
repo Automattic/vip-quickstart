@@ -25,9 +25,13 @@ then
 	fi
 fi
 
+HOSTS=''
+
 while IFS=$',\n\r' read site_slug site_name site_theme
 do           
 	[[ $site_slug = \#* ]] && continue
+	HOSTS="${HOSTS} ${site_slug}.vip.dev"
+	
 	repo=${site_theme}
 	echo "Setting up site: ${site_slug}"
 	
@@ -54,3 +58,5 @@ do
 	fi
 	
 done < ./sites
+
+sed -e '$a\' -e "10.86.73.80 ${HOSTS} # vip-quickstart pmc setup-sites.sh" -e "/# vip-quickstart pmc setup-sites.sh/d" -i /srv/pmc/hosts

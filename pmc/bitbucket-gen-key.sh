@@ -4,7 +4,8 @@
 
 gen_key(){
     local ID_FILE=$1;
-
+	local FILE_NAME="`basename $1`";
+	
     if [ "${ID_FILE}" == "" ]; then
         echo ID_FILE not defined;
         return 1;
@@ -19,10 +20,22 @@ gen_key(){
 		echo "Copying key to config/ssh..."
 		CURRENT_DIR=`dirname $0`
 		mkdir -p $CURRENT_DIR/config/ssh
-		cp ~/.ssh/bitbucket.org_id_rsa* $CURRENT_DIR/config/ssh/
+		cp ~/.ssh/${FILE_NAME}* $CURRENT_DIR/config/ssh/
 
         return 1;
     fi;
+	
+	CURRENT_DIR=`dirname $0`
+	if [ -f "${CURRENT_DIR}/config/ssh/${FILE_NAME}" ]; then
+        echo "Restoring from file ${CURRENT_DIR}/config/ssh/${FILE_NAME}";
+
+		cp "${CURRENT_DIR}/config/ssh/${FILE_NAME}" ${ID_FILE}
+
+		echo "Recording SSH config..."
+		record_ssh_config bitbucket.org $ID_FILE ~/.ssh/config;
+		
+		return 1;
+	fi;
 
     ssh-keygen -f ${ID_FILE};
     return $?;
@@ -125,6 +138,7 @@ Host $SERVICE_NAME
 gen_key_main(){
     local SERVICE_NAME=$1;
     local ID_FILE=${HOME}/.ssh/${SERVICE_NAME}_id_rsa;
+	local FILE_NAME=${SERVICE_NAME}_id_rsa;
     local ID_FILE_PUB=${ID_FILE}.pub;
     local SSH_CONFIG=${HOME}/.ssh/config;
     local USERNAME;
@@ -149,7 +163,7 @@ gen_key_main(){
 
 	CURRENT_DIR=`dirname $0`
 	mkdir -p $CURRENT_DIR/config/ssh
-	cp ~/.ssh/bitbucket.org_id_rsa* $CURRENT_DIR/config/ssh/
+	cp ~/.ssh/${FILE_NAME}* $CURRENT_DIR/config/ssh/
 
     echo ;
     echo OK;
