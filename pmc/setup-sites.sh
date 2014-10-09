@@ -2,6 +2,11 @@
 
 cd `dirname "$0"`
 
+# workaround pmc_analystics required this theme to be at this location.
+if [ ! -e /srv/www/wp-content/themes/twentyfourteen ]; then
+	ln -s /srv/www/wp-content/themes/pub/twentyfourteen/ /srv/www/wp-content/themes/twentyfourteen
+fi
+
 if [ ! -f ~/.ssh/bitbucket.org_id_rsa ]; then
 	./bitbucket-gen-key.sh
 fi
@@ -62,3 +67,6 @@ done < ./sites
 
 HOSTS="`/usr/bin/wp --path=/srv/www/wp site list --fields=domain --format=csv | sed -e 's/^domain$//g' | tr '\n' ' '`"
 sed -e '$a\' -e "10.86.73.80 ${HOSTS} # vip-quickstart pmc setup-sites.sh" -e "/# vip-quickstart pmc setup-sites.sh/d" -i /srv/pmc/hosts
+
+# need this for wp cron to work 
+sudo sed -e '$a\' -e "127.0.0.1 ${HOSTS} # vip-quickstart pmc setup-sites.sh" -e "/# vip-quickstart pmc setup-sites.sh/d" -i /etc/hosts
