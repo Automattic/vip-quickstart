@@ -1,7 +1,15 @@
 #!/bin/bash
 
 cd `dirname "$0"`
-./bitbucket-gen-key.sh
+
+if [ ! -f ~/.ssh/bitbucket.org_id_rsa ]; then
+	./bitbucket-gen-key.sh
+fi
+
+sed -e '$a\' -e "define('SUBDOMAIN_INSTALL', true );" -e "/define\s*(\s*'SUBDOMAIN_INSTALL'/d" -i /srv/www/local-config.php 
+if [ "0" == "`/usr/bin/wp --path=/srv/www/wp network meta get 1 subdomain_install`" ]; then
+	/usr/bin/wp --path=/srv/www/wp network meta update 1 subdomain_install 1
+fi
 
 export HTTP_USER_AGENT="WP_CLI"
 export HTTP_HOST="vip.dev"
@@ -34,14 +42,15 @@ do
 		fi
 	fi
 	
-	STATUS=`/usr/bin/wp --path=/srv/www/wp site list | grep /${site_slug}/`
+	STATUS=`/usr/bin/wp --path=/srv/www/wp site list --fields=domain --format=csv | grep "${site_slug}.vip.dev"`
 	if [ "" == "${STATUS}" ]; then
 		/usr/bin/wp --path=/srv/www/wp site create --slug=${site_slug} --title=${site_name}
 	fi
 	
-	STATUS=`/usr/bin/wp --path=/srv/www/wp --url=vip.dev/${site_slug} theme status | grep "A vip/${site_theme} "`
-	if [ "" == "${STATUS}" ]; then
-		/usr/bin/wp --path=/srv/www/wp --url=vip.dev/${site_slug} theme activate vip/${site_theme}
+	STATUS=`/usr/bin/wp --path=/srv/www/wp --url=variety.vip.dev theme status vip/pmc-variety-2014 | grep 'Status: Inactive'`
+	if [ "" != "${STATUS}" ]; then
+		/usr/bin/wp --path=/srv/www/wp theme enable vip/${site_theme} --network
+		/usr/bin/wp --path=/srv/www/wp --url=${site_slug}.vip.dev theme activate vip/${site_theme}
 	fi
 	
 done < ./sites

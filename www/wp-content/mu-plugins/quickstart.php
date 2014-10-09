@@ -6,6 +6,11 @@ add_filter( 'site_url', 'wpcom_vip_quickstart_fix_domain', 9999, 4 );
 add_filter( 'home_url', 'wpcom_vip_quickstart_fix_domain', 9999, 4 );
 
 function wpcom_vip_quickstart_fix_domain( $url, $path, $scheme = null, $blog_id = null ) {
+
+	if ( is_null( $blog_id ) && is_multisite() ) {
+		$blog_id = get_current_blog_id();
+	}
+
 	// Only apply this customization to blog 1 (which is the default installed by QS)
 	if ( ! is_null( $blog_id ) && 1 != $blog_id ) {
 		return $url;
@@ -20,6 +25,6 @@ function wpcom_vip_quickstart_fix_domain( $url, $path, $scheme = null, $blog_id 
 	return $url;
 }
 
-// Required to prevent infinite loop redirections from /wp-admin/network when the domain does not match 
+// Required to prevent infinite loop redirections from /wp-admin/network when the domain does not match
 // what is in the DB, for example, in the AWS AMI
 add_filter( 'redirect_network_admin_request', '__return_false' );

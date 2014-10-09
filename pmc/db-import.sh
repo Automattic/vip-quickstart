@@ -8,7 +8,7 @@ fi
 
 site_slug=$1
 sql_file=$2
-site_id=`/usr/bin/wp --path=/srv/www/wp site list | grep "vip.dev/${site_slug}/" | cut -d'	' -f1 | tr -d ' '`
+site_id=`/usr/bin/wp --path=/srv/www/wp site list --fields=blog_id,domain --format=csv|grep "${site_slug}.vip.dev" | cut -d',' -f1`
 
 if [ "" != "${site_id}" ]
 then
