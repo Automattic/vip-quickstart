@@ -7,12 +7,8 @@ add_filter( 'home_url', 'wpcom_vip_quickstart_fix_domain', 9999, 4 );
 
 function wpcom_vip_quickstart_fix_domain( $url, $path, $scheme = null, $blog_id = null ) {
 
-	if ( is_null( $blog_id ) && is_multisite() ) {
-		$blog_id = get_current_blog_id();
-	}
-
 	// Only apply this customization to blog 1 (which is the default installed by QS)
-	if ( ! is_null( $blog_id ) && 1 != $blog_id ) {
+	if ( ! is_null( $blog_id ) && 1 != $blog_id || is_subdomain_install() ) {
 		return $url;
 	}
 
