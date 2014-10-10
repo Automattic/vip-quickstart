@@ -70,3 +70,12 @@ sed -e '$a\' -e "10.86.73.80 ${HOSTS} # vip-quickstart pmc setup-sites.sh" -e "/
 
 # need this for wp cron to work 
 sudo sed -e '$a\' -e "127.0.0.1 ${HOSTS} # vip-quickstart pmc setup-sites.sh" -e "/# vip-quickstart pmc setup-sites.sh/d" -i /etc/hosts
+
+# nginx ssl
+if [ ! -f /etc/ssl/dev-san-domain.key ]; then
+	sudo cp /srv/pmc/dev-san-domain* /etc/ssl/
+	sudo sed -e "/http {/a\ \ ssl_certificate     /etc/ssl/dev-san-domain-chained.crt;\n\ \ ssl_certificate_key /etc/ssl/dev-san-domain.key;" -e '/ssl_certificate/d' -i /etc/nginx/nginx.conf 
+	sudo sed -e "/listen 80;/a\ \ listen 443 ssl;" -e "/listen 443/d" -i /etc/nginx/sites-available/50-_.conf  
+	sudo sed -e "/listen 80;/a\ \ listen 443 ssl;" -e "/listen 443/d" -i /etc/nginx/sites-enabled/50-_.conf  
+	sudo service nginx reload
+fi

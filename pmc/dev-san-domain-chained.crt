@@ -1,0 +1,104 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 9 (0x9)
+    Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=US, ST=California, L=Los Angeles, O=Penske Media Corporation, CN=PMC/emailAddress=dist.dev@pmc.com
+        Validity
+            Not Before: Oct 10 02:35:49 2014 GMT
+            Not After : Oct  7 02:35:49 2024 GMT
+        Subject: C=US, ST=California, L=Los Angeles, O=PMC, OU=PMC, CN=PMC Dev Sites
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:ac:24:91:18:ef:0e:a8:a8:e7:96:c8:4b:36:5b:
+                    57:a3:cb:c4:46:7f:be:74:35:28:98:17:19:62:9a:
+                    16:2d:ba:85:90:66:e9:ee:57:15:3a:71:6d:f5:65:
+                    a6:58:d2:1a:ca:26:5f:99:ff:76:fc:08:2f:78:82:
+                    75:52:2e:39:2d:70:03:36:b7:b8:96:d4:ae:14:a9:
+                    3e:be:37:fc:2e:f4:88:2b:ed:85:5b:9a:e3:ad:d4:
+                    b8:4d:1a:98:bd:1f:f2:31:fc:5d:6d:d8:56:a9:5c:
+                    50:3f:15:d7:98:61:58:95:bd:33:49:25:ea:e8:1e:
+                    86:45:b2:06:1e:07:cb:43:0d:21:e7:1f:85:d2:75:
+                    7c:b9:0a:9e:72:67:15:c4:8f:30:99:51:98:49:ef:
+                    f5:64:08:34:3d:70:88:2b:25:3c:52:d6:cc:85:51:
+                    e5:7d:f5:2c:6b:ff:2f:aa:01:fa:d4:ec:1e:15:37:
+                    c2:47:9f:9b:f2:a5:f5:7e:b6:f1:c8:b0:91:f7:27:
+                    a5:a7:f3:d1:f6:b5:7d:74:59:24:90:c1:c1:10:90:
+                    cc:90:3f:96:02:62:a1:52:1f:98:5a:4b:b5:2b:5e:
+                    17:fa:e7:f6:85:12:e8:0e:04:32:2c:5f:46:31:68:
+                    f3:b9:0e:db:20:af:60:59:07:03:e9:b7:bf:d9:7a:
+                    c8:67
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 Key Usage: 
+                Digital Signature, Non Repudiation, Key Encipherment, Data Encipherment
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Subject Alternative Name: 
+                DNS:localhost, DNS:*.vip.dev, DNS:*.pmc.dev, DNS:*.local.dev
+    Signature Algorithm: sha1WithRSAEncryption
+         c5:f3:d8:f9:2a:a1:1b:13:1c:ee:3d:cd:e6:86:95:e6:ae:71:
+         23:1a:53:7c:dd:93:8f:2b:12:c1:c5:b2:b9:11:be:9d:b5:d2:
+         a9:9c:3e:1d:2b:14:f0:0e:ad:dc:0e:55:4e:b2:05:2d:28:fe:
+         5d:ab:52:5e:fd:ff:05:21:14:79:38:e7:17:94:2e:7f:ff:fc:
+         20:b1:b9:d0:22:d7:7b:c4:5c:67:33:77:6b:fb:2f:28:98:19:
+         f5:03:40:3b:08:b3:f8:8f:71:54:57:d3:a8:f2:fb:b9:44:c0:
+         be:76:9f:1f:fb:10:27:04:87:7c:3e:de:0f:96:b8:db:ad:50:
+         09:4c:2a:0b:d0:ad:05:24:cf:0e:f6:0d:63:1d:0b:cd:f7:48:
+         16:da:5b:56:a7:54:b4:2e:40:43:8d:e6:f3:b0:63:9f:53:81:
+         8b:1c:03:e9:2b:0a:19:7f:59:f1:32:3c:a2:9a:d9:f4:b2:bb:
+         a0:86:70:85:bd:90:97:cb:94:a5:3d:19:00:33:12:90:d1:3b:
+         eb:e7:fc:70:4b:c6:f0:76:c9:95:4c:d5:46:47:22:c3:a8:2d:
+         a9:7a:06:4e:a1:9c:a5:10:fe:5d:68:b1:64:fa:b7:ea:76:cf:
+         63:08:61:1c:fe:28:14:09:5f:44:81:11:eb:33:9b:93:6f:b2:
+         27:a5:75:88
+-----BEGIN CERTIFICATE-----
+MIID2jCCAsKgAwIBAgIBCTANBgkqhkiG9w0BAQUFADCBijELMAkGA1UEBhMCVVMx
+EzARBgNVBAgMCkNhbGlmb3JuaWExFDASBgNVBAcMC0xvcyBBbmdlbGVzMSEwHwYD
+VQQKDBhQZW5za2UgTWVkaWEgQ29ycG9yYXRpb24xDDAKBgNVBAMMA1BNQzEfMB0G
+CSqGSIb3DQEJARYQZGlzdC5kZXZAcG1jLmNvbTAeFw0xNDEwMTAwMjM1NDlaFw0y
+NDEwMDcwMjM1NDlaMGwxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlh
+MRQwEgYDVQQHDAtMb3MgQW5nZWxlczEMMAoGA1UECgwDUE1DMQwwCgYDVQQLDANQ
+TUMxFjAUBgNVBAMMDVBNQyBEZXYgU2l0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IB
+DwAwggEKAoIBAQCsJJEY7w6oqOeWyEs2W1ejy8RGf750NSiYFxlimhYtuoWQZunu
+VxU6cW31ZaZY0hrKJl+Z/3b8CC94gnVSLjktcAM2t7iW1K4UqT6+N/wu9Igr7YVb
+muOt1LhNGpi9H/Ix/F1t2FapXFA/FdeYYViVvTNJJeroHoZFsgYeB8tDDSHnH4XS
+dXy5Cp5yZxXEjzCZUZhJ7/VkCDQ9cIgrJTxS1syFUeV99Sxr/y+qAfrU7B4VN8JH
+n5vypfV+tvHIsJH3J6Wn89H2tX10WSSQwcEQkMyQP5YCYqFSH5haS7UrXhf65/aF
+EugOBDIsX0YxaPO5Dtsgr2BZBwPpt7/ZeshnAgMBAAGjaDBmMAkGA1UdEwQCMAAw
+CwYDVR0PBAQDAgTwMBMGA1UdJQQMMAoGCCsGAQUFBwMBMDcGA1UdEQQwMC6CCWxv
+Y2FsaG9zdIIJKi52aXAuZGV2ggkqLnBtYy5kZXaCCyoubG9jYWwuZGV2MA0GCSqG
+SIb3DQEBBQUAA4IBAQDF89j5KqEbExzuPc3mhpXmrnEjGlN83ZOPKxLBxbK5Eb6d
+tdKpnD4dKxTwDq3cDlVOsgUtKP5dq1Je/f8FIRR5OOcXlC5///wgsbnQItd7xFxn
+M3dr+y8omBn1A0A7CLP4j3FUV9Oo8vu5RMC+dp8f+xAnBId8Pt4PlrjbrVAJTCoL
+0K0FJM8O9g1jHQvN90gW2ltWp1S0LkBDjebzsGOfU4GLHAPpKwoZf1nxMjyimtn0
+srughnCFvZCXy5SlPRkAMxKQ0Tvr5/xwS8bwdsmVTNVGRyLDqC2pegZOoZylEP5d
+aLFk+rfqds9jCGEc/igUCV9EgRHrM5uTb7InpXWI
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+MIID6TCCAtGgAwIBAgIJAP+joldyJIaGMA0GCSqGSIb3DQEBBQUAMIGKMQswCQYD
+VQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEUMBIGA1UEBwwLTG9zIEFuZ2Vs
+ZXMxITAfBgNVBAoMGFBlbnNrZSBNZWRpYSBDb3Jwb3JhdGlvbjEMMAoGA1UEAwwD
+UE1DMR8wHQYJKoZIhvcNAQkBFhBkaXN0LmRldkBwbWMuY29tMB4XDTE0MDQyMTE2
+Mjk1MVoXDTQxMDkwNTE2Mjk1MVowgYoxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApD
+YWxpZm9ybmlhMRQwEgYDVQQHDAtMb3MgQW5nZWxlczEhMB8GA1UECgwYUGVuc2tl
+IE1lZGlhIENvcnBvcmF0aW9uMQwwCgYDVQQDDANQTUMxHzAdBgkqhkiG9w0BCQEW
+EGRpc3QuZGV2QHBtYy5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
+AQDfpFIUHsOkdNKA+3Ip0UQHSTBC2mE2/tZkFVy7nyplm9/hb0ILBFobZ6BQncdq
+ojrb2TTBy0acy7CuTwFblDa8qeFKQy/DbY1I5qVTwUMkB7nhsQhmBR0SpETZsL++
+hRcAiDCNWHWlcNihowYKUpsMYf9gD7f+xyK0+TdNbioDZBty9vjJBPKBZRjqQA9/
+XY5057Ny1r8xnkWYG3n9HU7hU9p4xpiCxJOLaiGK1s07QWNS+GGvUSEk4WuIVqdM
+sf8XbKyP6kKq5FH5vlfnrq3e1jC5pmoUZfPHJ3GBX5LLzJiEwQm1iGNEHhev628G
+KE1NCDcw6CzF4QyUbCnNv1FNAgMBAAGjUDBOMB0GA1UdDgQWBBQcjUrSoG+8Fpkj
+D2dmfXV77E0WPjAfBgNVHSMEGDAWgBQcjUrSoG+8FpkjD2dmfXV77E0WPjAMBgNV
+HRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4IBAQAb3jSZu8D8F6OLrD4U0VJ3mBRN
+M33kT7TQ3vv934vlUKBsqpPSxAKPSNbjkej9PYFp84cKg3fXI8OS7m7E5R/nMgSx
+e/lsBps5CfyKQUcV6SIfDj+vPjBLLenCRC7rxMZJQ2Op1j3Buhwx+TPDNpl7r0Kp
+KKl6YVVlzyHpFWqw8dM9vf270ZPEDPDfYv3/Kw8IkCU2bc69TcksPfjCiTxoJ8x1
+YBcfVfT0wm+CFWl4PWxZQa2NYZd5pZB6q/lVdoLA5wfl92brQmchgI77xPefm/Qh
+rVqmlekqDiglJC/fUF9/2GJx6iza5S+KHYkRxy8wWaDTmuIQHq9l8NWQM0EQ
+-----END CERTIFICATE-----
