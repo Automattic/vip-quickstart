@@ -8,3 +8,6 @@ if ( $quickstart_domain ) {
     line => "127.0.0.1 ${quickstart_domain}",
   }
 }
+
+# Set up Zeroconf (Bonjour)
+package { 'libnss-mdns': ensure => present }
