@@ -10,7 +10,17 @@ server {
   error_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= @name %>.error.log;
  
   index index.html index.php;
- 
+
+  # Block all requests to hidden files
+  location ~ /\. {
+    deny all;
+  }
+
+  # Block all requests to config files
+  location ~ /((wp|local)-config)\.php$ {
+    deny all;
+  }
+
   location / {
     try_files $uri $uri/ /index.php?$args;
   }
@@ -47,5 +57,11 @@ server {
     fastcgi_index index.php;
     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
     fastcgi_pass 127.0.0.1:9000;
+  }
+
+  location /_static/ {
+    fastcgi_pass 127.0.0.1:9000;
+    include /etc/nginx/fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root/wp-content/mu-plugins/http-concat/ngx-http-concat.php;
   }
 }

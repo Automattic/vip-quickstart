@@ -41,5 +41,6 @@ user { 'vagrant':
     ensure => 'present',
     system => true,
     shell  => '/bin/bash',
+    home   => '/home/vagrant',
     notify => Service['php5-fpm'],
 }

@@ -12,7 +12,7 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = "puppetlabs/debian-7.4-32-puppet"
-  config.vm.hostname = ENV['QUICKSTART_DOMAIN']
+  config.vm.hostname = 'vip.local'
   config.vm.network :private_network, ip: "10.86.73.80"
 
   config.vm.synced_folder ".", "/srv"
@@ -27,7 +27,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     puppet.manifest_file  = "init.pp"
     puppet.options = ['--templatedir', '/vagrant/puppet/files']
     puppet.facter = {
-      "quickstart_domain" => ENV['QUICKSTART_DOMAIN'],
+      "quickstart_domain" => 'vip.local',
     }
   end
 

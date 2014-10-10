@@ -4,6 +4,7 @@ $plugins = [
   'debug-bar-cron',
   'debug-bar-extender',
   'debug-bar-slow-actions',
+  'debug-bar-query-count-alert',
   'debug-bar-remote-requests',
   'log-deprecated-notices',
   'log-viewer',
@@ -24,6 +25,7 @@ $github_plugins = {
     # WordPress.com
     'jetpack'        => 'https://github.com/Automattic/jetpack',
     'media-explorer' => 'https://github.com/Automattic/media-explorer',
+    'writing-helper' => 'https://github.com/automattic/writing-helper',
 }
 
 # Install WordPress
@@ -79,15 +81,27 @@ vcsrepo { '/srv/www/wp':
   provider => svn,
 }
 
+cron { '/srv/www/wp':
+  command => '/usr/bin/svn up /srv/www/wp > /dev/null 2>&1',
+  hour    => '*/30',
+  user    => 'vagrant',
+}
+
 vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
   ensure   => latest,
   source   => 'https://vip-svn.wordpress.com/plugins/',
   provider => svn,
 }
 
-vcsrepo { '/srv/www/wp-content/themes/pub':
+cron { '/srv/www/wp-content/themes/vip/plugins':
+  command => '/usr/bin/svn up /srv/www/wp-content/themes/vip/plugins > /dev/null 2>&1',
+  hour    => '*/30',
+  user    => 'vagrant',
+}
+
+vcsrepo { '/srv/www/wp-content/themes/pub/twentyfourteen':
   ensure   => latest,
-  source   => 'https://wpcom-themes.svn.automattic.com/',
+  source   => 'https://wpcom-themes.svn.automattic.com/twentyfourteen',
   provider => svn,
 }
 

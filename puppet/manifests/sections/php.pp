@@ -20,7 +20,8 @@ class {
   'php::extension::mcrypt':;
   'php::extension::memcache':;
   'php::extension::mysql':;
-  'php::extension::xdebug':;
+  'php::extension::xdebug':
+    inifile => false;
 }
 
 # Install PHP_CodeSniffer and the WordPress coding standard
