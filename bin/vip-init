@@ -30,6 +30,7 @@ done
 # Only use this script to configure servers
 if [ false == $SERVER ]; then
     git pull
+    git submodule update --init --recursive
     vagrant reload --no-provision || vagrant up --no-provision
     vagrant provision
     exit
