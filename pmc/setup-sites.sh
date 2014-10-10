@@ -65,11 +65,16 @@ do
 	
 done < ./sites
 
-HOSTS="`/usr/bin/wp --path=/srv/www/wp site list --fields=domain --format=csv | sed -e 's/^domain$//g' | tr '\n' ' '`"
-sed -e '$a\' -e "10.86.73.80 ${HOSTS} # vip-quickstart pmc setup-sites.sh" -e "/# vip-quickstart pmc setup-sites.sh/d" -i /srv/pmc/hosts
+cp -f /etc/hosts /srv/pmc/vagrant_hosts
+sed -e "/#pmcsetup/d" -i /srv/pmc/hosts
+sed -e "/#pmcsetup/d" -i /srv/pmc/vagrant_hosts
+
+/usr/bin/wp --path=/srv/www/wp site list --fields=domain --format=csv | sed -e 's/^domain$//' -e 's/^\(.\+\)/[ip] \1 #pmcsetup/' > server_hosts
+sed -e 's/\[ip\]/10.86.73.80/' server_hosts >> /srv/pmc/hosts
 
 # need this for wp cron to work 
-sudo sed -e '$a\' -e "127.0.0.1 ${HOSTS} # vip-quickstart pmc setup-sites.sh" -e "/# vip-quickstart pmc setup-sites.sh/d" -i /etc/hosts
+sed -e 's/\[ip\]/127.0.0.1/' server_hosts >> /srv/pmc/vagrant_hosts
+sudo cp -f /srv/pmc/vagrant_hosts /etc/hosts
 
 # ssl key and certificate
 if [ ! -f /etc/ssl/dev-san-domain.key ] || [ ! -f /etc/ssl/dev-san-domain-chained.crt ]; then
