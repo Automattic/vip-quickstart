@@ -16,6 +16,11 @@ server {
     deny all;
   }
 
+  # Block all requests to config files
+  location ~ /((wp|local)-config)\.php$ {
+    deny all;
+  }
+
   location / {
     try_files $uri $uri/ /index.php?$args;
   }
