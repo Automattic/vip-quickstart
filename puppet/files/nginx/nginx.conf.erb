@@ -1,4 +1,4 @@
-# File Managed by Puppet 
+# File Managed by Puppet
 user <%= scope.lookupvar('nginx::process_user') %>;
 worker_processes <%= @processorcount %>;
 
@@ -20,7 +20,7 @@ http {
   sendfile    off;
   tcp_nopush  on;
   tcp_nodelay on;
-  
+
   client_max_body_size <%= scope.lookupvar('nginx::client_max_body_size')%>;
   keepalive_timeout    <%= scope.lookupvar('nginx::keepalive_timeout')%>;
   types_hash_max_size  <%= scope.lookupvar('nginx::types_hash_max_size') %>;
@@ -36,5 +36,5 @@ http {
   # Disable for IE < 6 because there are known problems
   gzip_disable "MSIE [1-6]\.(?!.*SV1)";
 
-  include <%= scope.lookupvar('nginx::vdir')%>/*.conf;
+  include <%= scope.lookupvar('nginx::config_dir')%>/sites-enabled/*.conf;
 }
