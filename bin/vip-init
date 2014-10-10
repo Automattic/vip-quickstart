@@ -29,8 +29,9 @@ done
 
 # Only use this script to configure servers
 if [ false == $SERVER ]; then
-    echo 'Deprecated: This script is no longer intended for use with vagrant.'
-    echo 'Use `vagrant up` to start the VM or `vagrant provision` to update.'
+    git pull
+    vagrant reload --no-provision || vagrant up --no-provision
+    vagrant provision
     exit
 fi
 
