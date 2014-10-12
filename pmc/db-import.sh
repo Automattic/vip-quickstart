@@ -8,7 +8,13 @@ fi
 
 site_slug=$1
 sql_file=$2
-site_id=`/usr/bin/wp --path=/srv/www/wp site list --fields=blog_id,domain --format=csv|grep "${site_slug}.vip.dev" | cut -d',' -f1`
+
+if [ ! -f "${sql_file}" ]; then
+	echo "File not found: ${sql_file}"
+	continue
+fi
+
+site_id=`/usr/bin/wp --path=/srv/www/wp site list --fields=blog_id,domain --format=csv|grep "${site_slug}.local.dev" | cut -d',' -f1`
 
 if [ "" != "${site_id}" ]
 then
