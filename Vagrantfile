@@ -9,6 +9,19 @@ if `vagrant --version` < 'Vagrant 1.5.0'
     abort('Your Vagrant is too old. Please install at least 1.5.0')
 end
 
+
+if File.exists?('Quickstart.yaml') then
+	require 'yaml'
+	local_config = YAML::load_file('Quickstart.yaml')
+	if defined?local_config['domain']
+		QUICKSTART_DOMAIN = local_config['domain']
+	end
+end
+
+unless defined?QUICKSTART_DOMAIN
+	QUICKSTART_DOMAIN='vip.local'
+end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = "precise32"
@@ -17,7 +30,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     override.vm.box = "precise64-vmware"
     override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
   end
-  config.vm.hostname = 'vip.local'
+  config.vm.hostname = QUICKSTART_DOMAIN
   config.vm.network :private_network, ip: "10.86.73.80"
 
   config.vm.synced_folder ".", "/srv"
@@ -33,7 +46,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     puppet.manifest_file  = "init.pp"
     puppet.options = ['--templatedir', '/vagrant/puppet/files']
     puppet.facter = {
-      "quickstart_domain" => 'vip.local',
+      "quickstart_domain" => QUICKSTART_DOMAIN,
     }
   end
 

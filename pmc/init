@@ -5,10 +5,9 @@
 # =====================================
 DIR="$( dirname $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ) )"
 ORIG=`pwd`
-cd $DIR
+cd $DIR/..
 
-./vip-init --domain=local.dev
-cd ..
+vagrant up
 cp -f /etc/hosts pmc/hosts.backup
 cp -f /etc/hosts pmc/hosts
 vagrant ssh -c /srv/pmc/setup-sites.sh
