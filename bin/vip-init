@@ -11,7 +11,6 @@ cd $DIR
 # Setup command line flags
 # =====================================
 SERVER=false
-QUICKSTART_PROVIDER='virtualbox'
 
 for i in "$@"
 do
@@ -22,26 +21,25 @@ case $i in
     --domain=*)
         QUICKSTART_DOMAIN=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
     ;;
-    --provider=*)
-        QUICKSTART_PROVIDER=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
-    ;;
     *)
         # unknown option
     ;;
 esac
 done
 
+# Only use this script to configure servers
+if [ false == $SERVER ]; then
+    git pull
+    git submodule update --init --recursive
+    vagrant reload --no-provision || vagrant up --no-provision
+    vagrant provision
+    exit
+fi
 
 # =====================================
 # Setup other options
 # =====================================
-IS_INSTALLED=false
-
-if [ false == $SERVER ]; then
-    IS_INSTALLED=`vagrant ssh -c 'which wp && wp core is-installed'`
-else
-    IS_INSTALLED=`which wp && wp core is-installed`
-fi
+IS_INSTALLED=`which wp && wp core is-installed`
 
 
 # =====================================
@@ -59,31 +57,11 @@ echo '
 # =====================================
 # Check for requirements
 # =====================================
-if [ false == $SERVER ]; then
-    if [[ $QUICKSTART_PROVIDER == 'vmware_fusion' ]]; then
-        if [[ ! `which git` || ! `which vagrant` || ! `vagrant plugin list | grep vagrant-vmware-fusion` ]]; then
-            echo "Please install the requirements"
-            echo "* Git"
-            echo "* Vagrant"
-            echo "* VMWare Fusion with Vagrant provider"
-            exit 1
-        fi
-    else
-        if [[ ! `which git` || ! `which vagrant` || ! `which VBoxManage` ]]; then
-            echo "Please install the requirements"
-            echo "* Git"
-            echo "* Vagrant"
-            echo "* VirtualBox"
-            exit 1
-        fi
-    fi
-else
-    if [[ ! `which git` || ! `which puppet` ]]; then
-        echo "Please install the requirements"
-        echo "* Git"
-        echo "* Puppet"
-        exit 1
-    fi
+if [[ ! `which git` || ! `which puppet` ]]; then
+    echo "Please install the requirements"
+    echo "* Git"
+    echo "* Puppet"
+    exit 1
 fi
 
 # =====================================
@@ -127,13 +105,7 @@ echo ""
 echo "=================================="
 echo "= Provisioning"
 echo "=================================="
-if [ false == $SERVER ]; then
-    [[ -n $QUICKSTART_DOMAIN ]] && export QUICKSTART_DOMAIN="$QUICKSTART_DOMAIN"
-
-    vagrant reload --no-provision
-    vagrant up --no-provision --provider="$QUICKSTART_PROVIDER"
-    vagrant provision
-elif [[ -n "$QUICKSTART_DOMAIN" ]]; then
+if [[ -n "$QUICKSTART_DOMAIN" ]]; then
     export FACTER_quickstart_domain="$QUICKSTART_DOMAIN"
 
     puppet apply --modulepath=/srv/puppet/modules --templatedir=/srv/puppet/files /srv/puppet/manifests/init.pp
@@ -144,25 +116,10 @@ echo ""
 # =====================================
 # Chown the web directory to the web user
 # =====================================
-if [[ true == $SERVER ]]; then
-    echo "=================================="
-    echo "= Fixing file ownership"
-    echo "=================================="
-    chown -R vagrant:vagrant /srv/www
-fi
-
-
-# =====================================
-# Add vip.dev entry to hosts file
-# =====================================
-if [[ -n $QUICKSTART_DOMAIN && false == $SERVER ]]; then
-    echo "=================================="
-    echo "= Configuring the hosts file"
-    echo "=================================="
-
-    cat /etc/hosts | grep $QUICKSTART_DOMAIN || printf "\n# VIP Quickstart\n10.86.73.80 $QUICKSTART_DOMAIN\n" | sudo tee -a /etc/hosts
-    echo ""
-fi
+echo "=================================="
+echo "= Fixing file ownership"
+echo "=================================="
+chown -R vagrant:vagrant /srv/www
 
 
 # =====================================
