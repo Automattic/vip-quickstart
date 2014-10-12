@@ -7,7 +7,7 @@ DIR="$( dirname $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ) )"
 ORIG=`pwd`
 cd $DIR/..
 
-vagrant up
+vagrant up $1
 cp -f /etc/hosts pmc/hosts.backup
 cp -f /etc/hosts pmc/hosts
 vagrant ssh -c /srv/pmc/setup-sites.sh
