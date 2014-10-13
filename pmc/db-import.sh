@@ -11,7 +11,7 @@ sql_file=$2
 
 if [ ! -f "${sql_file}" ]; then
 	echo "File not found: ${sql_file}"
-	continue
+	exit
 fi
 
 site_id=`/usr/bin/wp --path=/srv/www/wp site list --fields=blog_id,domain --format=csv|grep "${site_slug}.local.dev" | cut -d',' -f1`
