@@ -9,7 +9,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 	private $needs_credentials = false;
 	private $access_token = null;
 	private $wpcom_endpoints = array(
-		'vip-themes' => 'https://public-api.wordpress.com/rest/v1/vip-themes',
+		'vip-themes' => 'https://public-api.wordpress.com/rest/v1/vip/themes',
 	);
 
 	private $svn_uri = 'https://vip-svn.wordpress.com/';

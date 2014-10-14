@@ -3,7 +3,7 @@
 class VIPOptionsSync extends Dashboard_Plugin {
 	private $action_descriptions = null;
 	private $wpcom_endpoints = array(
-		'vip-sites' => 'https://public-api.wordpress.com/rest/v1/vip-sites',
+		'vip-sites' => 'https://public-api.wordpress.com/rest/v1/vip/sites',
 	);
 
 	/**
