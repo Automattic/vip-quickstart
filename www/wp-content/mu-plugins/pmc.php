@@ -8,6 +8,9 @@ add_action( 'muplugins_loaded', function() {
 	if ( WP_DEBUG ) {
 		error_reporting( E_ALL );
 	}
+	
+	$_SERVER['SERVER_NAME'] = parse_url( get_home_url(), PHP_URL_HOST );
+
 } );
 
 add_filter('validate_current_theme', '__return_false');
@@ -27,3 +30,4 @@ function jf_cron_request( $cron_request ) {
 	$cron_request['args']['timeout'] = (float) 0.5;
 	return $cron_request;
 }
+
