@@ -16,6 +16,9 @@ if File.exists?('Quickstart.yaml') then
 	if defined?local_config['domain']
 		QUICKSTART_DOMAIN = local_config['domain']
 	end
+	if defined?local_config['memory']
+		QUICKSTART_VM_MEMORY = local_config['memory']
+	end
 end
 
 unless defined?QUICKSTART_DOMAIN
@@ -30,6 +33,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     override.vm.box = "precise64-vmware"
     override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
   end
+
+  if defined?QUICKSTART_VM_MEMORY
+    config.vm.provider "virtualbox" do |v|
+      v.memory = QUICKSTART_VM_MEMORY
+    end
+  end
+
   config.vm.hostname = QUICKSTART_DOMAIN
   config.vm.network :private_network, ip: "10.86.73.80"
 

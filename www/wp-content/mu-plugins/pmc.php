@@ -10,6 +10,18 @@ add_action( 'muplugins_loaded', function() {
 	}
 	
 	$_SERVER['SERVER_NAME'] = parse_url( get_home_url(), PHP_URL_HOST );
+	
+	if ( defined('WP_CLI') && WP_CLI ) {
+		// force display errors
+		if ( !ini_get( 'display_errors' ) ) {
+			ini_set( 'display_errors', '1' );
+		}
+		ob_implicit_flush(true);
+		if( 0 < ob_get_level() ) {
+			ob_flush();
+			ob_end_flush();
+		}
+	}
 
 } );
 
