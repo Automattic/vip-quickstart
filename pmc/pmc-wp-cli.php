@@ -99,6 +99,10 @@ class PMC_WP_CLI_Site extends WP_CLI_Command {
 		if ( !empty( $title ) && get_option( 'blogname' ) != $title )  {
 			update_option( 'blogname', $title );
 		}
+		
+		global $wpdb;		
+		$sql = "delete from `$wpdb->options` where option_name like '_transien%'";
+		$wpdb->query( $sql );
 
 		restore_current_blog();
 
