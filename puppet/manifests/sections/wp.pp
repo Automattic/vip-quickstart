@@ -28,12 +28,6 @@ $github_plugins = {
     'writing-helper' => 'https://github.com/automattic/writing-helper',
 }
 
-include database::settings
-# $mysql_password = $database::settings::mysql_password
-
-# notice("Got MySQL DB password '$mysql_password'")
-
-
 # Install WordPress
 exec { 'wp install /srv/www/wp':
   command => "/usr/bin/wp core multisite-install --url='${quickstart_domain}' --title='${quickstart_domain}' --admin_email='wordpress@${quickstart_domain}' --admin_name='wordpress' --admin_password='wordpress'",
@@ -121,13 +115,7 @@ vcsrepo { '/srv/www/wp-tests':
 file { 'local-config.php':
   ensure => present,
   path   => '/srv/www/local-config.php',
-  notify => Exec['local config header', 'generate salts']
-}
-
-# Add MySQL password created in database.pp to local config
-file_line { 'Add DB_PASSWORD to local-config.php':
-  line => "define(\'DB_PASSWORD\',      \'${database::settings::mysql_password}\');",
-  path => '/srv/www/local-config.php',
+  notify => Exec['generate salts']
 }
 
 # Add default path to local WP-CLI config
@@ -144,12 +132,7 @@ if ( $quickstart_domain ) {
   }
 }
 
-exec { 'local config header':
-  command     => 'printf "<?php\n" > /srv/www/local-config.php;',
-  refreshonly => true
-}
-
 exec { 'generate salts':
-  command     => 'curl https://api.wordpress.org/secret-key/1.1/salt/ >> /srv/www/local-config.php',
+  command     => 'printf "<?php\n" > /srv/www/local-config.php; curl https://api.wordpress.org/secret-key/1.1/salt/ >> /srv/www/local-config.php',
   refreshonly => true
 }
