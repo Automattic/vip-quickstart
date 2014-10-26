@@ -122,8 +122,9 @@ file { 'local-config.php':
 
 # Add MySQL password created in database.pp to local config
 file_line { 'Add DB_PASSWORD to local-config.php':
-  line => "define(\'DB_PASSWORD\',      \'${database::settings::mysql_password}\');",
-  path => '/srv/www/local-config.php',
+  line  => "define(\'DB_PASSWORD\', \'${database::settings::mysql_password}\');",
+  path  => '/srv/www/local-config.php',
+  match => 'DB_PASSWORD',
 }
 
 # Add default path to local WP-CLI config
