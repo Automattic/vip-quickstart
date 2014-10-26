@@ -29,10 +29,6 @@ $github_plugins = {
 }
 
 include database::settings
-# $mysql_password = $database::settings::mysql_password
-
-# notice("Got MySQL DB password '$mysql_password'")
-
 
 # Install WordPress
 exec { 'wp install /srv/www/wp':
