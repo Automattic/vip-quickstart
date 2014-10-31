@@ -71,7 +71,7 @@ cp -f /etc/hosts /srv/pmc/vagrant_hosts
 sed -e "/#pmcsetup/d" -i /srv/pmc/hosts
 sed -e "/#pmcsetup/d" -i /srv/pmc/vagrant_hosts
 
-/usr/bin/wp --path=/srv/www/wp site list --fields=domain --format=csv | sed -e '/^domain$/d' -e 's/^\(.\+\)/[ip] \1 #pmcsetup/' > server_hosts
+/usr/bin/wp --path=/srv/www/wp site list --fields=domain --format=csv | sed -e '/^domain$/d' -e 's/^\(.\+\)/[ip] \1 #pmcsetup\n[ip] live.\1 #pmcsetup/' > server_hosts
 sed -e 's/\[ip\]/10.86.73.80/' server_hosts >> /srv/pmc/hosts
 
 # need this for wp cron to work
