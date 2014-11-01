@@ -81,8 +81,13 @@ if ( ! defined( 'MP6_STYLE_GUIDE' ) )
     define('MP6_STYLE_GUIDE', true);
 
 /* Content Directory */
-define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
-define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/wp-content' );
+if ( !defined( 'WP_CONTENT_DIR' ) ) {
+	define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
+}
+
+if ( !defined( 'WP_CONTENT_URL' ) ) {
+	define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/wp-content' );
+}
 
 define('MULTISITE', true);
 define('SUNRISE', true);

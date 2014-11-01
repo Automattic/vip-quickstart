@@ -2,8 +2,8 @@
 /**
  * This class is reponsible for setting up theme for qa site where there are multiple versions
  * of the theme that are served over a subdomain, eg. [subdomain].xxx.yyy.zzz
- * The vip quick start deffault themes are located at WP_CONTENT_DIR/themes
- * The subdomain themes are located at WP_CONTENT_DIR/pmc-theme-switch/[subdomain]
+ * The vip quick start deffault themes are located at /srv/www/themes
+ * The subdomain themes are located at /srv/www/wp-content-sites/[subdomain]
  * If subdomain themes doesn't exist, it will fallback to default
  *
  */
@@ -12,12 +12,18 @@
 Add following code to local-config.php
 
 if ( preg_match( '/(?:(.+)\.)?([^.]+\.[^.]+\.[^.]+)$/si',$_SERVER['HTTP_HOST'], $matches ) ) {
-	if ( !empty( $matches[1] ) ) {
+	if ( !empty( $matches[1] ) && file_exists( __DIR__ . '/wp-content-sites/' . $matches[1] ) ) {
 		$_SERVER['SERVER_NAME']      = $_SERVER['HTTP_HOST'] = $matches[2];
 		$_SERVER['HTTP_HOST_PREFIX'] = $matches[1];
+		define( 'WP_HOME', 'http://' . $_SERVER['HTTP_HOST'] );
+		define( 'WP_CONTENT_DIR', __DIR__ . '/wp-content-sites/' . $_SERVER['HTTP_HOST_PREFIX'] );
+		define( 'WP_CONTENT_URL', WP_HOME . '/wp-content-sites/' . $_SERVER['HTTP_HOST_PREFIX'] );
+		define( 'WP_PLUGIN_DIR', __DIR__ .'/wp-content/plugins' );
+		define( 'WP_PLUGIN_URL', WP_HOME . '/wp-content/plugins' );
+		define( 'WPMU_PLUGIN_DIR', __DIR__ . '/wp-content/mu-plugins' );
+		define( 'WPMU_PLUGIN_URL', WP_HOME . '/wp-content/mu-plugins' );
 	}
 }
-
 
 */
 
@@ -39,19 +45,21 @@ final class PMC_Theme_Switch {
 
 	private function _init() {
 
+		add_action( 'init', array( $this, 'action_init' ) );
+
+	}
+
+	public function action_init() {
+
 		if ( !empty( $_SERVER['HTTP_HOST_PREFIX'] ) ) {
 			$this->_host_prefix = $_SERVER['HTTP_HOST_PREFIX'];
-			$this->_theme_directory = 'pmc-theme-switch/'. $this->_host_prefix;
-			$theme_directory_registered = register_theme_directory( $this->_theme_directory );
-
-			if ( !$theme_directory_registered ) {
-				header( 'Location: http://' . $_SERVER['HTTP_HOST'], true, 302);
-				die();
-			}
-
+			// quickstart mu plugins not playing nice in function wpcom_vip_quickstart_fix_domain
+			remove_all_filters( 'site_url' );
+			remove_all_filters( 'home_url' );
 			add_filter( 'home_url', array( $this, 'filter_url' ) );
 			add_filter( 'site_url', array( $this, 'filter_url' ) );
-			add_filter( 'theme_root', array( $this, 'filter_theme_root' ) );
+			add_filter( 'theme_root_uri', array( $this, 'filter_url' ) );
+			add_filter( 'plugins_url', array( $this, 'filter_url' ) );
 		}
 
 	}
@@ -60,20 +68,13 @@ final class PMC_Theme_Switch {
 		if ( empty( $this->_host_prefix ) ) {
 			return $url;
 		}
-		$scheme = parse_url( $url, PHP_URL_SCHEME );
-		return $scheme .'://' . $this->_host_prefix . '.'. $_SERVER['HTTP_HOST'];
-	}
-
-	public function filter_theme_root( $theme_root ) {
-		if ( !empty( $this->_theme_directory ) ) {
-			if ( file_exists( $this->_theme_directory ) ) {
-				return $this->_theme_directory;
-			}
-			if ( file_exists( WP_CONTENT_DIR . '/' . $this->_theme_directory ) ) {
-				return WP_CONTENT_DIR . '/' . $this->_theme_directory;
-			}
+		$url_parts = wp_parse_args( parse_url( $url ), array('path'=>'', 'scheme' => 'http', 'host' => $_SERVER['HTTP_HOST'] ) );
+		$url = $url_parts['scheme'] . '://' . $this->_host_prefix . '.' . $url_parts['host'] . $url_parts['path'];
+		if ( !empty( $url_parts['query'] ) ) {
+			$url .= '?'. $url_parts['query'];
 		}
-		return $theme_root;
+		unset( $url_parts );
+		return $url;
 	}
 
 }
