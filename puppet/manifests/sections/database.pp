@@ -1,6 +1,6 @@
 
 class database::settings {
-    $mysql_password = generate('/bin/sh', '-c', '< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-64};echo -n;')
+    $mysql_password = generate('/bin/sh', '-c', "< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c\${1:-64};echo -n;")
 }
 
 include database::settings
