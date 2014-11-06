@@ -43,9 +43,9 @@ package { 'pear.php.net/PHP_CodeSniffer':
 }
 
 vcsrepo { '/usr/share/php/PHP/CodeSniffer/Standards/WordPress':
+  ensure   => 'present',
   source   => 'https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards',
   provider => 'git',
-  ensure   => 'present',
   require  => Package['pear.php.net/PHP_CodeSniffer'],
 }
 
