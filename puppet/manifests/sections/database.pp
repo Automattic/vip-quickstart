@@ -21,3 +21,7 @@ mysql::grant { 'wptests':
   mysql_host       => 'localhost',
 }
 
+mysql::augeas {
+  'mysqld/log_slow_queries':
+    value => '/var/log/mysql/mysql-slow.log';
+}
