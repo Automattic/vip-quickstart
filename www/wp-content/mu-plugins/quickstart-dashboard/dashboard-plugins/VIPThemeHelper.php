@@ -158,7 +158,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 		$this->set_vip_scanned_themes( $themes );
 		
 		// Add the theme directory to the RepoMonitor
-		global $quickstart_dashboard;
+		$quickstart_dashboard = new Quickstart_Dashboard;
 		$plugins = $quickstart_dashboard->get_plugins();
 		if ( isset( $plugins['RepoMonitor'] ) ) {
 			$wp_theme = wp_get_theme( $themes[$theme]['stylesheet'] );
