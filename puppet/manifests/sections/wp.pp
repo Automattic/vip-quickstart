@@ -68,6 +68,13 @@ wp::command { 'plugin update --all':
   require  => Exec['wp install /srv/www/wp'],
 }
 
+# Symlink db.php for Query Monitor
+file { '/srv/www/wp-content/db.php':
+  ensure  => 'link',
+  target  => 'plugins/query-monitor/wp-content/db.php',
+  require => Wp::Plugin['query-monitor']
+}
+
 # Install WP-CLI
 class { 'wp::cli': ensure  => installed }
 
