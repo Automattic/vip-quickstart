@@ -14,6 +14,7 @@
 /www/wp-content/themes
 /www/wp-content/uploads
 /www/wp-content/upgrade
+/www/wp-content/db.php
 /www/wp-content/local-sunrise.php
 
 # tests
