@@ -23,3 +23,10 @@ function wpcom_vip_quickstart_fix_domain( $url, $path, $scheme = null, $blog_id 
 // Required to prevent infinite loop redirections from /wp-admin/network when the domain does not match 
 // what is in the DB, for example, in the AWS AMI
 add_filter( 'redirect_network_admin_request', '__return_false' );
+
+// Disable WordPress core updates
+// https://wordpress.org/plugins/disable-wordpress-core-update/developers/
+remove_action( 'wp_version_check', 'wp_version_check' );
+remove_action( 'admin_init', '_maybe_update_core' );
+add_filter( 'pre_transient_update_core', '__return_null' );
+add_filter( 'pre_site_transient_update_core', '__return_null' );

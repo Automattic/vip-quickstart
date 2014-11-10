@@ -40,5 +40,5 @@ done;
 if [ "$1" == "test-wp-filter" ]; then
 	echo ""
 else
-	vagrant ssh -c "cd /vagrant/www/wp; /usr/bin/wp $QUOTED_ARGS"
+	vagrant ssh -c "cd /vagrant/www/wp; /usr/bin/wp $QUOTED_ARGS" -- -q
 fi
