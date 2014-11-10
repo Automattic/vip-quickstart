@@ -30,6 +30,7 @@ done
 # Only use this script to configure servers
 if [ false == $SERVER ]; then
     git pull
+    git submodule update --init --recursive
     vagrant reload --no-provision || vagrant up --no-provision
     vagrant provision
     exit
@@ -104,11 +105,8 @@ echo ""
 echo "=================================="
 echo "= Provisioning"
 echo "=================================="
-if [[ -n "$QUICKSTART_DOMAIN" ]]; then
-    export FACTER_quickstart_domain="$QUICKSTART_DOMAIN"
-
-    puppet apply --modulepath=/srv/puppet/modules --templatedir=/srv/puppet/files /srv/puppet/manifests/init.pp
-fi
+[[ -n "$QUICKSTART_DOMAIN" ]] && export FACTER_quickstart_domain="$QUICKSTART_DOMAIN"
+puppet apply --modulepath=/srv/puppet/modules --templatedir=/srv/puppet/files /srv/puppet/manifests/init.pp
 echo ""
 
 
