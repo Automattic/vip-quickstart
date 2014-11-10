@@ -103,7 +103,7 @@ class VIPThemeHelper extends Dashboard_Plugin {
 
 	function admin_enqueue_scripts() {
 		if ( isset( $_REQUEST['page'] ) && 'vip-dashboard' == $_REQUEST['page'] ) {
-			wp_enqueue_script( 'vipthemehelper_js', get_bloginfo( 'wpurl' ) . '/wp-content/mu-plugins/quickstart-dashboard/js/vipthemehelper.js', array( 'jquery' ) );
+			wp_enqueue_script( 'vipthemehelper_js', WPMU_PLUGIN_URL . '/quickstart-dashboard/js/vipthemehelper.js', array( 'jquery' ) );
 			wp_localize_script( 'vipthemehelper_js', 'vipthemehelper_settings', array(
 				'translations'	=> array(
 					'action_done'	 => __( 'Done.', 'quickstart-dashboard' ),
