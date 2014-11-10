@@ -68,7 +68,7 @@ class RepoMonitor extends Dashboard_Plugin {
 	
 	function admin_enqueue_scripts() {
 		if ( isset( $_REQUEST['page'] ) && 'vip-dashboard' == $_REQUEST['page'] ) {
-			wp_enqueue_script( 'repomonitor_js', get_bloginfo( 'wpurl' ) . '/wp-content/mu-plugins/quickstart-dashboard/js/repomonitor.js', array( 'jquery' ) );
+			wp_enqueue_script( 'repomonitor_js', WPMU_PLUGIN_URL . '/quickstart-dashboard/js/repomonitor.js', array( 'jquery' ) );
 			wp_localize_script( 'repomonitor_js', 'repomonitor_settings', array(
 				'translations'	=> array(
 					'fetching_repos' => __( 'Retrieving list of repositories', 'quickstart-dashboard' ),
