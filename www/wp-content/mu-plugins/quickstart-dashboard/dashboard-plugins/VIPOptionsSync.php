@@ -78,7 +78,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	
 	function admin_enqueue_scripts() {
 		if ( isset( $_REQUEST['page'] ) && 'dashboard_options_sync' == $_REQUEST['page'] ) {
-			wp_enqueue_script( 'options_sync_js', get_bloginfo( 'wpurl' ) . '/wp-content/mu-plugins/quickstart-dashboard/js/options_sync.js', array( 'jquery' ) );
+			wp_enqueue_script( 'options_sync_js', WPMU_PLUGIN_URL . '/quickstart-dashboard/js/options_sync.js', array( 'jquery' ) );
 			wp_localize_script( 'options_sync_js', 'options_sync_settings', array(
 				'action_descriptions' => $this->get_action_descriptions(),
 				'table_dependencies'  => $this->table_dependencies,
