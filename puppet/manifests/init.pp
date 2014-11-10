@@ -14,7 +14,7 @@ class updates {
         timeout => 0
     }
 
-    if 'virtualbox' != $virtual {
+    if 'virtualbox' != $::virtual and 'vmware' != $::virtual {
         exec { 'apt-get upgrade':
             command => 'apt-get upgrade --quiet --yes',
             timeout => 0
