@@ -15,7 +15,7 @@ mysql::grant { 'wordpress':
 
 mysql::grant { 'wptests':
   mysql_privileges => 'ALL',
-  mysql_password   => $database::settings::mysql_password,
+  mysql_password   => 'wptests',
   mysql_db         => 'wptests',
   mysql_user       => 'wptests',
   mysql_host       => 'localhost',
