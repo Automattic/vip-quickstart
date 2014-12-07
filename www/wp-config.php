@@ -39,7 +39,9 @@ if ( ! defined( 'DB_PASSWORD' ) ) {
 }
 
 /** MySQL hostname */
-define( 'DB_HOST', 'localhost' );
+if ( ! defined( 'DB_HOST' ) ) {
+	define( 'DB_HOST', 'localhost' );
+}
 
 /** Database Charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8' );
