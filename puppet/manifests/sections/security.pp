@@ -1,4 +1,4 @@
-if 'virtualbox' != $virtual and 'vmware' != $virtual {
+if 'physical' == $virtual {
     # SSH
     include ssh::server
 
