@@ -1,5 +1,9 @@
 <?php
 
+function quickstart_env_is_staging() {
+	return getenv( 'QUICKSTART_ENV' ) == 'physical';
+}
+
 // On server installs (such as the QS AMI), we need to support arbitrary domains, so filter urls
 // to the current HTTP_HOST
 add_filter( 'site_url', 'wpcom_vip_quickstart_fix_domain', 9999, 4 );
