@@ -28,3 +28,7 @@
 [submodule "puppet/modules/ssh"]
 	path = puppet/modules/ssh
 	url = https://github.com/attachmentgenie/attachmentgenie-ssh.git
+[submodule "www"]
+	path = www
+	url = https://github.com/Automattic/vip-quickstart-skeleton.git
+	branch = master
