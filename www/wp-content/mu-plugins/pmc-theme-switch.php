@@ -50,6 +50,8 @@ final class PMC_Theme_Switch {
 	}
 
 	public function action_init() {
+		remove_all_filters( 'intermediate_image_sizes' );
+		remove_all_filters( 'send_headers' );
 
 		if ( !empty( $_SERVER['HTTP_HOST_PREFIX'] ) ) {
 			$this->_host_prefix = $_SERVER['HTTP_HOST_PREFIX'];
@@ -69,7 +71,7 @@ final class PMC_Theme_Switch {
 			return $url;
 		}
 		$url_parts = wp_parse_args( parse_url( $url ), array('path'=>'', 'scheme' => 'http', 'host' => $_SERVER['HTTP_HOST'] ) );
-		$url = $url_parts['scheme'] . '://' . $this->_host_prefix . '.' . $url_parts['host'] . $url_parts['path'];
+		$url = $url_parts['scheme'] . '://' . $this->_host_prefix . '.' . $_SERVER['HTTP_HOST'] . $url_parts['path'];
 		if ( !empty( $url_parts['query'] ) ) {
 			$url .= '?'. $url_parts['query'];
 		}
