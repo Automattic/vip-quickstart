@@ -1,14 +1,8 @@
 $plugins = [
-  'debug-bar',
-  'debug-bar-console',
-  'debug-bar-cron',
-  'debug-bar-extender',
-  'debug-bar-slow-actions',
-  'debug-bar-query-count-alert',
-  'debug-bar-remote-requests',
   'log-deprecated-notices',
   'log-viewer',
   'monster-widget',
+  'query-monitor',
   'user-switching',
   'wordpress-importer',
 
@@ -27,6 +21,8 @@ $github_plugins = {
     'media-explorer' => 'https://github.com/Automattic/media-explorer',
     'writing-helper' => 'https://github.com/automattic/writing-helper',
 }
+
+include database::settings
 
 # Install WordPress
 exec { 'wp install /srv/www/wp':
@@ -63,6 +59,13 @@ wp::command { 'plugin update --all':
   command  => 'plugin update --all',
   location => '/srv/www/wp',
   require  => Exec['wp install /srv/www/wp'],
+}
+
+# Symlink db.php for Query Monitor
+file { '/srv/www/wp-content/db.php':
+  ensure  => 'link',
+  target  => 'plugins/query-monitor/wp-content/db.php',
+  require => Wp::Plugin['query-monitor']
 }
 
 # Install WP-CLI
@@ -119,7 +122,14 @@ vcsrepo { '/srv/www/wp-tests':
 file { 'local-config.php':
   ensure => present,
   path   => '/srv/www/local-config.php',
-  notify => Exec['generate salts']
+  notify => Exec['local config header', 'generate salts']
+}
+
+# Add MySQL password created in database.pp to local config
+file_line { 'Add DB_PASSWORD to local-config.php':
+  line  => "define(\'DB_PASSWORD\', \'${database::settings::mysql_password}\');",
+  path  => '/srv/www/local-config.php',
+  match => 'DB_PASSWORD',
 }
 
 # Add default path to local WP-CLI config
@@ -136,7 +146,12 @@ if ( $quickstart_domain ) {
   }
 }
 
+exec { 'local config header':
+  command     => 'printf "<?php\n" > /srv/www/local-config.php;',
+  refreshonly => true
+}
+
 exec { 'generate salts':
-  command     => 'printf "<?php\n" > /srv/www/local-config.php; curl https://api.wordpress.org/secret-key/1.1/salt/ >> /srv/www/local-config.php',
+  command     => 'curl https://api.wordpress.org/secret-key/1.1/salt/ >> /srv/www/local-config.php',
   refreshonly => true
 }
