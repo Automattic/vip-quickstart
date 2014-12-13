@@ -33,7 +33,13 @@ class {
   'php::extension::memcache':;
   'php::extension::mysql':;
   'php::extension::xdebug':
-    inifile => false;
+    settings => {
+      set => {
+        '.anon/xdebug.idekey' => 'QUICKSTART',
+        '.anon/xdebug.remote_enable' => '1',
+        '.anon/xdebug.remote_connect_back' => '1',
+      }
+    }
 }
 
 # Install PHP_CodeSniffer and the WordPress coding standard
