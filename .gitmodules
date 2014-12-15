@@ -6,13 +6,13 @@
 	url = https://github.com/example42/puppi.git
 [submodule "puppet/modules/php"]
 	path = puppet/modules/php
-	url = https://github.com/nodesagency/puppet-php.git
+	url = https://github.com/jippi/puppet-php.git
 [submodule "puppet/modules/mysql"]
 	path = puppet/modules/mysql
 	url = https://github.com/example42/puppet-mysql.git
 [submodule "puppet/modules/nginx"]
 	path = puppet/modules/nginx
-	url = https://github.com/example42/puppet-nginx.git
+	url = https://github.com/netmanagers/puppet-nginx.git
 [submodule "puppet/modules/wp"]
 	path = puppet/modules/wp
 	url = https://github.com/joshbetz/puppet-wp.git
@@ -27,4 +27,4 @@
 	url = https://github.com/puppetlabs/puppetlabs-apt
 [submodule "puppet/modules/ssh"]
 	path = puppet/modules/ssh
-	url = https://github.com/attachmentgenie/puppet-module-ssh.git
+	url = https://github.com/attachmentgenie/attachmentgenie-ssh.git
