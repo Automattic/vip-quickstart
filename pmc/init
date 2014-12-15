@@ -7,6 +7,13 @@ DIR="$( dirname $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ) )"
 ORIG=`pwd`
 cd $DIR/..
 
+# =====================================
+# Give ourselves root access for the rest of the script
+# =====================================
+sudo -k
+sudo -p "Enter your password to continue:" whoami 1>/dev/null || exit
+echo ""
+
 vagrant up $1
 cp -f /etc/hosts pmc/hosts.backup
 cp -f /etc/hosts pmc/hosts
