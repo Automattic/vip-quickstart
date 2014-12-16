@@ -34,25 +34,28 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
   end
 
+  config.vm.hostname = QUICKSTART_DOMAIN
+  config.vm.network :private_network, ip: "10.86.73.80"
+
   if defined?QUICKSTART_VM_MEMORY
     config.vm.provider "virtualbox" do |v|
       v.memory = QUICKSTART_VM_MEMORY
     end
+	config.vm.provider "vmware_fusion" do |v|
+	  v.memory = QUICKSTART_VM_MEMORY
+	end
+  else
+    # Use 1GB of memory in virtualbox
+    config.vm.provider "virtualbox" do |v|
+      v.memory = 1024
+    end
+
+    # Use 1GB of memory in vmware_fusion
+    config.vm.provider "vmware_fusion" do |v|
+      v.memory = 1024
+    end
   end
-
-  config.vm.hostname = QUICKSTART_DOMAIN
-  config.vm.network :private_network, ip: "10.86.73.80"
-
-  # Use 1GB of memory in virtualbox
-  config.vm.provider "virtualbox" do |v|
-    v.memory = 1024
-  end
-
-  # Use 1GB of memory in vmware_fusion
-  config.vm.provider "vmware_fusion" do |v|
-    v.memory = 1024
-  end
-
+    
   config.vm.synced_folder ".", "/srv"
 
   # Address a bug in an older version of Puppet

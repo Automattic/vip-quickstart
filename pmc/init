@@ -10,7 +10,7 @@ cd $DIR/..
 vagrant up $1
 cp -f /etc/hosts pmc/hosts.backup
 cp -f /etc/hosts pmc/hosts
-vagrant ssh -c /srv/pmc/setup-sites.sh
+vagrant ssh -c /srv/pmc/setup-sites.sh -- -t
 cp -f pmc/hosts /etc/hosts
 
 # =====================================

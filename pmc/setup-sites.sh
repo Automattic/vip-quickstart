@@ -10,7 +10,7 @@ if [ ! -e /srv/www/wp-content/themes/twentyfourteen ]; then
 fi
 
 if [ ! -f ~/.ssh/bitbucket.org_id_rsa ]; then
-	./bitbucket-gen-key.sh
+	/srv/pmc/bitbucket-gen-key.sh
 fi
 
 sed -e '$a\' -e "define('SUBDOMAIN_INSTALL', true );" -e "/define\s*(\s*'SUBDOMAIN_INSTALL'/d" -i /srv/www/local-config.php
