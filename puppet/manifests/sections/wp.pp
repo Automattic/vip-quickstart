@@ -86,7 +86,7 @@ vcsrepo { '/srv/www/wp':
 
 cron { '/srv/www/wp':
   command => '/usr/bin/svn up /srv/www/wp > /dev/null 2>&1',
-  hour    => '*/30',
+  hour    => '*/1',
   user    => 'vagrant',
 }
 
@@ -98,7 +98,7 @@ vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
 
 cron { '/srv/www/wp-content/themes/vip/plugins':
   command => '/usr/bin/svn up /srv/www/wp-content/themes/vip/plugins > /dev/null 2>&1',
-  hour    => '*/30',
+  hour    => '*/1',
   user    => 'vagrant',
 }
 
