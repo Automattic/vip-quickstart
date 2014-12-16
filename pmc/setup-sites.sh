@@ -24,7 +24,7 @@ export HTTP_HOST="${DOMAIN}"
 if [ ! -d "/srv/www/wp-content/themes/vip/pmc-plugins" ]
 then
 	printf "\nDownloading pmc-plugins...\n"
-	if [ ! -f /home/vagrant/.ssh/bitbucket.org_id_rsa.pub ]
+	if [ ! -f /home/vagrant/.ssh/bitbucket.org_id_rsa ]
 	then
 		printf "\nSkipping this step, SSH key has not been created.\n"
 	else
