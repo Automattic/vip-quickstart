@@ -56,7 +56,10 @@ if ( ! defined( 'WPLANG' ) ) {
  * in their development environments.
  */
 define( 'WP_DEBUG', true );
-define( 'SAVEQUERIES', true );
+
+if ( ! defined( 'SAVEQUERIES' ) ) {
+	define( 'SAVEQUERIES', true );
+}
 
 if ( ! defined( 'JETPACK_DEV_DEBUG' ) ) {
 	define( 'JETPACK_DEV_DEBUG', true );
