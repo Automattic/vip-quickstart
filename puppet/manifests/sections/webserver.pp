@@ -6,6 +6,8 @@ class { 'nginx':
 }
 
 nginx::vhost { '_':
-  docroot  => '/srv/www',
-  template => 'nginx/vip.dev.erb',
+  docroot    => '/srv/www',
+  template   => 'nginx/vip.dev.erb',
+  owner      => 'www-data',
+  groupowner => 'www-data',
 }
