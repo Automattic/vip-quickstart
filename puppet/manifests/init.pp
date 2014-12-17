@@ -22,6 +22,15 @@ class updates {
     }
 }
 
+if 'physical' == $::virtual {
+    file { '/srv/www':
+        ensure  => directory,
+        recurse => true,
+        owner   => 'www-data',
+        group   => 'www-data',
+    }
+}
+
 user { ['vagrant', 'ubuntu']:
     groups => 'www-data',
 }
