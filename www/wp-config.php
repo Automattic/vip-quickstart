@@ -48,14 +48,7 @@ if ( ! defined( 'WPLANG' ) ) {
 	define( 'WPLANG', '' );
 }
 
-/**
- * For developers: WordPress debugging mode.
- *
- * Change this to true to enable the display of notices during development.
- * It is strongly recommended that plugin and theme developers use WP_DEBUG
- * in their development environments.
- */
-define( 'WP_DEBUG', true );
+define( 'WP_DEBUG', @getenv( 'QUICKSTART_ENV' ) == 'virtual' );
 define( 'SAVEQUERIES', true );
 
 if ( ! defined( 'JETPACK_DEV_DEBUG' ) ) {
