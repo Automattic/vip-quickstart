@@ -22,10 +22,6 @@ class updates {
     }
 }
 
-user { 'vagrant':
-    ensure => 'present',
-    system => true,
-    shell  => '/bin/bash',
-    home   => '/home/vagrant',
-    notify => Service['php5-fpm'],
+user { ['vagrant', 'ubuntu']:
+    groups => 'www-data',
 }
