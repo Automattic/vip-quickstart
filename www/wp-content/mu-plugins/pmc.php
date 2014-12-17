@@ -1,12 +1,5 @@
 <?php
 
-// Throw generic 404 message for images, css, js files to avoid wp from processing 404 page.
-$ext = pathinfo( $_SERVER['REQUEST_URI'], PATHINFO_EXTENSION );
-if ( in_array( $ext, array('jpg','png','gif','css','js','html') ) ) {
-	header("HTTP/1.0 404 Not Found");
-	die('File not found');
-}
-
 add_action('wp_feed_options', function( $feed, $url ) {
 	$feed->set_cache_duration( 12 * HOUR_IN_SECONDS );
 }, 10, 2);
