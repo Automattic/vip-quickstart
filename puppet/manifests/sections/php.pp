@@ -49,7 +49,7 @@ vcsrepo { '/usr/share/php/PHP/CodeSniffer/Standards/WordPress':
   require  => Package['pear.php.net/PHP_CodeSniffer'],
 }
 
-php::fpm::conf { 'www': user => 'vagrant' }
+php::fpm::conf { 'www': user => 'www-data' }
 
 file { '/etc/php5/conf.d/apc.ini': ensure => absent }
 
