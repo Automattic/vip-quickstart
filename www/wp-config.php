@@ -52,7 +52,7 @@ define( 'WP_DEBUG', @getenv( 'QUICKSTART_ENV' ) == 'virtual' );
 define( 'SAVEQUERIES', true );
 
 if ( ! defined( 'JETPACK_DEV_DEBUG' ) ) {
-	define( 'JETPACK_DEV_DEBUG', true );
+	define( 'JETPACK_DEV_DEBUG', @getenv( 'QUICKSTART_ENV' ) != 'virtual' );
 }
 
 /* Content Directory */
