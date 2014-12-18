@@ -25,6 +25,11 @@ unless defined?QUICKSTART_DOMAIN
 	QUICKSTART_DOMAIN='vip.local'
 end
 
+unless defined?QUICKSTART_VM_MEMORY
+	# Use 1GB of memory in virtualbox
+	QUICKSTART_VM_MEMORY=1024
+end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = "precise32"
@@ -37,23 +42,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.hostname = QUICKSTART_DOMAIN
   config.vm.network :private_network, ip: "10.86.73.80"
 
-  if defined?QUICKSTART_VM_MEMORY
-    config.vm.provider "virtualbox" do |v|
-      v.memory = QUICKSTART_VM_MEMORY
-    end
-	config.vm.provider "vmware_fusion" do |v|
-	  v.memory = QUICKSTART_VM_MEMORY
-	end
-  else
-    # Use 1GB of memory in virtualbox
-    config.vm.provider "virtualbox" do |v|
-      v.memory = 1024
-    end
-
-    # Use 1GB of memory in vmware_fusion
-    config.vm.provider "vmware_fusion" do |v|
-      v.memory = 1024
-    end
+  config.vm.provider "virtualbox" do |v|
+    v.memory = QUICKSTART_VM_MEMORY
+  end
+  config.vm.provider "vmware_fusion" do |v|
+    v.memory = QUICKSTART_VM_MEMORY
   end
     
   config.vm.synced_folder ".", "/srv"
