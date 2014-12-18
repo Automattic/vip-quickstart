@@ -2,6 +2,14 @@
 
 Here's an introduction to developing VIP Quickstart. If you have any additional questions, feel free to open an issue so we can write the proper documentation.
 
+## AMI
+
+We distribute an AMI on AWS. To build the AMI, we have a Packer configuration.
+
+* Install Packer. https://www.packer.io/docs/installation.html
+* Set up AWS keys.
+* In `bin`, run `packer build ami.json`.
+
 ## Testing
 
 At this point we only only test that the syntax is correct with puppet-lint.
