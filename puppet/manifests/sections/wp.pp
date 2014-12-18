@@ -29,7 +29,7 @@ exec { 'wp install /srv/www/wp':
   command => "/usr/bin/wp core multisite-install --url='${quickstart_domain}' --title='${quickstart_domain}' --admin_email='wordpress@${quickstart_domain}' --admin_name='wordpress' --admin_password='wordpress'",
   cwd     => '/srv/www/wp',
   unless  => "test -z ${quickstart_domain}",
-  user    => 'vagrant',
+  user    => 'www-data',
   require => [
     Vcsrepo['/srv/www/wp'],
     Class['wp::cli'],
@@ -88,7 +88,6 @@ cron { '/srv/www/wp':
   command => '/usr/bin/svn up /srv/www/wp > /dev/null 2>&1',
   minute  => '0',
   hour    => '*',
-  user    => 'vagrant',
 }
 
 vcsrepo { '/srv/www/wp-content/themes/vip/plugins':
@@ -101,7 +100,6 @@ cron { '/srv/www/wp-content/themes/vip/plugins':
   command => '/usr/bin/svn up /srv/www/wp-content/themes/vip/plugins > /dev/null 2>&1',
   minute  => '0',
   hour    => '*',
-  user    => 'vagrant',
 }
 
 vcsrepo { '/srv/www/wp-content/themes/pub/twentyfourteen':
