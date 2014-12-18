@@ -25,14 +25,14 @@ $github_plugins = {
 include database::settings
 
 # Install WordPress
-exec { 'wp install /srv/www/wp':
-  command => "/usr/bin/wp core multisite-install --url='${quickstart_domain}' --title='${quickstart_domain}' --admin_email='wordpress@${quickstart_domain}' --admin_name='wordpress' --admin_password='wordpress'",
-  cwd     => '/srv/www/wp',
-  unless  => "test -z ${quickstart_domain}",
-  user    => 'vagrant',
+wp::site { '/srv/www/wp':
+  url             => $quickstart_domain,
+  sitename        => $quickstart_domain,
+  admin_user      => 'wordpress',
+  admin_password => 'wordpress',
+  network         => true,
   require => [
     Vcsrepo['/srv/www/wp'],
-    Class['wp::cli'],
     Line['path:/srv/www/wp'],
   ]
 }
@@ -48,7 +48,7 @@ wp::plugin { $plugins:
   location    => '/srv/www/wp',
   networkwide => true,
   require     => [
-    Exec['wp install /srv/www/wp'],
+    Wp::Site['/srv/www/wp'],
     File['/srv/www/wp-content/plugins'],
     Gitplugin[ $github_plugin_keys ],
   ]
@@ -58,7 +58,7 @@ wp::plugin { $plugins:
 wp::command { 'plugin update --all':
   command  => 'plugin update --all',
   location => '/srv/www/wp',
-  require  => Exec['wp install /srv/www/wp'],
+  require  => Wp::Site['/srv/www/wp'],
 }
 
 # Symlink db.php for Query Monitor

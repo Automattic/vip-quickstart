@@ -111,15 +111,6 @@ echo ""
 
 
 # =====================================
-# Chown the web directory to the web user
-# =====================================
-echo "=================================="
-echo "= Fixing file ownership"
-echo "=================================="
-chown -R vagrant:vagrant /srv/www
-
-
-# =====================================
 # Outro/next steps
 # =====================================
 if [[ ! $IS_INSTALLED ]]; then
