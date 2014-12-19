@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 DOMAIN='local.dev'
 
@@ -14,6 +14,7 @@ if [ ! -f ~/.ssh/bitbucket.org_id_rsa ]; then
 fi
 
 sed -e '$a\' -e "define('SUBDOMAIN_INSTALL', true );" -e "/define\s*(\s*'SUBDOMAIN_INSTALL'/d" -i /srv/www/local-config.php
+sed -e '$a\' -e "define('AUTOMATIC_UPDATER_DISABLED', true );" -e "/define\s*(\s*'AUTOMATIC_UPDATER_DISABLED'/d" -i /srv/www/local-config.php
 if [ "0" == "`/usr/bin/wp --path=/srv/www/wp network meta get 1 subdomain_install`" ]; then
 	/usr/bin/wp --path=/srv/www/wp network meta update 1 subdomain_install 1
 fi
@@ -88,3 +89,8 @@ sudo sed -e "/http {/a\ \ ssl_certificate     /etc/ssl/dev-san-domain-chained.cr
 sudo sed -e "/listen 80;/a\ \ listen 443 ssl;" -e "/listen 443/d" -i /etc/nginx/sites-available/50-_.conf
 sudo sed -e "/listen 80;/a\ \ listen 443 ssl;" -e "/listen 443/d" -i /etc/nginx/sites-enabled/50-_.conf
 sudo service nginx reload
+
+sudo apt-get install rubygems -y
+sudo apt-get install ruby -y
+sudo gem install sass compass compass-rgbapng compass-photoshop-drop-shadow sassy-strings compass-import-once
+
