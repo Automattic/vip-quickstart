@@ -114,18 +114,26 @@ vcsrepo { '/srv/www/wp-tests':
   provider => svn,
 }
 
-# Create a local config
-file { 'local-config.php':
-  ensure => present,
-  path   => '/srv/www/local-config.php',
-  notify => Exec['local config header', 'generate salts']
-}
+if 'physical' == $::virtual {
+  # Create a local config
+  file { 'local-config.php':
+    ensure => present,
+    path   => '/srv/www/local-config.php',
+    notify => Exec['SUBDOMAIN_INSTALL'],
+  }
 
-# Add MySQL password created in database.pp to local config
-file_line { 'Add DB_PASSWORD to local-config.php':
-  line  => "define(\'DB_PASSWORD\', \'${database::settings::mysql_password}\');",
-  path  => '/srv/www/local-config.php',
-  match => 'DB_PASSWORD',
+  exec { 'SUBDOMAIN_INSTALL':
+    command     => 'echo "define(\'SUBDOMAIN_INSTALL\', true);" >> /srv/www/local-config.php',
+    unless      => 'grep "SUBDOMAIN_INSTALL /srv/www/local-config.php',
+    refreshonly => true,
+    require     => Exec['local config header'],
+  }
+} else {
+  # Create a local config
+  file { 'local-config.php':
+    ensure => present,
+    path   => '/srv/www/local-config.php',
+  }
 }
 
 # Add default path to local WP-CLI config
@@ -143,11 +151,27 @@ if ( $quickstart_domain ) {
 }
 
 exec { 'local config header':
-  command     => 'printf "<?php\n" > /srv/www/local-config.php;',
-  refreshonly => true
+  command => 'printf "<?php\n" > /srv/www/local-config.php;',
+  unless  => 'grep "<?php" /srv/www/local-config.php',
+  require => File['local-config.php'],
 }
 
 exec { 'generate salts':
-  command     => 'curl https://api.wordpress.org/secret-key/1.1/salt/ >> /srv/www/local-config.php',
-  refreshonly => true
+  command => 'curl https://api.wordpress.org/secret-key/1.1/salt/ >> /srv/www/local-config.php',
+  unless  => 'grep "AUTH_KEY" /srv/www/local-config.php',
+  require => [
+    File['local-config.php'],
+    Exec['local config header'],
+  ]
+}
+
+# Add MySQL password created in database.pp to local config
+file_line { 'Add DB_PASSWORD to local-config.php':
+  line    => "define(\'DB_PASSWORD\', \'${database::settings::mysql_password}\');",
+  path    => '/srv/www/local-config.php',
+  match   => 'DB_PASSWORD',
+  require => [
+    File['local-config.php'],
+    Exec['local config header'],
+  ]
 }
