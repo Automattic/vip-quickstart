@@ -26,6 +26,8 @@ file { '/srv/www/wp-content':
     ensure  => directory,
     recurse => true,
     mode    => 0664,
+    owner   => 'www-data',
+    group   => 'www-data',
 }
 
 user { ['vagrant', 'ubuntu']:
