@@ -22,6 +22,12 @@ if 'physical' == $::virtual {
     }
 }
 
+file { '/srv/www/wp-content':
+    ensure  => directory,
+    recurse => true,
+    mode    => 0664,
+}
+
 user { ['vagrant', 'ubuntu']:
     groups => 'www-data',
 }
