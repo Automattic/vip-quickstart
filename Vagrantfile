@@ -30,7 +30,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.memory = 1024
   end
 
-  config.vm.synced_folder ".", "/srv", owner: 'www-data'
+  config.vm.synced_folder ".", "/srv", type: 'rsync', owner: 'www-data'
+  config.vm.synced_folder "www/wp-content/themes/vip", "/srv/www/wp-content/themes/vip"
 
   # Address a bug in an older version of Puppet
   # See http://stackoverflow.com/questions/10894661/augeas-support-on-my-vagrant-machine
