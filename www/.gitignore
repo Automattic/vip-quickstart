@@ -5,7 +5,8 @@
 
 # wp-content directory
 /wp-content/plugins
-/wp-content/themes
+/wp-content/themes/*
+!vip
 /wp-content/uploads
 /wp-content/upgrade
 /wp-content/db.php
