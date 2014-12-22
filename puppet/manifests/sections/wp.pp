@@ -71,11 +71,21 @@ file { '/srv/www/wp-content/db.php':
 # Install WP-CLI
 class { 'wp::cli': ensure  => installed }
 
-# Make sure the themes directory exists
-file { '/srv/www/wp-content/themes': ensure => 'directory' }
+# Make sure the wp-content directories exists
+$wp_content_dirs = [
+  '/srv/www/wp-content/themes',
+  '/srv/www/wp-content/plugins',
+  '/srv/www/wp-content/upgrade',
+  '/srv/www/wp-content/uploads',
+]
 
-# Make sure the plugins directory exists
-file { '/srv/www/wp-content/plugins': ensure => 'directory' }
+file { $wp_content_dirs:
+    ensure  => directory,
+    recurse => true,
+    mode    => 0664,
+    owner   => 'www-data',
+    group   => 'www-data',
+}
 
 # VCS Checkout
 vcsrepo { '/srv/www/wp':
