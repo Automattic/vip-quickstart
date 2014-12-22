@@ -20,8 +20,5 @@
 # tests
 /www/wp-tests
 
-# WP-CLI dev mode
-/wp-cli
-
 # Logs
 www/wp-content/debug.log
