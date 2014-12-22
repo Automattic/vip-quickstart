@@ -13,12 +13,12 @@ class updates {
         command => 'apt-get update --quiet --yes',
         timeout => 0
     }
+}
 
-    if 'physical' == $::virtual {
-        exec { 'apt-get upgrade':
-            command => 'apt-get upgrade --quiet --yes',
-            timeout => 0
-        }
+if 'physical' == $::virtual {
+    exec { 'apt-get upgrade':
+        command => 'apt-get upgrade --quiet --yes',
+        timeout => 0
     }
 }
 
