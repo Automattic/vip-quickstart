@@ -2,10 +2,11 @@
 define gitplugin ( $git_urls ) {
     vcsrepo { "/srv/www/wp-content/plugins/${title}" :
         ensure   => present,
+        force    => true,
         source   => $git_urls[$title],
         provider => git,
         require  => [
-            Exec['wp install /srv/www/wp'],
+            Wp::Site['/srv/www/wp'],
             File['/srv/www/wp-content/plugins'],
         ]
     }

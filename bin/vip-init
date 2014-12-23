@@ -105,21 +105,9 @@ echo ""
 echo "=================================="
 echo "= Provisioning"
 echo "=================================="
-if [[ -n "$QUICKSTART_DOMAIN" ]]; then
-    export FACTER_quickstart_domain="$QUICKSTART_DOMAIN"
-
-    puppet apply --modulepath=/srv/puppet/modules --templatedir=/srv/puppet/files /srv/puppet/manifests/init.pp
-fi
+[[ -n "$QUICKSTART_DOMAIN" ]] && export FACTER_quickstart_domain="$QUICKSTART_DOMAIN"
+puppet apply --modulepath=/srv/puppet/modules --templatedir=/srv/puppet/files /srv/puppet/manifests/init.pp
 echo ""
-
-
-# =====================================
-# Chown the web directory to the web user
-# =====================================
-echo "=================================="
-echo "= Fixing file ownership"
-echo "=================================="
-chown -R vagrant:vagrant /srv/www
 
 
 # =====================================

@@ -1,0 +1,23 @@
+{
+	"builders": [
+		{
+			"type": "amazon-ebs",
+			"region": "us-east-1",
+			"source_ami": "ami-2acc7a42",
+			"instance_type": "t1.micro",
+			"ssh_username": "ubuntu",
+			"ami_name": "VIP Quickstart {{timestamp}}"
+		}
+	],
+
+	"provisioners": [
+		{
+			"type": "shell",
+			"inline": [ "sleep 10" ]
+		},
+		{
+			"type": "shell",
+			"script": "ami-provision.sh"
+		}
+	]
+}

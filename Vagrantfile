@@ -15,7 +15,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.hostname = 'vip.local'
   config.vm.network :private_network, ip: "10.86.73.80"
 
-  config.vm.synced_folder ".", "/srv"
+  # Use 1GB of memory in virtualbox
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 1024
+  end
+
+  # Use 1GB of memory in vmware_fusion
+  config.vm.provider "vmware_fusion" do |v|
+    v.memory = 1024
+  end
+
+  config.vm.synced_folder ".", "/srv", owner: 'www-data', group: 'www-data', mount_options: ["dmode=775", "fmode=664"]
 
   # Map MySQL to local port 3306
   config.vm.network :forwarded_port, guest: 3306, host: 3306
@@ -25,7 +35,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     puppet.module_path = "puppet/modules"
     puppet.manifests_path = "puppet/manifests"
     puppet.manifest_file  = "init.pp"
-    puppet.options = ['--templatedir', '/vagrant/puppet/files']
+    puppet.options = ['--templatedir', '/srv/puppet/files']
     puppet.facter = {
       "quickstart_domain" => 'vip.local',
     }
