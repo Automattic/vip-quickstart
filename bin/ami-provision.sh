@@ -12,3 +12,6 @@ sudo git clone https://github.com/Automattic/vip-quickstart.git /srv
 
 # Install Quickstart
 sudo /srv/bin/vip-init --server --domain=vip.dev
+
+# Delete all authorized_key files
+sudo find / -name "authorized_keys" -print -exec rm {} \;

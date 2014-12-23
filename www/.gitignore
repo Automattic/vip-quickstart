@@ -1,0 +1,19 @@
+# WordPress directory
+/wp
+/local-config.php
+/wp-cli.yml
+
+# wp-content directory
+/wp-content/plugins
+/wp-content/themes/*
+!vip
+/wp-content/uploads
+/wp-content/upgrade
+/wp-content/db.php
+/wp-content/local-sunrise.php
+
+# tests
+/wp-tests
+
+# Logs
+/wp-content/debug.log
