@@ -21,6 +21,14 @@ server {
     deny all;
   }
 
+  # Don't try to rewrite static assets
+  # Just return 404 if not found
+  # The reason is pretty simple: each 404'd asset will try to pass that to WP
+  # Spawning a bunch of unwanted requests and making things SLOOOOOOOW
+  location ~ \.(png|jpg|css|js)$ {
+    try_files $uri return 404;
+  }
+
   location / {
     try_files $uri $uri/ /index.php?$args;
   }
