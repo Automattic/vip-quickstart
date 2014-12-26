@@ -27,8 +27,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Use 1GB of memory in vmware_fusion
     v.memory = 1024
 
-    override.vm.box = "precise64-vmware"
-    override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
+    v.vm.box = "precise64-vmware"
+    v.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
   end
 
   # Use Rsync if it's available
