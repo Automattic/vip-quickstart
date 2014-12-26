@@ -146,6 +146,14 @@ if 'physical' == $::virtual {
   }
 }
 
+$jetpack_dev_debug = $::virtual != 'physical'
+file_line { 'JETPACK_DEV_DEBUG':
+  line    => "define('JETPACK_DEV_DEBUG', ${jetpack_dev_debug});",
+  path    => '/srv/www/local-config.php',
+  match   => 'JETPACK_DEV_DEBUG',
+  require => File['local-config.php'],
+}
+
 # Add default path to local WP-CLI config
 line { 'path:/srv/www/wp':
   line => 'path:/srv/www/wp',
