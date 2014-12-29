@@ -31,22 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
   end
 
-  # Use Rsync if it's available
-  if Vagrant::Util::Which.which("rsync")
-    config.vm.synced_folder ".", "/srv", type: "rsync",
-      owner: "www-data",
-      group: "www-data",
-      mount_options: ["dmode=775", "fmode=644"]
-    config.vm.synced_folder "www/wp-content/themes/vip", "/srv/www/wp-content/themes/vip",
-      owner: "www-data",
-      group: "www-data",
-      mount_options: ["dmode=775", "fmode=664"]
-  else
-    config.vm.synced_folder ".", "/srv",
-      owner: "www-data",
-      group: "www-data",
-      mount_options: ["dmode=775", "fmode=644"]
-  end
+  config.vm.synced_folder ".", "/srv", owner: 'www-data', group: 'www-data', mount_options: ["dmode=775", "fmode=664"]
 
   # Address a bug in an older version of Puppet
   # See http://stackoverflow.com/questions/10894661/augeas-support-on-my-vagrant-machine
