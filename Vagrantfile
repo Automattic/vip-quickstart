@@ -36,6 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Address a bug in an older version of Puppet
   # See http://stackoverflow.com/questions/10894661/augeas-support-on-my-vagrant-machine
   config.vm.provision :shell, :inline => "if ! dpkg -s puppet > /dev/null; then sudo apt-get update --quiet --yes && sudo apt-get install puppet --quiet --yes; fi"
+  config.vm.provision :shell, :inline => "sudo apt-get update --quiet --yes && sudo apt-get install git --quiet --yes; cd /srv; git submodule update --init --recursive"
 
   # Provision everything we need with Puppet
   config.vm.provision :puppet do |puppet|
