@@ -29,8 +29,8 @@ done
 
 # Only use this script to configure servers
 if [ false == $SERVER ]; then
-    git pull
-    git submodule update --init --recursive
+    #git pull
+    #git submodule update --init --recursive
     vagrant reload --no-provision || vagrant up --no-provision
     vagrant provision
     exit
@@ -75,15 +75,7 @@ echo ""
 # =====================================
 # Ask for domain
 # =====================================
-if [[ -z "$QUICKSTART_DOMAIN" && ! $IS_INSTALLED ]]; then
-    echo "=================================="
-    echo "= Domain Setup"
-    echo "=================================="
-
-    read -e -p "What domain would you like to use? [vip.dev]:" QUICKSTART_DOMAIN
-    QUICKSTART_DOMAIN="${QUICKSTART_DOMAIN:-vip.dev}"
-    echo ""
-fi
+QUICKSTART_DOMAIN="qz.dev"
 
 
 # =====================================
@@ -109,6 +101,9 @@ echo "=================================="
 puppet apply --modulepath=/srv/puppet/modules --templatedir=/srv/puppet/files /srv/puppet/manifests/init.pp
 echo ""
 
+# =====================================
+# Enable Theme
+# =====================================
 
 # =====================================
 # Outro/next steps

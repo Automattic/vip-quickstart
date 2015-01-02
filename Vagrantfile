@@ -13,7 +13,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = "precise32"
   config.vm.box_url = "http://files.vagrantup.com/precise32.box"
-  config.vm.hostname = 'vip.local'
+  config.vm.hostname = 'qz.dev'
   config.vm.network :private_network, ip: "10.86.73.80"
 
   # Virtualbox overrides
@@ -45,8 +45,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     puppet.manifest_file  = "init.pp"
     puppet.options = ['--templatedir', '/srv/puppet/files']
     puppet.facter = {
-      "quickstart_domain" => 'vip.local',
+      "quickstart_domain" => 'qz.dev',
     }
   end
+
+  # Quartz configuration
+  config.vm.provision :shell, :path => "bin/qz"
 
 end

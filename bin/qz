@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# =====================================
+# Create symlink to theme
+# =====================================
+cd /srv/www/wp-content/themes/vip
+ln -s ../../../qzwordpress/wp-content/themes/vip/qzapi ./qzapi
+echo "Symlink from www/qzwordpress/wp-content/themes/vip/qzapi to www/wp-content/themes/vip/qzapi added."
+
+# =====================================
+# Enable/activate theme
+# =====================================
+su -c "wp theme enable vip/qzapi" vagrant
+su -c "wp theme activate vip/qzapi" vagrant
+
+# =====================================
+# Configure Settings > General
+# =====================================
+su -c "wp option update blogname 'Quartz'" vagrant
+su -c "wp option update blogdescription 'Quartz is a digitally native news outlet for the new global economy.'" vagrant
+
+# =====================================
+# Import Content
+# =====================================
+su -c "wp import /srv/import/post1.xml --authors=skip --skip=image_resize" vagrant
+su -c "wp import /srv/import/note1.xml --authors=skip --skip=image_resize" vagrant
+
+# =====================================
+# Fix thumnails
+# =====================================
+
+
+# =====================================
+# Configure Queues
+# =====================================
+
+# =====================================
+# Configure Menus
+# =====================================
+
+# Find posts that have a _thumbnail_id and the _thumbnail_id exists
+wp db query 'delete from wp_posts WHERE id NOT IN (select p.id from wp_posts AS p LEFT JOIN wp_postmeta AS pm ON pm.post_id = p.id LEFT JOIN wp_posts AS p2 ON p.id = p2.id WHERE pm.meta_key = "_thumbnail_id")'
+
+wp db query 'SELECT post_parent FROM wp_posts WHERE id IN (SELECT pm.meta_value FROM wp_posts AS p LEFT JOIN wp_postmeta AS pm ON p.id = pm.post_id WHERE pm.meta_key = "_thumbnail_id") LIMIT 10'

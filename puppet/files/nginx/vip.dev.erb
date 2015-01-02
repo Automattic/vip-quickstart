@@ -21,6 +21,10 @@ server {
     deny all;
   }
 
+  location ~* \.(eot|ttf|woff|woff2)$ {
+    add_header Access-Control-Allow-Origin *;
+  }
+
   location / {
     try_files $uri $uri/ /index.php?$args;
   }
