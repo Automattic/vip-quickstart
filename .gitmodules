@@ -28,3 +28,9 @@
 [submodule "puppet/modules/ssh"]
 	path = puppet/modules/ssh
 	url = https://github.com/attachmentgenie/attachmentgenie-ssh.git
+[submodule "www/qzapp"]
+	path = www/qzapp
+	url = https://github.com/Quartz/qzapp.git
+[submodule "www/qzwordpress"]
+	path = www/qzwordpress
+	url = https://github.com/Quartz/qzwordpress.git
