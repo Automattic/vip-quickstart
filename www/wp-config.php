@@ -48,7 +48,7 @@ if ( ! defined( 'WPLANG' ) ) {
 	define( 'WPLANG', '' );
 }
 
-define( 'WP_DEBUG', @getenv( 'QUICKSTART_ENV' ) == 'virtual' );
+define( 'WP_DEBUG', true );
 define( 'SAVEQUERIES', true );
 
 if ( ! defined( 'JETPACK_DEV_DEBUG' ) ) {

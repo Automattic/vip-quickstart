@@ -71,11 +71,21 @@ file { '/srv/www/wp-content/db.php':
 # Install WP-CLI
 class { 'wp::cli': ensure  => installed }
 
-# Make sure the themes directory exists
-file { '/srv/www/wp-content/themes': ensure => 'directory' }
+# Make sure the wp-content directories exists
+$wp_content_dirs = [
+  '/srv/www/wp-content/themes',
+  '/srv/www/wp-content/plugins',
+  '/srv/www/wp-content/upgrade',
+  '/srv/www/wp-content/uploads',
+]
 
-# Make sure the plugins directory exists
-file { '/srv/www/wp-content/plugins': ensure => 'directory' }
+file { $wp_content_dirs:
+    ensure  => directory,
+    recurse => true,
+    mode    => 0664,
+    owner   => 'www-data',
+    group   => 'www-data',
+}
 
 # VCS Checkout
 vcsrepo { '/srv/www/wp':
@@ -118,18 +128,34 @@ vcsrepo { '/srv/www/wp-tests':
   provider => svn,
 }
 
-# Create a local config
-file { 'local-config.php':
-  ensure => present,
-  path   => '/srv/www/local-config.php',
-  notify => Exec['local config header', 'generate salts']
+if 'physical' == $::virtual {
+  # Create a local config
+  file { 'local-config.php':
+    ensure => present,
+    path   => '/srv/www/local-config.php',
+    notify => Exec['SUBDOMAIN_INSTALL'],
+  }
+
+  exec { 'SUBDOMAIN_INSTALL':
+    command     => 'echo "define(\'SUBDOMAIN_INSTALL\', true);" >> /srv/www/local-config.php',
+    unless      => 'grep "SUBDOMAIN_INSTALL /srv/www/local-config.php',
+    refreshonly => true,
+    require     => Exec['local config header'],
+  }
+} else {
+  # Create a local config
+  file { 'local-config.php':
+    ensure => present,
+    path   => '/srv/www/local-config.php',
+  }
 }
 
-# Add MySQL password created in database.pp to local config
-file_line { 'Add DB_PASSWORD to local-config.php':
-  line  => "define(\'DB_PASSWORD\', \'${database::settings::mysql_password}\');",
-  path  => '/srv/www/local-config.php',
-  match => 'DB_PASSWORD',
+$jetpack_dev_debug = $::virtual != 'physical'
+file_line { 'JETPACK_DEV_DEBUG':
+  line    => "define('JETPACK_DEV_DEBUG', ${jetpack_dev_debug});",
+  path    => '/srv/www/local-config.php',
+  match   => 'JETPACK_DEV_DEBUG',
+  require => File['local-config.php'],
 }
 
 # Add default path to local WP-CLI config
@@ -147,11 +173,27 @@ if ( $quickstart_domain ) {
 }
 
 exec { 'local config header':
-  command     => 'printf "<?php\n" > /srv/www/local-config.php;',
-  refreshonly => true
+  command => 'printf "<?php\n" > /srv/www/local-config.php;',
+  unless  => 'grep "<?php" /srv/www/local-config.php',
+  require => File['local-config.php'],
 }
 
 exec { 'generate salts':
-  command     => 'curl https://api.wordpress.org/secret-key/1.1/salt/ >> /srv/www/local-config.php',
-  refreshonly => true
+  command => 'curl https://api.wordpress.org/secret-key/1.1/salt/ >> /srv/www/local-config.php',
+  unless  => 'grep "AUTH_KEY" /srv/www/local-config.php',
+  require => [
+    File['local-config.php'],
+    Exec['local config header'],
+  ]
+}
+
+# Add MySQL password created in database.pp to local config
+file_line { 'Add DB_PASSWORD to local-config.php':
+  line    => "define(\'DB_PASSWORD\', \'${database::settings::mysql_password}\');",
+  path    => '/srv/www/local-config.php',
+  match   => 'DB_PASSWORD',
+  require => [
+    File['local-config.php'],
+    Exec['local config header'],
+  ]
 }
