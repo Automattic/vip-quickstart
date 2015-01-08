@@ -137,9 +137,10 @@ class PMC_WP_CLI_Site extends WP_CLI_Command {
 		foreach ( wp_get_sites() as $site ) {
 			$blog_id = $site['blog_id'];
 			switch_to_blog( $blog_id );
+			$blog_domain = str_replace( $old_domain, $domain, $site['domain'] );
 			$blog_data = array(
-					'domain'  => str_replace( $old_domain, $domain, $site['domain'] ),
-					'siteurl' => 'http://' . $domain,
+					'domain'  => $blog_domain,
+					'siteurl' => 'http://' . $blog_domain,
 					'path'    => '/',
 				);
 			$blog_address = esc_url_raw( $blog_data['siteurl'] );
@@ -154,7 +155,29 @@ class PMC_WP_CLI_Site extends WP_CLI_Command {
 
 			update_blog_details( $blog_id, $blog_data );
 			restore_current_blog();
+			WP_CLI::line( "{$blog_data['domain']} -> {$blog_domain}" );
+		}
 
+
+		if ( file_exists( __DIR__ . '/hosts' ) ) {
+			$hosts = file_get_contents( __DIR__ . '/hosts' );
+			$hosts = preg_replace('/\s'. preg_quote( $old_domain ) .'\s/', " {$domain} ", $hosts);
+			$hosts = preg_replace('/\.'. preg_quote( $old_domain ) .'\s/', ".{$domain} ", $hosts);
+			file_put_contents( __DIR__ . '/hosts' , $hosts );
+		}
+
+		if ( file_exists( __DIR__ . '/server_hosts' ) ) {
+			$hosts = file_get_contents( __DIR__ . '/server_hosts' );
+			$hosts = preg_replace('/\s'. preg_quote( $old_domain ) .'\s/', " {$domain} ", $hosts);
+			$hosts = preg_replace('/\.'. preg_quote( $old_domain ) .'\s/', ".{$domain} ", $hosts);
+			file_put_contents( __DIR__ . '/server_hosts' , $hosts );
+		}
+
+		if ( file_exists( '/etc/hosts' ) ) {
+			$hosts = file_get_contents( '/etc/hosts' );
+			$hosts = preg_replace('/\s'. preg_quote( $old_domain ) .'\s/', " {$domain} ", $hosts);
+			$hosts = preg_replace('/\.'. preg_quote( $old_domain ) .'\s/', ".{$domain} ", $hosts);
+			file_put_contents( '/etc/hosts' , $hosts );
 		}
 
 		WP_CLI::success( "{$old_domain} -> {$domain}" );

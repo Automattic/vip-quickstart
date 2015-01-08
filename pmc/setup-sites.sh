@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOMAIN='local.dev'
+DOMAIN='vip.local'
 
 cd `dirname "$0"`
 
@@ -22,7 +22,7 @@ fi
 export HTTP_USER_AGENT="WP_CLI"
 export HTTP_HOST="${DOMAIN}"
 
-/usr/bin/wp --require=/srv/pmc/pmc-wp-cli.php --path=/srv/www/wp pmc-site set-domain ${DOMAIN}
+sudo /usr/bin/wp --allow-root --require=/srv/pmc/pmc-wp-cli.php --path=/srv/www/wp pmc-site set-domain ${DOMAIN}
 
 if [ ! -d "/srv/www/wp-content/themes/vip/pmc-plugins" ]
 then

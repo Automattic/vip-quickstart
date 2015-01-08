@@ -13,19 +13,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = "precise32"
   config.vm.box_url = "http://files.vagrantup.com/precise32.box"
-  config.vm.hostname = 'local.dev'
+  config.vm.hostname = 'vip.local'
   config.vm.network :private_network, ip: "10.86.73.80"
 
   # Virtualbox overrides
   config.vm.provider "virtualbox" do |v|
-    # Use 4GB of memory
-    v.memory = 4048
+    # Use 1GB of memory
+    v.memory = 1024
   end
 
   # VMWare Fusion overrides
   config.vm.provider "vmware_fusion" do |v|
-    # Use 4GB of memory in vmware_fusion
-    v.memory = 4048
+    # Use 1GB of memory in vmware_fusion
+    v.memory = 1024
 
     v.vm.box = "precise64-vmware"
     v.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
@@ -45,7 +45,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     puppet.manifest_file  = "init.pp"
     puppet.options = ['--templatedir', '/srv/puppet/files']
     puppet.facter = {
-      "quickstart_domain" => 'local.dev',
+      "quickstart_domain" => 'vip.local',
     }
   end
 
