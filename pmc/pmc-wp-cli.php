@@ -114,21 +114,25 @@ class PMC_WP_CLI_Site extends WP_CLI_Command {
 	 * @synopsis <domain>
 	*/
 	public function set_domain($args, $assoc_args) {
+		global $wpdb;
+
 		$sites = wp_get_sites();
 
 		list( $domain ) = $args;
 
-		$details = get_blog_details(1);
+		$network = wp_get_network(1);
 
-		if ( empty( $details) ) {
+		if ( empty( $network ) ) {
 			return;
 		}
 
-		$old_domain = $details->domain;
+		$old_domain = $network->domain;
 
 		if ( $old_domain == $domain ) {
 			return;
 		}
+
+		$wpdb->update( $wpdb->site, array( 'domain' => $domain ), array( 'id' => 1 ) );
 
 		foreach ( wp_get_sites() as $site ) {
 			$blog_id = $site['blog_id'];
