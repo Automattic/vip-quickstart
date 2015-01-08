@@ -1,6 +1,8 @@
 #!/bin/bash
 
 DOMAIN='vip.local'
+export HTTP_USER_AGENT="WP_CLI"
+export HTTP_HOST="${DOMAIN}"
 
 cd `dirname "$0"`
 
@@ -10,19 +12,19 @@ if [ ! -e /srv/www/wp-content/themes/twentyfourteen ]; then
 fi
 
 if [ ! -f ~/.ssh/bitbucket.org_id_rsa ]; then
-	/srv/pmc/bitbucket-gen-key.sh
+	bash /srv/pmc/bitbucket-gen-key.sh
+	sudo chmod 600 ~/.ssh/bitbucket.org_id_rsa
 fi
 
 sed -e '$a\' -e "define('SUBDOMAIN_INSTALL', true );" -e "/define\s*(\s*'SUBDOMAIN_INSTALL'/d" -i /srv/www/local-config.php
 sed -e '$a\' -e "define('AUTOMATIC_UPDATER_DISABLED', true );" -e "/define\s*(\s*'AUTOMATIC_UPDATER_DISABLED'/d" -i /srv/www/local-config.php
+sed -e '$a\' -e "define('WP_CACHE_KEY_SALT', \$_SERVER['HTTP_HOST'] );" -e "/define\s*(\s*'WP_CACHE_KEY_SALT'/d" -i /srv/www/local-config.php
+
 if [ "0" == "`/usr/bin/wp --path=/srv/www/wp network meta get 1 subdomain_install`" ]; then
 	/usr/bin/wp --path=/srv/www/wp network meta update 1 subdomain_install 1
 fi
 
-export HTTP_USER_AGENT="WP_CLI"
-export HTTP_HOST="${DOMAIN}"
-
-sudo /usr/bin/wp --allow-root --require=/srv/pmc/pmc-wp-cli.php --path=/srv/www/wp pmc-site set-domain ${DOMAIN}
+sudo /usr/bin/wp --allow-root --require=/srv/pmc/pmc-wp-cli.php --path=/srv/www/wp --url=${DOMAIN} pmc-site set-domain ${DOMAIN}
 
 if [ ! -d "/srv/www/wp-content/themes/vip/pmc-plugins" ]
 then
