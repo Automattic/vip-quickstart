@@ -84,15 +84,21 @@ sed -e 's/\[ip\]/127.0.0.1/' server_hosts >> /srv/pmc/vagrant_hosts
 sudo cp -f /srv/pmc/vagrant_hosts /etc/hosts
 
 # ssl key and certificate
-if [ ! -f /etc/ssl/dev-san-domain.key ] || [ ! -f /etc/ssl/dev-san-domain-chained.crt ]; then
-	sudo cp /srv/pmc/dev-san-domain* /etc/ssl/
-fi
+sudo cp /srv/pmc/dev-san-domain* /etc/ssl/
 
 # nginx ssl
 sudo sed -e "/http {/a\ \ ssl_certificate     /etc/ssl/dev-san-domain-chained.crt;\n\ \ ssl_certificate_key /etc/ssl/dev-san-domain.key;" -e '/ssl_certificate/d' -i /etc/nginx/nginx.conf
 sudo sed -e "/listen 80;/a\ \ listen 443 ssl;" -e "/listen 443/d" -i /etc/nginx/sites-available/50-_.conf
 sudo sed -e "/listen 80;/a\ \ listen 443 ssl;" -e "/listen 443/d" -i /etc/nginx/sites-enabled/50-_.conf
+
+# php.ini default to display errors
+sudo sed -e 's/^display_errors = Off/display_errors = On/g' -e  's/^display_startup_errors = Off/display_startup_errors = On/g' -i  /etc/php5/fpm/php.ini
+
+# non vip sites nginx conf file
+sudo cp /srv/pmc/nginx-sites.conf /etc/nginx/sites-enabled/sites.conf
+
 sudo service nginx reload
+sudo service php5-fpm restart
 
 sudo apt-get install rubygems -y
 sudo apt-get install ruby -y

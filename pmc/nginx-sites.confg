@@ -1,0 +1,58 @@
+server {
+	listen       80;
+	listen       443 ssl;
+	server_name vscoreserver.local;
+	root         /srv/www/htdocs/vscore-server;
+
+	# If file doesn't exist send to index.php
+	try_files $uri /index.php?$args;
+
+	# Pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+	location ~ \.php$ {
+		fastcgi_pass  127.0.0.1:9000;
+		fastcgi_index index.php;
+		fastcgi_param SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+		include       fastcgi_params;
+		fastcgi_pass_header Set-Cookie;
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		include fastcgi_params;
+	}
+}
+
+server {
+	listen       80;
+	listen       443 ssl;
+	server_name varietyarchive.local;
+	root         /srv/www/htdocs/variety-archive;
+	try_files $uri /index.php?$args;
+	# Pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+	location ~ \.php$ {
+		fastcgi_pass  127.0.0.1:9000;
+		fastcgi_index index.php;
+		fastcgi_param SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+		include       fastcgi_params;
+		fastcgi_pass_header Set-Cookie;
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		include fastcgi_params;
+	}
+
+	rewrite ^/login$|^login/ /login.php last;
+	rewrite ^/search$|^search/ /search.php last;
+	rewrite ^/myaccount$ /myaccount.php last;
+	rewrite ^/layout/([A-Za-z0-9-]+)$ /layout/$1.php last;
+	rewrite ^/layout/featuredArchives/([0-9]+).[0-9]+ /layout/featured$1.php last;
+	rewrite ^/archive/pdf/([0-9]+).pdf /AccessPDF.php?id=$1 last;
+	rewrite ^/archive/issue/(DV|WV)-([0-9]+)-([0-9]+)-([0-9]+)-([0-9]+) /layout/archiveIssue.php?pubtype=$1&month=$2&day=$3&year=$4&page=$5 last;
+	rewrite ^/archive/issue/list-cal-([0-9]+).([0-9]+) /layout/ListIssueCalendar.php?year=$1&month=$2 last;
+	rewrite ^/archive/issue/list-cal	/layout/ListIssueCalendar.php	last;
+	rewrite ^/layout/viewHistory/([0-9]+) /layout/viewHistory.php?page=$1 last;
+	rewrite ^/layout/viewHistory/(.*) /layout/viewHistory.php?page=1 last;
+	rewrite ^/archive/issue/list-(d+)-(d+).(d+)-(d+).(d+)	/layout/ListIssue.php?page=$1&from=$2.$3&to=$4.$5 last;
+	rewrite ^/archive/issue/list-(d+)-(d+).(d+)	/layout/ListIssue.php?page=$1&from=$2.$3  last;
+	rewrite ^/archive/issue/list-(d+)-(d+)-(d+)	/layout/ListIssue.php?page=$1&from=$2&to=$3	last;
+	rewrite ^/archive/issue/list-(d+)	/layout/ListIssue.php?page=$1  last;
+	rewrite ^/archive/issue/list	/layout/ListIssue.php  last;
+	rewrite ^/AutoSearch$|^AutoSearch/ /AutoSearch.php last;
+
+}
+
