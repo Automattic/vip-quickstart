@@ -9,7 +9,7 @@ fi
 site_slug=$1
 sql_file=$2
 
-site_id=`/usr/bin/wp --path=/srv/www/wp site list --fields=blog_id,domain --format=csv|grep "${site_slug}.local.dev" | cut -d',' -f1`
+site_id=`/usr/bin/wp --path=/srv/www/wp site list --fields=blog_id,domain --format=csv|grep "${site_slug}.vip.local" | cut -d',' -f1`
 
 if [ "" != "${site_id}" ]
 then
