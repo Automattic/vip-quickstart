@@ -24,8 +24,6 @@ class {
   'php::phpunit':;
 
   # Extensions
-  'php::extension::apc':
-    ensure => absent;
   'php::extension::curl':;
   'php::extension::gd':;
   'php::extension::imagick':;
@@ -56,8 +54,6 @@ vcsrepo { '/usr/share/php/PHP/CodeSniffer/Standards/WordPress':
 }
 
 php::fpm::conf { 'www': user => 'www-data' }
-
-file { '/etc/php5/conf.d/apc.ini': ensure => absent }
 
 # Turn on html_errors
 exec { 'html_errors = On':
