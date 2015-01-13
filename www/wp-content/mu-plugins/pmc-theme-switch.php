@@ -12,7 +12,10 @@
 Add following code to local-config.php
 
 if ( preg_match( '/(?:(.+)\.)?([^.]+\.[^.]+\.[^.]+)$/si',$_SERVER['HTTP_HOST'], $matches ) ) {
-	if ( !empty( $matches[1] ) && file_exists( __DIR__ . '/wp-content-sites/' . $matches[1] ) ) {
+	if ( !empty( $matches[1] ) ) {
+		if ( ! file_exists( __DIR__ . '/wp-content-sites/' . $matches[1] ) ) {
+			die("Error! Site not found or have not been configured.");
+		}
 		$_SERVER['SERVER_NAME']      = $_SERVER['HTTP_HOST'] = $matches[2];
 		$_SERVER['HTTP_HOST_PREFIX'] = $matches[1];
 		define( 'WP_HOME', 'http://' . $_SERVER['HTTP_HOST'] );
@@ -62,8 +65,37 @@ final class PMC_Theme_Switch {
 			add_filter( 'site_url', array( $this, 'filter_url' ) );
 			add_filter( 'theme_root_uri', array( $this, 'filter_url' ) );
 			add_filter( 'plugins_url', array( $this, 'filter_url' ) );
+			add_filter( 'admin_url', array( $this, 'filter_url' ) );
+			add_filter( 'login_url', array( $this, 'filter_login_url' ), 10, 2 );
 		}
 
+	}
+
+	public function filter_login_url( $login_url, $redirect ) {
+
+		$url_parts = parse_url( $login_url );
+		if ( !empty( $url_parts['query'] ) ) {
+			$args = wp_parse_args( $url_parts['query'] );
+			$args['redirect_to'] = $this->filter_url( $redirect );
+			$url_parts['query'] = http_build_query( $args );
+
+			$login_url = $url_parts['scheme'] .'://' . $url_parts['host'];
+
+			if ( !empty( $url_parts['path'] ) ) {
+				$login_url .= $url_parts['path'];
+			}
+
+			if ( !empty( $url_parts['query'] ) ) {
+				$login_url .= '?' . $url_parts['query'];
+			}
+
+			if ( !empty( $url_parts['fragment'] ) ) {
+				$login_url .= '#' . $url_parts['fragment'];
+			}
+
+		}
+
+		return $login_url;
 	}
 
 	public function filter_url( $url ) {
