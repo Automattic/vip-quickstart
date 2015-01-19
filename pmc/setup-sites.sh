@@ -5,6 +5,7 @@ export HTTP_USER_AGENT="WP_CLI"
 export HTTP_HOST="${DOMAIN}"
 
 cd `dirname "$0"`
+sudo usermod -a -G www-data vagrant
 
 # workaround pmc_analystics required this theme to be at this location.
 if [ ! -e /srv/www/wp-content/themes/twentyfourteen ]; then
