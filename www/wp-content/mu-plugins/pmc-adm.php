@@ -5,7 +5,7 @@ add_filter( 'pmc_adm_hostname', function() {
 	$parts = explode( '.', $_SERVER['HTTP_HOST'] );	
 	switch ( end( $parts ) ) {
 		case 'local':
-			echo reset( $parts ) .'.com';
+			return reset( $parts ) .'.com';
 			break;
 	}
 	return $_SERVER['HTTP_HOST'];
