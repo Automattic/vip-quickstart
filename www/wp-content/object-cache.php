@@ -189,10 +189,6 @@ class WP_Object_Cache {
 	}
 
 	function flush() {
-		// Don't flush if multi-blog.
-		if ( function_exists('is_site_admin') || defined('CUSTOM_USER_TABLE') && defined('CUSTOM_USER_META_TABLE') )
-			return true;
-
 		$ret = true;
 		foreach ( array_keys($this->mc) as $group )
 			$ret &= $this->mc[$group]->flush();
