@@ -120,7 +120,7 @@ class PMC_WP_CLI_Site extends WP_CLI_Command {
 
 		list( $domain ) = $args;
 
-		$network = wp_get_network(1);
+		$network = wp_get_network( $wpdb->siteid );
 
 		if ( empty( $network ) ) {
 			return;
@@ -132,7 +132,11 @@ class PMC_WP_CLI_Site extends WP_CLI_Command {
 			return;
 		}
 
-		$wpdb->update( $wpdb->site, array( 'domain' => $domain ), array( 'id' => 1 ) );
+		$wpdb->update( $wpdb->site, array( 'domain' => $domain ), array( 'id' => $wpdb->siteid ) );
+
+		update_site_option( 'siteurl', "http://{$domain}/" );
+		update_site_option( 'site_name', "{$domain} Sites" );
+		update_site_option( 'admin_email', "wordpress@{$domain}" );
 
 		foreach ( wp_get_sites() as $site ) {
 			$blog_id = $site['blog_id'];
@@ -183,6 +187,50 @@ class PMC_WP_CLI_Site extends WP_CLI_Command {
 		WP_CLI::success( "{$old_domain} -> {$domain}" );
 
 	} // function
+
+	/**
+	 * @subcommand clean-db
+	*/
+	public function clean_db($args, $assoc_args) {
+		global $wpdb;
+
+		$sql = "select post_type
+					from {$wpdb->posts}
+					where post_status = 'publish'
+					group by post_type
+					having count(*) > 500
+				";
+		$results = $wpdb->get_results( $sql );
+
+		foreach ( $results as $row ) {
+			$post_type = $row->post_type;
+			$sql = "delete
+				from {$wpdb->posts}
+				where post_type = '{$post_type}'
+				and ID not in (
+					select ID
+					from (
+						select ID
+						from {$wpdb->posts}
+						where post_status = 'publish'
+						and post_type = '{$post_type}'
+						order by post_date desc
+						limit 500
+					) x
+				)
+				";
+			$r = $wpdb->query( $sql );
+			printf("removed %d records from post type %s\n", $r, $post_type );
+		}
+
+		$wpdb->query( "delete from {$wpdb->posts} where post_status <> 'publish' ");
+		$wpdb->query( "delete from {$wpdb->postmeta} where post_id not in ( select ID from {$wpdb->posts} )");
+		$wpdb->query( "delete from {$wpdb->comments} where comment_post_ID not in ( select ID from {$wpdb->posts} )");
+		$wpdb->query( "delete from {$wpdb->commentmeta} where comment_id not in ( select comment_post_ID from {$wpdb->comments} )");
+		$wpdb->query( "delete from {$wpdb->term_relationships} where object_id not in ( select ID from {$wpdb->posts} )");
+		$wpdb->query( "delete from {$wpdb->term_taxonomy} where term_taxonomy_id not in ( select term_taxonomy_id from {$wpdb->term_relationships} )");
+
+	}
 
 }
 
