@@ -8,6 +8,6 @@ do
 		[[ "$1" != "${site_slug}" ]] && continue
 	fi
 	
-	./db-import.sh "$site_slug" "/srv/pmc/sql/${site_slug}.sql"
+	bash /srv/pmc/db-import.sh "$site_slug" "/srv/pmc/sql/${site_slug}.sql"
 
-done < ./sites
+done < /srv/pmc/sites

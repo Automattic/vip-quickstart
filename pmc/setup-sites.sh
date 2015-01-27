@@ -12,6 +12,11 @@ if [ ! -e /srv/www/wp-content/themes/twentyfourteen ]; then
 	ln -s /srv/www/wp-content/themes/pub/twentyfourteen/ /srv/www/wp-content/themes/twentyfourteen
 fi
 
+# eventbrite theme required for pmc-conference
+if [ ! -e /srv/www/wp-content/themes/eventbrite ]; then
+	svn co https://wpcom-themes.svn.automattic.com/eventbrite/ /srv/www/wp-content/themes/eventbrite
+fi
+
 if [ ! -f ~/.ssh/bitbucket.org_id_rsa ]; then
 	bash /srv/pmc/bitbucket-gen-key.sh
 	sudo chmod 600 ~/.ssh/bitbucket.org_id_rsa
