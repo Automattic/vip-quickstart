@@ -19,7 +19,7 @@ site_id=`/usr/bin/wp --path=/srv/www/wp site list --fields=blog_id,domain --form
 
 if [ "" != "${site_id}" ]
 then
-	site_theme=`/usr/bin/wp --path=/srv/www/wp --url=varietylatino.localdev theme list --fields=name,status --format=csv | grep ',active' | cut -d',' -f1`
+	site_theme=`/usr/bin/wp --path=/srv/www/wp --url=${site_slug}.${DOMAIN} theme list --fields=name,status --format=csv | grep ',active' | cut -d',' -f1`
 	echo "Importing ${sql_file} into ${site_slug} site id ${site_id}"
 	sed -e "s/CREATE TABLE IF NOT EXISTS \`wp_/CREATE TABLE IF NOT EXISTS \`wp_${site_id}_/g" -e "s/ INTO \`wp_/ INTO \`wp_${site_id}_/g" -e "s/ TABLE \`wp_/ TABLE \`wp_${site_id}_/g" -e "s/table \`wp_/table \`wp_${site_id}_/g" -e "s/LOCK TABLES \`wp_/LOCK TABLES \`wp_${site_id}_/g" -e "s/DROP TABLE IF EXISTS \`wp_/DROP TABLE IF EXISTS \`wp_${site_id}_/g" ${sql_file} | mysql -uroot wordpress
 	sudo service memcached restart

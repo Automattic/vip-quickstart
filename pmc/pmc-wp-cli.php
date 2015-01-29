@@ -227,8 +227,6 @@ class PMC_WP_CLI_Site extends WP_CLI_Command {
 		$wpdb->query( "delete from {$wpdb->postmeta} where post_id not in ( select ID from {$wpdb->posts} )");
 		$wpdb->query( "delete from {$wpdb->comments} where comment_post_ID not in ( select ID from {$wpdb->posts} )");
 		$wpdb->query( "delete from {$wpdb->commentmeta} where comment_id not in ( select comment_post_ID from {$wpdb->comments} )");
-		$wpdb->query( "delete from {$wpdb->term_relationships} where object_id not in ( select ID from {$wpdb->posts} )");
-		$wpdb->query( "delete from {$wpdb->term_taxonomy} where term_taxonomy_id not in ( select term_taxonomy_id from {$wpdb->term_relationships} )");
 
 	}
 
