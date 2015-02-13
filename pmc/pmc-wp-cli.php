@@ -1,4 +1,5 @@
 <?php
+define( 'WP_MAX_MEMORY_LIMIT', '512M' );
 
 class PMC_WP_CLI_Site extends WP_CLI_Command {
 

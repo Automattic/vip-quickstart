@@ -30,7 +30,7 @@ if [ "0" == "`/usr/bin/wp --path=/srv/www/wp network meta get 1 subdomain_instal
 	/usr/bin/wp --path=/srv/www/wp network meta update 1 subdomain_install 1
 fi
 
-sudo /usr/bin/wp --allow-root --require=/srv/pmc/pmc-wp-cli.php --path=/srv/www/wp --url=${DOMAIN} pmc-site set-domain ${DOMAIN}
+sudo /usr/bin/wp --allow-root --require=/srv/pmc/pmc-wp-cli.php --path=/srv/www/wp pmc-site set-domain ${DOMAIN}
 
 if [ ! -d "/srv/www/wp-content/themes/vip/pmc-plugins" ]
 then
