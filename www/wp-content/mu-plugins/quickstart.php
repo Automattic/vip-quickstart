@@ -1,5 +1,10 @@
 <?php
 
+// Include the quickstart dashboard
+if ( !class_exists( 'Quickstart_Dashboard' ) ) {
+	require dirname( __FILE__ ) . '/quickstart-dashboard/quickstart-dashboard.php';
+}
+
 function quickstart_env_is_staging() {
 	return getenv( 'QUICKSTART_ENV' ) == 'physical';
 }
