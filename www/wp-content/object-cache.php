@@ -189,6 +189,13 @@ class WP_Object_Cache {
 	}
 
 	function flush() {
+		$is_multisite = ( function_exists( 'is_site_admin' ) || defined( 'CUSTOM_USER_TABLE' ) && defined( 'CUSTOM_USER_META_TABLE' ) );
+
+		// Abort object cache flushing if on multisite (really, WordPress.com) when not running unit tests
+		if ( $is_multisite && ! ( defined( 'WP_TESTS_MULTISITE' ) && WP_TESTS_MULTISITE ) ) {
+			return false;
+		}
+
 		$ret = true;
 		foreach ( array_keys($this->mc) as $group )
 			$ret &= $this->mc[$group]->flush();
