@@ -77,6 +77,8 @@ if ( ! defined( 'WP_DEFAULT_THEME' ) ) {
 	define( 'WP_DEFAULT_THEME', 'pub/twentyfourteen' );
 }
 
+define( 'WP_MAX_MEMORY_LIMIT', '1024M' );
+
 /* That's all, stop editing! Happy blogging. */
 
 // Use the latest Jetpack user-agent detection if we have it
