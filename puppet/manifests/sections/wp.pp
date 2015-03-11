@@ -1,6 +1,5 @@
 $plugins = [
   'log-deprecated-notices',
-  'log-viewer',
   'monster-widget',
   'query-monitor',
   'user-switching',
