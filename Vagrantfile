@@ -13,39 +13,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box = "precise32"
   config.vm.box_url = "http://files.vagrantup.com/precise32.box"
-  config.vm.provider "vmware_fusion" do |v, override|
-    override.vm.box = "precise64-vmware"
-    override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
-  end
   config.vm.hostname = 'vip.local'
   config.vm.network :private_network, ip: "10.86.73.80"
 
-  # Use 1GB of memory in virtualbox
+  # Virtualbox overrides
   config.vm.provider "virtualbox" do |v|
+    # Use 1GB of memory
     v.memory = 1024
   end
 
-  # Use 1GB of memory in vmware_fusion
+  # VMWare Fusion overrides
   config.vm.provider "vmware_fusion" do |v|
+    # Use 1GB of memory in vmware_fusion
     v.memory = 1024
+
+    override.vm.box = "precise64-vmware"
+    override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
   end
 
-  # Use Rsync if it's available
-  if Vagrant::Util::Which.which("rsync")
-    config.vm.synced_folder ".", "/srv", type: "rsync",
-      owner: "www-data",
-      group: "www-data",
-      mount_options: ["dmode=775", "fmode=644"]
-    config.vm.synced_folder "www/wp-content/themes/vip", "/srv/www/wp-content/themes/vip",
-      owner: "www-data",
-      group: "www-data",
-      mount_options: ["dmode=775", "fmode=664"]
-  else
-    config.vm.synced_folder ".", "/srv",
-      owner: "www-data",
-      group: "www-data",
-      mount_options: ["dmode=775", "fmode=644"]
-  end
+  config.vm.synced_folder ".", "/srv", owner: 'www-data', group: 'www-data', mount_options: ["dmode=775", "fmode=664"]
 
   # Address a bug in an older version of Puppet
   # See http://stackoverflow.com/questions/10894661/augeas-support-on-my-vagrant-machine
