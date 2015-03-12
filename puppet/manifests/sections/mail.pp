@@ -7,3 +7,6 @@ exec { 'configure postfix hostname':
     user    => root,
     notify  => Service['postfix']
 }
+
+# Mailtuils for sending diagnostic reports
+package { 'mailutils': ensure => installed }

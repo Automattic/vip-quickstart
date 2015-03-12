@@ -9,6 +9,10 @@ if 'physical' == $virtual {
         port => 80,
         ip   => 'any',
     }
+    ufw::allow { 'allow-all-https':
+        port => 443,
+        ip   => 'any',
+    }
     ufw::allow { 'allow-dns-over-udp':
         port  => 53,
         proto => 'udp',
