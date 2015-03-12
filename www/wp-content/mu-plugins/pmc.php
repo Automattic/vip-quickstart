@@ -1,5 +1,12 @@
 <?php
 
+// remove emoji js support as it is causing major issue with site stability
+add_action('wp_enqueue_scripts', function() {
+	global $wp_scripts;
+	wp_dequeue_script('emoji');
+	wp_dequeue_script('twemoji');
+});
+
 add_action('wp_feed_options', function( $feed, $url ) {
 	$feed->set_cache_duration( 12 * HOUR_IN_SECONDS );
 }, 10, 2);
