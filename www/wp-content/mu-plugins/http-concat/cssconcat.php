@@ -18,6 +18,16 @@ class WPcom_CSS_Concat extends WP_Styles {
 	function __construct( $styles ) {
 		$this->old_styles = $styles;
 
+		// Unset all the object properties except our private copy of the styles object.
+		// We have to unset everything so that the overload methods talk to $this->old_styles->whatever
+		// instead of $this->whatever.
+		foreach ( array_keys( get_object_vars( $this ) ) as $key ) {
+			if ( 'old_styles' === $key ) {
+				continue;
+			}
+			unset( $this->$key );
+		}
+
 		parent::__construct();
 	}
 
@@ -77,7 +87,7 @@ class WPcom_CSS_Concat extends WP_Styles {
 				$media = $obj->args;
 				if( empty( $media ) )
 					$media = 'all';
-				if ( isset( $stylesheets[ $stylesheet_group_index ] ) && ! is_array( $stylesheets[ $stylesheet_group_index ] ) )
+				if ( ! is_array( $stylesheets[ $stylesheet_group_index ] ) )
 					$stylesheets[ $stylesheet_group_index ] = array();
 
 				$stylesheets[ $stylesheet_group_index ][ $media ][ $handle ] = $css_url['path'];
