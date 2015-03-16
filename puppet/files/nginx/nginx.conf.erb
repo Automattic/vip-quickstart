@@ -36,5 +36,8 @@ http {
   # Disable for IE < 6 because there are known problems
   gzip_disable "MSIE [1-6]\.(?!.*SV1)";
 
+  fastcgi_buffers 16 16k;
+  fastcgi_buffer_size 32k;
+
   include <%= scope.lookupvar('nginx::vdir')%>/*.conf;
 }
