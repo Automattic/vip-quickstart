@@ -18,6 +18,16 @@ class WPcom_JS_Concat extends WP_scripts {
 	function __construct( $scripts ) {
 		$this->old_scripts = $scripts;
 
+		// Unset all the object properties except our private copy of the scripts object.
+		// We have to unset everything so that the overload methods talk to $this->old_scripts->whatever
+		// instead of $this->whatever.
+		foreach ( array_keys( get_object_vars( $this ) ) as $key ) {
+			if ( 'old_scripts' === $key ) {
+				continue;
+			}
+			unset( $this->$key );
+		}
+
 		parent::__construct();
 	}
 
