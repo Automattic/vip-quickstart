@@ -11,6 +11,8 @@
  * It will also replace the relative paths in CSS files with absolute paths.
  */
 
+require __DIR__ . '/cssmin.php';
+
 /* Config */
 $concat_max_files = 150;
 $concat_unique = true;
@@ -112,6 +114,8 @@ $last_modified = 0;
 $pre_output = '';
 $output = '';
 
+$css_minify = new CSSmin();
+
 foreach ( $args as $uri ) {
 	$fullpath = concat_get_path( $uri );
 
@@ -195,6 +199,8 @@ foreach ( $args as $uri ) {
 				$buf
 			);
 		}
+
+		$buf = $css_minify->run( $buf );
 	}
 
 	if ( 'application/x-javascript' == $mime_type )
