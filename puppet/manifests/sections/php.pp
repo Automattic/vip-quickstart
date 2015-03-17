@@ -31,13 +31,11 @@ class {
   'php::extension::memcache':;
   'php::extension::mysql':;
   'php::extension::xdebug':
-    settings => {
-      set => {
-        '.anon/xdebug.idekey' => 'QUICKSTART',
-        '.anon/xdebug.remote_enable' => '1',
-        '.anon/xdebug.remote_connect_back' => '1',
-      }
-    }
+    settings => [
+        'set .anon/xdebug.idekey QUICKSTART',
+        'set .anon/xdebug.remote_enable 1',
+        'set .anon/xdebug.remote_connect_back 1',
+    ];
 }
 
 php::fpm::pool { 'www': user => 'www-data' }
