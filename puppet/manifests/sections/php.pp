@@ -35,6 +35,7 @@ class {
         'set .anon/xdebug.idekey QUICKSTART',
         'set .anon/xdebug.remote_enable 1',
         'set .anon/xdebug.remote_connect_back 1',
+        'set .anon/profiler_enable_trigger 1',
     ];
 }
 
