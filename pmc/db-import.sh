@@ -28,5 +28,15 @@ then
 	/usr/bin/wp --path=/srv/www/wp --url=${site_slug}.${DOMAIN} theme activate ${site_theme}
 	sudo service memcached restart
 else
-	echo 'Site not found'
+	echo 'Wordpress Site not found'
+fi
+
+if [ "uls" = "${site_slug}" ]
+then
+	echo "Importing ${sql_file} into ${site_slug} db uls_wwd_local"
+	mysql -uroot -e "drop database uls_wwd_local"
+	mysql -uroot -e "create database uls_wwd_local"
+	mysql -uroot uls_wwd_local < ${sql_file}
+else
+	echo 'ULS Site not found'
 fi

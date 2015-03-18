@@ -87,6 +87,7 @@ sed -e "/#pmcsetup/d" -i /srv/pmc/vagrant_hosts
 # custom non-vip site domain
 echo '[ip] varietyarchive.local #pmcsetup
 [ip] vscoreserver.local #pmcsetup
+[ip] uls.wwd.local #pmcsetup
 ' >> server_hosts
 
 sed -e 's/\[ip\]/10.86.73.80/' server_hosts >> /srv/pmc/hosts
@@ -108,6 +109,13 @@ sudo sed -e 's/^display_errors = Off/display_errors = On/g' -e  's/^display_star
 
 # non vip sites nginx conf file
 sudo cp /srv/pmc/nginx-sites.conf /etc/nginx/sites-enabled/sites.conf
+
+# uls.wwd.local setup
+git clone git@bitbucket.org:penskemediacorp/pmc-wwd-uls.git /srv/www/htdocs/pmc-wwd-uls
+cd /srv/www/htdocs/pmc-wwd-uls
+curl -sS https://getcomposer.org/installer | php
+php composer.phar install
+cp /srv/pmc/.env.local.php /srv/www/htdocs/pmc-wwd-uls/
 
 sudo service nginx reload
 sudo service php5-fpm restart
