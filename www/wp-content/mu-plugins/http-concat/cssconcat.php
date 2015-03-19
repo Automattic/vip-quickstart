@@ -85,10 +85,12 @@ class WPcom_CSS_Concat extends WP_Styles {
 
 			if ( true === $do_concat ) {
 				$media = $obj->args;
-				if( empty( $media ) )
+				if ( empty( $media ) ) {
 					$media = 'all';
-				if ( ! is_array( $stylesheets[ $stylesheet_group_index ] ) )
+				}
+				if ( empty( $stylesheets[ $stylesheet_group_index ] ) || ! is_array( $stylesheets[ $stylesheet_group_index ] ) ) {
 					$stylesheets[ $stylesheet_group_index ] = array();
+				}
 
 				$stylesheets[ $stylesheet_group_index ][ $media ][ $handle ] = $css_url['path'];
 				$this->done[] = $handle;
@@ -179,6 +181,10 @@ class WPcom_CSS_Concat extends WP_Styles {
 
 function css_concat_init() {
 	global $wp_styles;
+
+	if ( ! ( $wp_styles instanceof WP_Styles ) ) {
+		$wp_styles = new WP_Styles();
+	}
 
 	$wp_styles = new WPcom_CSS_Concat( $wp_styles );
 	$wp_styles->allow_gzip_compression = ALLOW_GZIP_COMPRESSION;
