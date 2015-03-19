@@ -180,6 +180,10 @@ class WPcom_CSS_Concat extends WP_Styles {
 function css_concat_init() {
 	global $wp_styles;
 
+	if ( ! ( $wp_styles instanceof WP_Styles ) ) {
+		$wp_styles = new WP_Styles();
+	}
+
 	$wp_styles = new WPcom_CSS_Concat( $wp_styles );
 	$wp_styles->allow_gzip_compression = ALLOW_GZIP_COMPRESSION;
 }

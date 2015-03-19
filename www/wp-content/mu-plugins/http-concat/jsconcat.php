@@ -177,6 +177,10 @@ class WPcom_JS_Concat extends WP_scripts {
 function js_concat_init() {
 	global $wp_scripts;
 
+	if ( ! ( $wp_scripts instanceof WP_Scripts ) ) {
+		$wp_scripts = new WP_Scripts();
+	}
+
 	$wp_scripts = new WPcom_JS_Concat( $wp_scripts );
 	$wp_scripts->allow_gzip_compression = ALLOW_GZIP_COMPRESSION;
 }
