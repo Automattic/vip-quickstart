@@ -136,13 +136,10 @@ function options_sync_package_downloader() {
 		}
 
 		function do_status_actions() {
-			var request = $.ajax( ajaxurl, {
-				data: {
-					action: 'qs_options_sync-' + states[current_state],
-					_wpnonce: $( '#wpnonce' ).val(),
-				},
-				dataType: 'json',
-			} );
+			
+			var request = create_status_request();
+
+			console.log("Current State: " + current_state);
 
 			switch ( current_state ) {
 				case 0:
@@ -166,6 +163,29 @@ function options_sync_package_downloader() {
 			}
 		}
 
+		function create_status_request()
+		{
+			console.log("Creating status request: " + current_state);
+			switch(current_state)
+			{
+				case 1:
+					return $.ajax( "http://vip.local:3000/download-status", {
+						dataType: 'json'
+					} );
+
+					break;
+
+				default:
+					return $.ajax( ajaxurl, {
+						data: {
+							action: 'qs_options_sync-' + states[current_state],
+							_wpnonce: $( '#wpnonce' ).val(),
+						},
+						dataType: 'json',
+					} );
+			}
+		}
+
 		function parse_package_generation_status_response( full_response ) {
 			console.log( full_response );
 			var response = full_response.responseJSON;
@@ -185,14 +205,20 @@ function options_sync_package_downloader() {
 
 		function parse_package_download_response( full_response ) {
 			console.log( full_response );
-			var response = full_response.responseJSON;
+			var response = JSON.parse(full_response);
 
-			if ( ! response.success ) {
-				handle_failure();
-				return;
+			if( ! response.downloading ) // If finished downloading, check success
+			{
+				if( response.success ) 
+				{
+					next_state();
+				}
+				else // If success == false
+				{
+					handle_failure();
+					return;
+				}
 			}
-
-			next_state();
 		}
 
 		function parse_package_generate_preview_response( full_response ) {
