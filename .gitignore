@@ -8,4 +8,4 @@
 wp-cli.local.yml
 
 # Don't include node modules
-./VipSyncServer/node_modules
+VipSyncServer/node_modules
