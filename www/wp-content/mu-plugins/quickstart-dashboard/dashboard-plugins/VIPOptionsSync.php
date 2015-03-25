@@ -243,10 +243,19 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		$signature = hash_hmac( 'sha256', rawurlencode( $url['path'] ), $package_info['package_psk'] );
 		
 		$url = add_query_arg( array( 'signature' => $signature ), $package_info['package_url'] );
-		//var_dump( $url );
 
 		$download_start_response = wp_remote_get( "http://localhost:3000/download-package?url=" . $url );
-	
+		
+		$package_info['filepath'] = "/srv/VIPSyncServer/downloads/";
+		set_transient( 'qs_os_current_package_info', $package_info );
+
+		if( $download_start_response != null) {
+			wp_send_json_success();
+		}
+		else {
+			wp_send_json_error();
+		}
+
 		// Download the package OLD
 		//$download_result = download_url( add_query_arg( array( 'signature' => $signature ), $package_info['package_url'] ) );
 
@@ -319,24 +328,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	 * @param string $filepath Path to the dump file
 	 */
 	function preview_import_bundle( $filepath ) {
-		$destination = $this->get_extracted_filename( $filepath );
-
-		// Extract the file
-		if ( ! $this->is_file_extracted( $filepath ) ) {
-			$extract_result = $this->extract_file( $filepath, $destination );
-
-			if ( is_wp_error( $extract_result ) ) {
-				?>
-				<div class="error"><p><?php echo esc_html( $extract_result->get_error_message() ); ?></p></div>
-				<?php
-				
-				return;
-			}
-		}
-
-		if ( !$this->is_file_extracted( $filepath ) ) {
-			return;
-		}
+		$destination = "/srv/VIPSyncServer/downloads/";
 
 		// List files in dir
 		$files = scandir( $destination );
@@ -436,24 +428,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		
 		set_time_limit( 0 );
 		
-		$destination = $this->get_extracted_filename( $filepath );
-
-		// Extract the file
-		if ( ! $this->is_file_extracted( $filepath ) ) {
-			$extract_result = $this->extract_file( $filepath, $destination );
-
-			if ( is_wp_error( $extract_result ) ) {
-				?>
-				<div class="error"><p><?php echo esc_html( $extract_result->get_error_message() ); ?></p></div>
-				<?php
-
-				return;
-			}
-		}
-
-		if ( !$this->is_file_extracted( $filepath ) ) {
-			return;
-		}
+		$destination = "/srv/VIPSyncServer/downloads/";
 
 		// List files in dir
 		$files = scandir( $destination );
@@ -1083,65 +1058,6 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		) );
 
 		return $this->action_descriptions;
-	}
-
-	private function is_file_extracted( $filepath ) {
-		$directory = $this->get_extracted_filename( $filepath );
-		return file_exists( $directory ) && is_dir( $directory );
-	}
-
-	private function get_extracted_filename( $filepath ) {
-		$filename = preg_replace( '/(\.zip|\.tar\.gz)$/', '/', $filepath );
-
-		if ( $filename === $filepath ) {
-			$filename .= '_ext';
-		}
-
-		if ( $filename[strlen( $filename ) - 1] !== '/' ) {
-			$filename .= '/';
-		}
-
-		return $filename;
-	}
-
-	private function extract_file( $filepath, $destination = null ) {
-		if ( is_null( $destination ) ) {
-			$destination = $this->get_extracted_filename( $filepath );
-		}
-
-		// Check that the source file exists
-		if ( ! file_exists( $filepath ) ) {
-			return new WP_Error( 1, __( 'Source file does not exist', 'quickstart-dashboard' ) );
-		} elseif ( ! is_readable( $filepath ) ) {
-			return new WP_Error( 2, __( 'Source file is not readable', 'quickstart-dashboard' ) );
-		}
-
-		// If the destination file/directory exists, remove it
-		if ( file_exists( $destination ) ) {
-			// Delete the destination
-			$delete_result = false;
-			if ( is_file( $destination ) ) {
-				$delete_result = unlink( $destination );
-			} elseif ( is_dir( $destination ) ) {
-				$delete_result = $this->remove_directory( $destination );
-			}
-			
-			if ( ! $delete_result ) {
-				return new WP_Error( 3, __( 'Destination exists and could not be removed. Please delete it manually and try again.', 'quickstart-dashboard' ) );
-			}
-		}
-
-		// Create the destination directory
-		mkdir( $destination );
-
-		// Extract the file
-		exec( sprintf( 'tar -xvf %s -C %s', escapeshellarg( $filepath ), escapeshellarg( $destination ) ), $output, $return_value );
-
-		if ( 0 !== $return_value ) {
-			return new WP_Error( $return_value, sprintf( __( 'Error: Extraction failed with output: %s', 'quickstart-dashboard' ), implode( "\n", $output ) ) );
-		}
-
-		return true;
 	}
 
 	private function remove_directory( $directory ) {

@@ -7,5 +7,6 @@
 # Enables local modifications
 wp-cli.local.yml
 
-# Don't include node modules
+# Don't include node modules or downloaded sql files
 VipSyncServer/node_modules
+VipSyncServer/downloads
