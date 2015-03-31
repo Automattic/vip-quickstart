@@ -9,4 +9,3 @@ wp-cli.local.yml
 
 # Don't include node modules or downloaded sql files
 VipSyncServer/node_modules
-VipSyncServer/downloads

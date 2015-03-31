@@ -35,7 +35,7 @@ http.createServer(function(req, res)
 		success = false;
 
 		console.log("Download route");
-		downloadPackage(query['url'], "downloads/", function(download) // Callback triggered when download starts
+		downloadPackage(query['url'], "../../tmp/sync/", function(download) // Callback triggered when download starts
 		{
 			console.log(download['status']);
 			res.writeHead(download['status'], {'Content-Type': 'application/json'});
@@ -78,7 +78,8 @@ var downloadPackage = function(url, destination, callback)
 		res.on('data', function(data)
 		{
 			var increment = Math.floor(data.length/total * 100)
-			console.log( progress += increment );
+			progress += increment;
+			console.log(progress);
 		});
 	});
 
@@ -86,7 +87,7 @@ var downloadPackage = function(url, destination, callback)
 
 	try
 	{
-		clearDLDir(destination, function(removed)
+		clearDLDir(destination, function(removed) // Remove any old SQL files
 		{
 			if(removed)
 			{

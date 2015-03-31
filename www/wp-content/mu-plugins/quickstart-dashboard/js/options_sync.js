@@ -120,6 +120,7 @@ function options_sync_package_downloader() {
 		var current_state = -1;
 		var status_action_interval = false;
 		var request_package_interval = 15000;
+		var request_status_interval = 5000;
 		var states = [ 'request-package', 'download-package', 'download-status', 'generate-preview' ];
 		next_state();
 
@@ -158,7 +159,7 @@ function options_sync_package_downloader() {
 
 				case 2:
 					if ( !status_action_interval ) {
-						status_action_interval = setInterval( do_status_actions, request_package_interval );
+						status_action_interval = setInterval( do_status_actions, request_status_interval );
 					}
 					
 					// Check the download status
@@ -222,7 +223,8 @@ function options_sync_package_downloader() {
 				return;
 			}
 			else {
-				next_state();
+				current_state = 2;
+				do_status_actions(); // Don't call next_state() so the UI doesn't update yet
 			}
 		}
 
@@ -248,7 +250,7 @@ function options_sync_package_downloader() {
 		function parse_package_generate_preview_response( full_response ) {
 			console.log( full_response );
 			var response = full_response.responseJSON;
-
+			alert('wait');
 			if ( ! response.success || typeof response.data.preview_url === 'undefined' ) {
 				handle_failure();
 				return;

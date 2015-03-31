@@ -246,7 +246,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 
 		$download_start_response = wp_remote_get( "http://localhost:3000/download-package?url=" . $url );
 		
-		$package_info['filepath'] = "/srv/VIPSyncServer/downloads/";
+		$package_info['filepath'] = "/tmp/sync/";
 		set_transient( 'qs_os_current_package_info', $package_info );
 
 		if( $download_start_response != null) {
@@ -328,7 +328,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 	 * @param string $filepath Path to the dump file
 	 */
 	function preview_import_bundle( $filepath ) {
-		$destination = "/srv/VIPSyncServer/downloads/";
+		$destination = "/tmp/sync/";
 
 		// List files in dir
 		$files = scandir( $destination );
@@ -428,7 +428,7 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		
 		set_time_limit( 0 );
 		
-		$destination = "/srv/VIPSyncServer/downloads/";
+		$destination = "/tmp/sync/";
 
 		// List files in dir
 		$files = scandir( $destination );
