@@ -5,7 +5,6 @@ define gitplugin ( $git_urls ) {
         force    => true,
         source   => $git_urls[$title],
         provider => git,
-        submodules => true,
         require  => [
             Wp::Site['/srv/www/wp'],
             File['/srv/www/wp-content/plugins'],
