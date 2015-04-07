@@ -79,7 +79,7 @@ var downloadPackage = function(url, destination, callback)
 		{
 			var increment = data.length/total * 100
 			progress += increment;
-			console.log(progress);
+			console.log( Math.floor(progress) );
 		});
 	});
 
@@ -95,7 +95,7 @@ var downloadPackage = function(url, destination, callback)
 				{
 				    if (err) 
 				    {
-				        throw "Download operation failed";
+				        throw new Error("Download operation failed");
 				    }
 				 	
 				 	progress = 100;
@@ -128,7 +128,19 @@ var prepareDestination = function(path, callback) // Calls back true if successf
 {
 	console.log("Preparing destination folder...");
 
-	var exists = fs.lstatSync(path).isDirectory(); // Sync because it's a quick operation most of the time
+	var exists = false;
+
+	try
+	{
+		if( fs.lstatSync(path).isDirectory() ) // Sync because it's a quick operation most of the time
+		{
+			exists = true
+		}
+	}
+	catch(err)
+	{
+		console.log("/tmp/sync does not exist.. creating now");
+	}
 
 	if(exists)
 	{
