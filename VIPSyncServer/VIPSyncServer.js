@@ -77,7 +77,7 @@ var downloadPackage = function(url, destination, callback)
 
 		res.on('data', function(data)
 		{
-			var increment = Math.floor(data.length/total * 100)
+			var increment = data.length/total * 100
 			progress += increment;
 			console.log(progress);
 		});
@@ -87,7 +87,7 @@ var downloadPackage = function(url, destination, callback)
 
 	try
 	{
-		clearDLDir(destination, function(removed) // Remove any old SQL files
+		prepareDestination(destination, function(removed) // Remove any old SQL files
 		{
 			if(removed)
 			{
@@ -124,26 +124,38 @@ var downloadPackage = function(url, destination, callback)
 	callback({status: 200}); // Trigger callback if err is not thrown
 }
 
-var clearDLDir = function(path, callback) // Calls back true if successful, false if error
+var prepareDestination = function(path, callback) // Calls back true if successful, false if error
 {
+	console.log("Preparing destination folder...");
+
 	var exists = fs.lstatSync(path).isDirectory(); // Sync because it's a quick operation most of the time
 
 	if(exists)
 	{
-		fs.remove(path, function(err)
+		fs.remove(path, function(err) // fs.remove is from the fs-extra module
 		{
-			if(!err)
+			if(!err) 
 			{
-				callback(true);
+				fs.mkdir(path, function(err) // re-create the empty dir
+				{
+					if(err) { callback(false) }
+					else { callback(true) }
+				});
 			}
 			else
 			{
+				console.log(err);
 				callback(false);
 			}
-		})
+		});
 	}
 	else
 	{
-		callback(true); // Still true even if there is nothing to remove
+		fs.mkdir(path, function(err)
+		{
+			if(err) { callback(false) }
+			else { callback(true) }
+		});
+
 	}
 }

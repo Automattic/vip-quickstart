@@ -250,7 +250,6 @@ function options_sync_package_downloader() {
 		function parse_package_generate_preview_response( full_response ) {
 			console.log( full_response );
 			var response = full_response.responseJSON;
-			alert('wait');
 			if ( ! response.success || typeof response.data.preview_url === 'undefined' ) {
 				handle_failure();
 				return;
