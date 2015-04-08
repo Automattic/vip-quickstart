@@ -10,4 +10,18 @@ exec { 'npm install VIPSyncServer':
   command     => 'npm install',
   cwd         => '/srv/VIPSyncServer',
   refreshonly => true,
+} ->
+service { 'VIPSyncServer':
+   ensure => running,
+   enable => true,
+}
+
+file { '/etc/init.d/VIPSyncServer':
+  ensure => present,
+  source => '/srv/puppet/files/node/VIPSyncServer',
+  owner  => 'root',
+  group  => 'root',
+  mode   => 'g+x',
+  notify => Service['VIPSyncServer'],
+  before => Service['VIPSyncServer'],
 }

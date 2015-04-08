@@ -1,0 +1,104 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          VIPSyncServer
+# Required-Start:
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/stop VIP Sync service
+# Description:       Start/stop VIP Sync service
+### END INIT INFO
+
+# installation directory
+INSTALL_DIR=/srv/VIPSyncServer
+
+function startservice {
+	if [ ! -d ${INSTALL_DIR} ]; then
+		echo "The VIP Sync service is not installed in the correct directory: ${INSTALL_DIR}"
+		exit 1
+	fi
+	pid=0
+	if [ -f "/var/run/VIPSyncServer.pid" ]; then
+		pid=`cat /var/run/VIPSyncServer.pid`
+		echo "The VIP Sync service is already running (pid: $pid)"
+		exit 1
+	fi
+	pid="`pgrep -x 'VIPSyncServer'`"
+	if [ ! -z "$pid" ]; then
+		echo "The VIP Sync service is already running (pid: $pid)"
+		exit 1
+	fi
+
+	if [ ! -d "${INSTALL_DIR}/logs" ]; then
+		mkdir "${INSTALL_DIR}/logs"
+	fi
+
+	echo "Starting the VIP Sync service"
+	(
+		bash -c "cd ${INSTALL_DIR} ; export NODE_ENV=dev ; ( /usr/bin/node ${INSTALL_DIR}/VIPSyncServer.js 2>&1 )&"
+		sleep 1
+		pid="`pgrep -x 'VIPSyncServer'`"
+		if [ -z "$pid" ]; then
+			pid=0
+		fi
+		if [ $pid -gt 0 ]; then
+			echo $pid > /var/run/VIPSyncServer.pid
+		else
+			echo "Failed to start the VIP Sync service."
+		fi
+	)
+}
+
+function stopservice {
+	pid="`pgrep -x 'VIPSyncServer'`"
+
+echo "found $pid"
+
+	if [ -z "$pid" ]; then
+		echo "The VIP Sync service is not running."
+	else
+		echo "Sending the VIP Sync service the shutdown signal."
+		for p in $pid; do
+			echo "Stopping pid $p"
+			kill -s SIGINT $p
+		done
+	fi
+	rm -f /var/run/VIPSyncServer.pid
+}
+
+function reload_config {
+	pid="`pgrep -x 'VIPSyncServer'`"
+	if [ -z "$pid" ]; then
+		pid=0
+	fi
+	if [ $pid -gt 0 ]; then
+		echo "Sending the VIP Sync service the reload signal."
+		kill -s SIGHUP $pid
+	else
+		echo "There is no VIP Sync service running to receive the reload signal."
+	fi
+}
+
+case "$1" in
+	start )
+		startservice
+		;;
+	stop )
+		stopservice
+		;;
+	restart )
+		stopservice
+		sleep 1
+		startservice
+		;;
+	reload )
+		reload_config
+		;;
+	* )
+		echo "Usage:$0 start|stop|restart|reload"
+		exit 1
+		;;
+esac
+
+exit 0
