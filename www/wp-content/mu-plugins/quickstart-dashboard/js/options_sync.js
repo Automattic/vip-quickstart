@@ -140,7 +140,6 @@ function options_sync_package_downloader() {
 			
 			var request = create_status_request();
 
-			console.log("Current State: " + current_state);
 
 			switch ( current_state ) {
 				case 0:
@@ -173,12 +172,8 @@ function options_sync_package_downloader() {
 			}
 		}
 
-		function create_status_request()
-		{
-			console.log("Creating status request: " + current_state);
-
-			switch(current_state)
-			{
+		function create_status_request() {
+			switch(current_state) {
 				case 2:
 					return $.ajax( "http://vip.local:3000/download-status", {
 						dataType: 'json'
@@ -193,12 +188,11 @@ function options_sync_package_downloader() {
 							_wpnonce: $( '#wpnonce' ).val(),
 						},
 						dataType: 'json',
-					} );
+					});
 			}
 		}
 
 		function parse_package_generation_status_response( full_response ) {
-			console.log( full_response );
 			var response = full_response.responseJSON;
 
 			if ( ! response.success ) {
@@ -215,7 +209,6 @@ function options_sync_package_downloader() {
 		}
 
 		function parse_package_download_response( full_response ) {
-			console.log( full_response );
 			var response = full_response.responseJSON;
 
 			if ( ! response.success ) {
@@ -229,18 +222,14 @@ function options_sync_package_downloader() {
 		}
 
 		function parse_download_status_response( full_response ) {
-			console.log( full_response );
 			var response = full_response.responseJSON;
-			console.log("Downloading " + response.downloading);
-			if( response.downloading === false ) // If finished downloading, check success
-			{
-				console.log("I got here");
-				if( response.success ) 
-				{
+			
+			// If finished downloading, check success
+			if( ! response.downloading ) {
+				if( response.success ) {
 					next_state();
 				}
-				else // If success == false
-				{
+				else {
 					handle_failure();
 					return;
 				}
@@ -248,7 +237,6 @@ function options_sync_package_downloader() {
 		}
 
 		function parse_package_generate_preview_response( full_response ) {
-			console.log( full_response );
 			var response = full_response.responseJSON;
 			if ( ! response.success || typeof response.data.preview_url === 'undefined' ) {
 				handle_failure();
@@ -260,8 +248,6 @@ function options_sync_package_downloader() {
 
 		function next_state() {
 			++current_state;
-
-			console.log("State change: " + (current_state - 1) + " to " + current_state);
 
 			if ( status_action_interval ) {
 				clearInterval( status_action_interval );

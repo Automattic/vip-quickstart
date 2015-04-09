@@ -255,17 +255,6 @@ class VIPOptionsSync extends Dashboard_Plugin {
 		else {
 			wp_send_json_error();
 		}
-
-		// Download the package OLD
-		//$download_result = download_url( add_query_arg( array( 'signature' => $signature ), $package_info['package_url'] ) );
-
-		//if ( is_wp_error( $download_result ) ) {
-			//wp_send_json_error( $download_result );
-		//}
-
-		// The package appears to be downloaded, save its path
-		//$package_info['filepath'] = $download_result;
-		//set_transient( 'qs_os_current_package_info', $package_info );
 	}
 
 	function ajax_generate_preview() {
