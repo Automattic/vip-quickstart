@@ -13,6 +13,6 @@ define repomonitor_repo ( $repo_name, $path = $title, $type = '' ) {
       Class['wp::cli'],
       Exec['wp install /srv/www/wp']
     ],
-    user => 'vagrant',
+    user      => 'vagrant',
   }
 }
