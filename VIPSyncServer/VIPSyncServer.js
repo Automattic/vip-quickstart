@@ -36,7 +36,7 @@ http.createServer(function(req, res) {
 
 		console.log("Download route");
 
-		downloadPackage(query['url'], "../../tmp/sync/", function(download) { 
+		downloadPackage(query['url'], "/tmp/sync/", function(download) { 
 			// Callback triggered when download starts successfully
 			console.log(download['status']);
 			res.writeHead(download['status'], {'Content-Type': 'application/json'});
@@ -91,18 +91,16 @@ var downloadPackage = function(url, destination, callback) {
 	try {
 		// Remove any old SQL files
 		prepareDestination(destination, function(removed) {
-			
 			if(removed) {
 				download.run(function (err, files) {
-
 					// Calls back when DL is finished
-				    if (!err) {
-					 	progress = 100;
-					 	downloading = false;
-					 	success = true;
-					    console.log('File downloaded successfully!');
-				    }
-				 	else { throw new Error("Download operation failed") } 
+					if (!err) {
+						progress = 100;
+						downloading = false;
+						success = true;
+						console.log('File downloaded successfully!');
+					}
+					else { throw new Error("Download operation failed") } 
 				});
 			}
 			else {
