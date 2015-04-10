@@ -13,7 +13,7 @@ exec { 'npm install VIPSyncServer':
 } ->
 service { 'VIPSyncServer':
   ensure => running,
-  enable => true, 
+  enable => true,
 }
 
 file { '/etc/init.d/VIPSyncServer':
