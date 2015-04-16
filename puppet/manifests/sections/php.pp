@@ -61,3 +61,11 @@ exec { 'html_errors = On':
   user    => root,
   notify  => Service['php5-fpm']
 }
+
+# Bump max_input_vars to match WordPress.com
+exec { 'max_input_vars = 6144':
+  command => 'sed -i "s/;* *max_input_vars *= *[0-9]*/max_input_vars = 6144/g" /etc/php5/fpm/php.ini',
+  unless  => 'cat /etc/php5/fpm/php.ini | grep "max_input_vars = 6144"',
+  user    => root,
+  notify  => Service['php5-fpm']
+}
