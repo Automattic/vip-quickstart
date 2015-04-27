@@ -111,11 +111,19 @@ sudo sed -e 's/^display_errors = Off/display_errors = On/g' -e  's/^display_star
 sudo cp /srv/pmc/nginx-sites.conf /etc/nginx/sites-enabled/sites.conf
 
 # uls.wwd.local setup
-git clone git@bitbucket.org:penskemediacorp/pmc-wwd-uls.git /srv/www/htdocs/pmc-wwd-uls
-cd /srv/www/htdocs/pmc-wwd-uls
-curl -sS https://getcomposer.org/installer | php
-php composer.phar install
-cp /srv/pmc/.env.local.php /srv/www/htdocs/pmc-wwd-uls/
+if [ ! -d /srv/www/htdocs/pmc-wwd-uls ]; then
+	git clone git@bitbucket.org:penskemediacorp/pmc-wwd-uls.git /srv/www/htdocs/pmc-wwd-uls
+	cd /srv/www/htdocs/pmc-wwd-uls
+	curl -sS https://getcomposer.org/installer | php
+	php composer.phar install
+	cp /srv/pmc/.env.local.php /srv/www/htdocs/pmc-wwd-uls/
+fi
+
+# wwd digital daily
+if [ ! -d /srv/www/htdocs/wwd-digital-daily ]; then
+	git clone git@bitbucket.org:penskemediacorp/wwd-digital-daily.git /srv/www/htdocs/wwd-digital-daily
+	/bin/bash /srv/www/htdocs/wwd-digital-daily/bin/init.sh
+fi
 
 sudo service nginx reload
 sudo service php5-fpm restart
