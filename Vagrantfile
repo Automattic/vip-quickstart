@@ -39,11 +39,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
   end
 
-  if (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) == nil
-    config.vm.synced_folder ".", "/srv", nfs: true
-  else
-    config.vm.synced_folder ".", "/srv", owner: 'www-data', group: 'www-data', mount_options: ["dmode=775", "fmode=664"]
-  end
+  config.vm.synced_folder ".", "/srv", owner: 'www-data', group: 'www-data', mount_options: ["dmode=775", "fmode=664"]
 
   # Address a bug in an older version of Puppet
   # See http://stackoverflow.com/questions/10894661/augeas-support-on-my-vagrant-machine
