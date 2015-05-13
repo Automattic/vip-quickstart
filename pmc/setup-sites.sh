@@ -168,6 +168,12 @@ if [ ! -d /srv/www/htdocs/pmc-wwd-uls ]; then
 	echo "Setting up uls.vip.local"
 	git clone git@bitbucket.org:penskemediacorp/pmc-wwd-uls.git /srv/www/htdocs/pmc-wwd-uls
 	cp /srv/pmc/uls.env.local.php /srv/www/htdocs/pmc-wwd-uls/.env.local.php
+	mysql -uroot -e 'create database uls_wwd_local;'
+	cd /srv/www/htdocs/pmc-wwd-uls
+	composer install
+	php artisan migrate
+	# email password first last
+	php artisan  bauhaus:user:register pmc@pmc.com pmc pmc pmc
 fi
 
 # dd-wwd.vip.local (wwd digital daily)
@@ -176,8 +182,10 @@ if [ ! -d /srv/www/htdocs/wwd-digital-daily ]; then
 	cp /srv/pmc/wwd-digital-daily.env /srv/www/htdocs/wwd-digital-daily/.env
 	cd /srv/www/htdocs/wwd-digital-daily/
 	mysql -uroot -e 'create database wwd_digital_daily;'
+	composer install
 	php artisan migrate
 	php artisan role:setup
+	# email password name
 	php artisan user:add pmc@pmc.com pmc pmc
 	php artisan user:role pmc@pmc.com superadmin
 fi
