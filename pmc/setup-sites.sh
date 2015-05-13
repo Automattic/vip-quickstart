@@ -7,6 +7,50 @@ export HTTP_HOST="${DOMAIN}"
 cd `dirname "$0"`
 sudo usermod -a -G www-data vagrant
 
+#####################
+# Required packages #
+#####################
+
+# mcrypt
+if [[ -z "`dpkg -s php5-mcrypt | grep "Status: install ok installed"`" ]]; then
+	apt-get -y install php5-mcrypt mcrypt
+	ln -s /etc/php5/mods-available/mcrypt.ini /etc/php5/cli/conf.d/20-mcrypt.ini
+	ln -s /etc/php5/mods-available/mcrypt.ini /etc/php5/fpm/conf.d/20-mcrypt.ini
+	service php5-fpm restart
+fi;
+
+# composer
+if [ ! -f /usr/local/bin/composer ]; then
+	curl -sS https://getcomposer.org/installer | php
+	php composer.phar install
+	if [ ! /usr/local/bin/composer ]; then
+		mv composer.phar /usr/local/bin/composer
+		chmod +x /usr/local/bin/composer
+	fi
+fi;
+
+# nodejs
+if [ -z "`which npm`" ]; then
+	curl -sL https://deb.nodesource.com/setup | sudo bash -
+	sudo apt-get install -y nodejs
+fi
+
+# mobify client
+if [ -z "`mobify`" ]; then
+	sudo npm -g install mobify-client
+fi
+
+# compass
+if [ -z "`which compass`" ]; then
+	sudo apt-get install rubygems -y
+	sudo apt-get install ruby -y
+	sudo gem install sass compass compass-rgbapng compass-photoshop-drop-shadow sassy-strings compass-import-once
+fi
+
+######################
+# Wordpress Projects #
+######################
+
 # workaround pmc_analystics required this theme to be at this location.
 if [ ! -e /srv/www/wp-content/themes/twentyfourteen ]; then
 	ln -s /srv/www/wp-content/themes/pub/twentyfourteen/ /srv/www/wp-content/themes/twentyfourteen
@@ -78,6 +122,10 @@ do
 
 done < ./sites
 
+###############
+# Local hosts #
+###############
+
 cp -f /etc/hosts /srv/pmc/vagrant_hosts
 sed -e "/#pmcsetup/d" -i /srv/pmc/hosts
 sed -e "/#pmcsetup/d" -i /srv/pmc/vagrant_hosts
@@ -87,7 +135,8 @@ sed -e "/#pmcsetup/d" -i /srv/pmc/vagrant_hosts
 # custom non-vip site domain
 echo '[ip] varietyarchive.local #pmcsetup
 [ip] vscoreserver.local #pmcsetup
-[ip] uls.wwd.local #pmcsetup
+[ip] uls.vip.local #pmcsetup
+[ip] dd-wwd.vip.local #pmcsetup
 ' >> server_hosts
 
 sed -e 's/\[ip\]/10.86.73.80/' server_hosts >> /srv/pmc/hosts
@@ -110,25 +159,39 @@ sudo sed -e 's/^display_errors = Off/display_errors = On/g' -e  's/^display_star
 # non vip sites nginx conf file
 sudo cp /srv/pmc/nginx-sites.conf /etc/nginx/sites-enabled/sites.conf
 
-# uls.wwd.local setup
+#######################
+# Non Wordpress Sites #
+#######################
+
+# uls.vip.local wwd paywall server
 if [ ! -d /srv/www/htdocs/pmc-wwd-uls ]; then
+	echo "Setting up uls.vip.local"
 	git clone git@bitbucket.org:penskemediacorp/pmc-wwd-uls.git /srv/www/htdocs/pmc-wwd-uls
-	cd /srv/www/htdocs/pmc-wwd-uls
-	curl -sS https://getcomposer.org/installer | php
-	php composer.phar install
-	cp /srv/pmc/.env.local.php /srv/www/htdocs/pmc-wwd-uls/
+	cp /srv/pmc/uls.env.local.php /srv/www/htdocs/pmc-wwd-uls/.env.local.php
 fi
 
-# wwd digital daily
+# dd-wwd.vip.local (wwd digital daily)
 if [ ! -d /srv/www/htdocs/wwd-digital-daily ]; then
 	git clone git@bitbucket.org:penskemediacorp/wwd-digital-daily.git /srv/www/htdocs/wwd-digital-daily
-	/bin/bash /srv/www/htdocs/wwd-digital-daily/bin/init.sh
+	cp /srv/pmc/wwd-digital-daily.env /srv/www/htdocs/wwd-digital-daily/.env
+	cd /srv/www/htdocs/wwd-digital-daily/
+	mysql -uroot -e 'create database wwd_digital_daily;'
+	php artisan migrate
+	php artisan role:setup
+	php artisan user:add pmc@pmc.com pmc pmc
+	php artisan user:role pmc@pmc.com superadmin
 fi
 
+# wwd mobify
+if [ ! -d /srv/www/htdocs/wwd-mobify ]; then
+	git clone git@bitbucket.org:penskemediacorp/wwd-mobify.git /srv/www/htdocs/wwd-mobify
+	cd /srv/www/htdocs/wwd-mobify
+	mobify build
+	sudo ln -fs /srv/www/htdocs/wwd-mobify/bld /srv/www/wp-content/themes/vip/pmc-wwd-2015/static/mobify
+fi
+
+# restart nginx
 sudo service nginx reload
 sudo service php5-fpm restart
 
-sudo apt-get install rubygems -y
-sudo apt-get install ruby -y
-sudo gem install sass compass compass-rgbapng compass-photoshop-drop-shadow sassy-strings compass-import-once
-
+echo "Site setup finished."

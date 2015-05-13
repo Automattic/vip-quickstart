@@ -1,4 +1,9 @@
 <?php
+add_action('init', function() {
+	if ( isset( $_GET['debug'] ) && 'publicize' == $_GET['debug'] ) {
+		require_once WP_PLUGIN_DIR . '/jetpack/modules/publicize.php';
+	}
+});
 
 final class PMC_Debug {
 	private static $_instance = false;
