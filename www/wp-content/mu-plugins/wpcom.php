@@ -36,3 +36,14 @@ add_action( 'init', function() {
     $alloptions = wp_cache_get( 'alloptions', 'options' );
     $alloptions = apply_filters( 'alloptions', $alloptions );
 });
+
+// Load wpcom global.css
+add_action( 'wp_head', 'global_css', 5 );
+
+function global_css() {
+	// wp_head action + echo are used instead of wp_enqueue_style, because these stylesheets must be loaded before the others
+	wp_enqueue_style( 'h4-global', 'http://s0.wp.com/wp-content/themes/h4/global.css', array() );
+
+	if ( 'rtl' == get_bloginfo( 'text_direction' ) )
+		wp_enqueue_style( 'h4-global-rtl', 'http://s0.wp.com/wp-content/themes/h4/global-rtl.css', array() );
+}
