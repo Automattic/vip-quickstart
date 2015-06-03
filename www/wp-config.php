@@ -77,6 +77,7 @@ if ( ! defined( 'WP_DEFAULT_THEME' ) ) {
 	define( 'WP_DEFAULT_THEME', 'pub/twentyfourteen' );
 }
 
+define( 'WP_MEMORY_LIMIT', '512M' );
 define( 'WP_MAX_MEMORY_LIMIT', '1024M' );
 
 /* That's all, stop editing! Happy blogging. */
