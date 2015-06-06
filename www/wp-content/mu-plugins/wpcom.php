@@ -44,6 +44,6 @@ function global_css() {
 	// wp_head action + echo are used instead of wp_enqueue_style, because these stylesheets must be loaded before the others
 	wp_enqueue_style( 'h4-global', 'http://s0.wp.com/wp-content/themes/h4/global.css', array() );
 
-	if ( 'rtl' == get_bloginfo( 'text_direction' ) )
+	if ( is_rtl() )
 		wp_enqueue_style( 'h4-global-rtl', 'http://s0.wp.com/wp-content/themes/h4/global-rtl.css', array() );
 }
