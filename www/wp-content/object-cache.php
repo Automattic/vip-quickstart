@@ -335,7 +335,7 @@ class WP_Object_Cache {
 		foreach ( $this->group_ops as $group => $ops ) {
 			if ( !isset($_GET['debug_queries']) && 500 < count($ops) ) {
 				$ops = array_slice( $ops, 0, 500 );
-				echo "<big>Too many to show! <a href='" . add_query_arg( 'debug_queries', 'true' ) . "'>Show them anyway</a>.</big>\n";
+				echo "<big>Too many to show! <a href='" . esc_url( add_query_arg( 'debug_queries', 'true' ) ) . "'>Show them anyway</a>.</big>\n";
 			}
 			echo "<h4>$group commands</h4>";
 			echo "<pre>\n";
