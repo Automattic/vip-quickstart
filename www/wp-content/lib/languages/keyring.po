@@ -1,0 +1,656 @@
+# Copyright (C) 2013 Keyring
+# This file is distributed under the same license as the Keyring package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Keyring\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/keyring\n"
+"POT-Creation-Date: 2013-11-13 23:15:58+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2013-11-13 18:17-0500\n"
+"Last-Translator: Beau Lebens <beau@dentedreality.com.au>\n"
+"Language-Team:  <beau@dentedreality.com.au>\n"
+"Language: English\n"
+"X-Generator: Poedit 1.5.7\n"
+
+#: admin-ui.php:56
+msgid "Keyring: Managed Connections"
+msgstr ""
+
+#: admin-ui.php:56
+msgid "Add New"
+msgstr ""
+
+#: admin-ui.php:59
+msgid "Add New Connection"
+msgstr ""
+
+#: admin-ui.php:60 includes/services/extended/google-contacts.php:155
+#: service.php:148
+msgid "&larr; Back"
+msgstr ""
+
+#: admin-ui.php:63
+msgid "Keyring Error!"
+msgstr ""
+
+#. #-#-#-#-#  plugin.pot (Keyring 1.5)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: admin-ui.php:66
+msgid "Keyring"
+msgstr ""
+
+#: admin-ui.php:76
+msgid "Start Again"
+msgstr ""
+
+#: admin-ui.php:98
+msgid "Invalid/missing delete nonce."
+msgstr ""
+
+#: admin-ui.php:103
+msgid "That connection has been deleted."
+msgstr ""
+
+#: admin-ui.php:105
+msgid "Could not delete that connection!"
+msgstr ""
+
+#: admin-ui.php:149
+msgid "Click a service to create a new connection:"
+msgstr ""
+
+#: admin-ui.php:159
+msgid "Manage"
+msgstr ""
+
+#: admin-ui.php:166
+msgid "There are no fully-configured services available to connect to."
+msgstr ""
+
+#: admin-ui.php:170
+msgid ""
+"The following services need to be configured correctly before you can "
+"connect to them."
+msgstr ""
+
+#: admin-ui.php:208
+msgid ""
+"You haven't added any connections yet. <a href=\"%s\">Add a New Connection</"
+"a>."
+msgstr ""
+
+#: admin-ui.php:213
+msgid "Service"
+msgstr ""
+
+#: admin-ui.php:214 admin-ui.php:228
+msgid "Avatar"
+msgstr ""
+
+#: admin-ui.php:215
+msgid "External ID"
+msgstr ""
+
+#: admin-ui.php:216
+msgid "Name"
+msgstr ""
+
+#: admin-ui.php:255
+msgid "Delete"
+msgstr ""
+
+#: includes/services/core/http-basic.php:33
+#: includes/services/extended/instapaper.php:49
+msgid "Account Details"
+msgstr ""
+
+#: includes/services/core/http-basic.php:40
+#: includes/services/extended/instapaper.php:56
+msgid "Your account details could not be confirmed, please try again."
+msgstr ""
+
+#: includes/services/core/http-basic.php:43
+#: includes/services/extended/instapaper.php:59
+msgid "Please make sure you enter a username and password."
+msgstr ""
+
+#: includes/services/core/http-basic.php:70
+msgid "Enter your username and password for accessing <strong>%s</strong>:"
+msgstr ""
+
+#: includes/services/core/http-basic.php:78
+msgid "Username"
+msgstr ""
+
+#: includes/services/core/http-basic.php:80
+#: includes/services/extended/instapaper.php:96
+msgid "Password"
+msgstr ""
+
+#: includes/services/core/http-basic.php:84
+#: includes/services/extended/instapaper.php:100
+msgid "Verify Details"
+msgstr ""
+
+#: includes/services/core/http-basic.php:85
+#: includes/services/extended/google-contacts.php:197
+#: includes/services/extended/instapaper.php:101 service.php:187
+msgid "Cancel"
+msgstr ""
+
+#: includes/services/core/http-basic.php:102
+#: includes/services/core/oauth1.php:199 includes/services/core/oauth2.php:71
+#: includes/services/extended/instapaper.php:116
+msgid "Invalid/missing verification nonce."
+msgstr ""
+
+#: includes/services/core/http-basic.php:173
+#: includes/services/core/oauth1.php:259 includes/services/core/oauth2.php:174
+msgid "No token"
+msgstr ""
+
+#: includes/services/core/http-basic.php:203
+msgid "Unsupported method specified for verify_token."
+msgstr ""
+
+#: includes/services/core/oauth1.php:55 includes/services/core/oauth2.php:31
+msgid "Invalid/missing request nonce."
+msgstr ""
+
+#: includes/services/core/oauth1.php:128
+msgid "Unsupported method specified for request_token."
+msgstr ""
+
+#: includes/services/core/oauth1.php:169 includes/services/core/oauth1.php:251
+msgid ""
+"There was a problem connecting to %s to create an authorized connection. "
+"Please try again in a moment."
+msgstr ""
+
+#: includes/services/core/oauth1.php:349
+msgid "Unsupported method specified."
+msgstr ""
+
+#: includes/services/core/oauth2.php:77 includes/services/core/oauth2.php:151
+msgid "There was a problem authorizing with %s. Please try again in a moment."
+msgstr ""
+
+#: includes/services/core/oauth2.php:91
+msgid ""
+"Failed to load your request token while connecting to %s. Please try again "
+"in a moment."
+msgstr ""
+
+#: includes/services/extended/example.php:58
+msgid "Continue"
+msgstr ""
+
+#: includes/services/extended/example.php:94
+msgid "Done"
+msgstr ""
+
+#: includes/services/extended/facebook.php:39
+msgid "If you haven't already, you'll need to set up an app on Facebook:"
+msgstr ""
+
+#: includes/services/extended/facebook.php:41
+msgid ""
+"Click <strong>+ Create New App</strong> at the top-right of <a href='https://"
+"developers.facebook.com/apps'>this page</a>"
+msgstr ""
+
+#: includes/services/extended/facebook.php:42
+msgid ""
+"Enter a name for your app (maybe the name of your website?) and click "
+"<strong>Continue</strong> (ignore the other settings)"
+msgstr ""
+
+#: includes/services/extended/facebook.php:43
+msgid "Enter whatever is in the CAPTCHA and click <strong>Continue</strong>"
+msgstr ""
+
+#: includes/services/extended/facebook.php:44
+msgid ""
+"Put your domain name in the <strong>App Domains</strong> box. That value is "
+"probably <code>%s</code>"
+msgstr ""
+
+#: includes/services/extended/facebook.php:45
+msgid ""
+"Click the <strong>Website with Facebook Login</strong> box and enter the URL "
+"to your website, which is probably <code>%s</code>"
+msgstr ""
+
+#: includes/services/extended/facebook.php:46
+msgid "Click <strong>Save Changes</strong>"
+msgstr ""
+
+#: includes/services/extended/facebook.php:48
+msgid ""
+"Once you're done configuring your app, copy and paste your <strong>App ID</"
+"strong> and <strong>App Secret</strong> (in the top section of your app's "
+"Basic details) into the appropriate fields below. Leave the App Key field "
+"blank."
+msgstr ""
+
+#: includes/services/extended/flickr.php:36
+msgid ""
+"To connect to Flickr, you'll need to <a href='http://www.flickr.com/services/"
+"apps/create/apply/?'>create an application at Flickr.com</a>. If this is a "
+"personal website then you can use a non-commercial key (which will be "
+"approved automatically)."
+msgstr ""
+
+#: includes/services/extended/flickr.php:37
+msgid ""
+"Once you've created your app, enter the API <strong>Key</strong> and "
+"<strong>Secret</strong> below (App ID is not required for Flickr apps)."
+msgstr ""
+
+#: includes/services/extended/foursquare.php:38
+msgid ""
+"If you haven't already, you'll need to <a href='https://foursquare.com/"
+"developers/register'>create a new app at Foursquare</a>. You should only "
+"need to worry about these settings:"
+msgstr ""
+
+#: includes/services/extended/foursquare.php:40
+msgid ""
+"<strong>Your app name</strong>: enter whatever you like, maybe your "
+"website's name?"
+msgstr ""
+
+#: includes/services/extended/foursquare.php:41
+msgid ""
+"<strong>Download / welcome page url</strong>: just enter your website's URL, "
+"<code>%s</code>"
+msgstr ""
+
+#: includes/services/extended/foursquare.php:42
+msgid "<strong>Redirect URI(s)</strong>: Copy-paste this, <code>%s</code>"
+msgstr ""
+
+#: includes/services/extended/foursquare.php:43
+msgid "<strong>New users can connect via the web</strong>: check the box"
+msgstr ""
+
+#: includes/services/extended/foursquare.php:45
+msgid ""
+"Once you've saved those changes, copy the <strong>Client id</strong> value "
+"into the <strong>API Key</strong> field, and the <strong>Client secret</"
+"strong> value into the <strong>API Secret</strong> field and click save (you "
+"don't need an App ID value for Foursquare)."
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:57
+msgid ""
+"Google controls access to all of their APIs through their API Console. <a "
+"href='https://code.google.com/apis/console'>Go to the console</a> and click "
+"the project dropdown just under the logo in the upper left of the screen. "
+"Click <strong>Create&hellip;</strong> to create a new project. Enter a name "
+"and then click <strong>Create project</strong>. You don't technically need "
+"access to any of the additional APIs, but if you want to, then feel free to "
+"enable them"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:58
+msgid "Now you need to set up an OAuth Client ID."
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:60
+msgid "Click <strong>API Access</strong> in the menu on the left."
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:61
+msgid ""
+"Click the big blue button labelled <strong>Create an OAuth 2.0 client "
+"ID&hellip;</strong>"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:62
+msgid ""
+"You must enter a <strong>Product name</strong>, but you can skip the logo "
+"and home page URL"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:63
+msgid "Leave the Application type set to <strong>Web application</strong>"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:64
+msgid ""
+"Next to <strong>Your site or hostname</strong>, click <strong>(more options)"
+"</strong> <code>%s</code>"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:65
+msgid ""
+"In the <strong>Authorized Redirect URIs</strong> box, enter the URL <code>"
+"%s</code>"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:66
+msgid ""
+"For the <strong>Authorized JavaScript Origins</strong>, enter the URL of "
+"your domain, e.g. <code>http://%s</code>"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:67
+msgid "Click <strong>Create client ID</strong> when you're done"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:69
+msgid ""
+"Once you've saved your details, copy the <strong>Client ID</strong> into the "
+"<strong>Client ID</strong> field below, and the <strong>Client secret</"
+"strong> value into <strong>Client Secret</strong>. The Redirect URI box "
+"should fill itself out for you."
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:147 service.php:140
+msgid "Invalid/missing management nonce."
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:154 service.php:147
+msgid "Keyring Service Management"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:156 service.php:149
+msgid "%s API Credentials"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:166 service.php:159
+msgid "Credentials saved."
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:188
+msgid "Client ID"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:190
+msgid "Client Secret"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:192
+msgid "Redirect URI"
+msgstr ""
+
+#: includes/services/extended/google-contacts.php:196 service.php:186
+msgid "Save Changes"
+msgstr ""
+
+#: includes/services/extended/instagram.php:38
+msgid ""
+"To get started, <a href='http://instagram.com/developer/clients/"
+"register/'>register an OAuth client on Instagram</a>. The most important "
+"setting is the <strong>OAuth redirect_uri</strong>, which should be set to "
+"<code>%s</code>. You can set the other values to whatever you like."
+msgstr ""
+
+#: includes/services/extended/instagram.php:39
+msgid ""
+"Once you've saved those changes, copy the <strong>CLIENT ID</strong> value "
+"into the <strong>API Key</strong> field, and the <strong>CLIENT SECRET</"
+"strong> value into the <strong>API Secret</strong> field and click save (you "
+"don't need an App ID value for Instagram)."
+msgstr ""
+
+#: includes/services/extended/instapaper.php:38
+msgid ""
+"To use the Instapaper API, you need to get manually approved. <a "
+"href='http://www.instapaper.com/main/request_oauth_consumer_token'>Apply "
+"here</a>, then wait for a reply email."
+msgstr ""
+
+#: includes/services/extended/instapaper.php:39
+msgid ""
+"Once you get approved, you'll get an email back with your details. Copy the "
+"<strong>OAuth consumer key</strong> value into the <strong>API Key</strong> "
+"field, and the <strong>OAuth consumer secret</strong> value into the "
+"<strong>API Secret</strong> field and click save (you don't need an App ID "
+"value for Instapaper)."
+msgstr ""
+
+#: includes/services/extended/instapaper.php:86
+msgid ""
+"Enter your username (or email address) and password for accessing <strong>"
+"%s</strong>:"
+msgstr ""
+
+#: includes/services/extended/instapaper.php:94
+msgid "Email address"
+msgstr ""
+
+#: includes/services/extended/linkedin.php:37
+msgid ""
+"To connect to LinkedIn, you'll first need to <a href='https://www.linkedin."
+"com/secure/developer?newapp='>create an app</a>. A lot of the details are "
+"required, but they're not actually important to the operation of your app, "
+"since Keyring will override any important settings."
+msgstr ""
+
+#: includes/services/extended/linkedin.php:38
+msgid ""
+"Once you've created your app, go down to the <strong>OAuth Keys</strong> "
+"section and copy the <strong>API Key</strong> value into the <strong>API "
+"Key</strong> field below, and the <strong>Secret Key</strong> value into the "
+"<strong>API Secret</strong> field and click save (you don't need an App ID "
+"value for LinkedIn)."
+msgstr ""
+
+#: includes/services/extended/moves.php:17
+msgid "Unknown"
+msgstr ""
+
+#: includes/services/extended/moves.php:18
+msgid "Home"
+msgstr ""
+
+#: includes/services/extended/moves.php:19
+msgid "Work"
+msgstr ""
+
+#: includes/services/extended/moves.php:20
+msgid "School"
+msgstr ""
+
+#: includes/services/extended/moves.php:21
+msgid "Manually Named"
+msgstr ""
+
+#: includes/services/extended/moves.php:22
+msgid "Selected from foursquare"
+msgstr ""
+
+#: includes/services/extended/moves.php:26
+msgid "Walking"
+msgstr ""
+
+#: includes/services/extended/moves.php:27
+msgid "Cycling"
+msgstr ""
+
+#: includes/services/extended/moves.php:28
+msgid "Running"
+msgstr ""
+
+#: includes/services/extended/moves.php:29
+msgid "Transport"
+msgstr ""
+
+#: includes/services/extended/moves.php:58
+msgid ""
+"Head over and <a href='https://dev.moves-app.com/apps/new'>create a new "
+"application</a> on Moves-app which you'll use to connect."
+msgstr ""
+
+#: includes/services/extended/moves.php:59
+msgid ""
+"Once it's created, click the <strong>Development</strong> tab. Your "
+"<strong>App ID</strong> and <strong>API Key</strong> are both shown on that "
+"page as <strong>Client ID</strong>. Enter your <strong>Client secret</"
+"strong> in the <strong>API Secret</strong> box. On that tab there is also a "
+"<strong>Redirect URI</strong> box, which you should set to <code>%s</code>."
+msgstr ""
+
+#: includes/services/extended/runkeeper.php:40
+msgid ""
+"You'll need to <a href='http://runkeeper.com/partner/applications/"
+"registerForm'>register a new application</a> on RunKeeper so that you can "
+"connect. Be sure to check the <strong>Read Health Information</strong> "
+"option under <strong>Permissions Requests</strong> (and explain why you want "
+"to read that data). You will also be required to set an <strong>Estimated "
+"Date of Publication</strong>."
+msgstr ""
+
+#: includes/services/extended/runkeeper.php:41
+msgid ""
+"Once you've registered your application, click the <strong>Application Keys "
+"and URLs</strong> next to it, and copy the <strong>Client ID</strong> into "
+"the <strong>API Key</strong> field below, and the <strong>Client Secret</"
+"strong> value into <strong>API Secret</strong>."
+msgstr ""
+
+#: includes/services/extended/tripit.php:40
+msgid ""
+"If you haven't created an app on TripIt yet, <a href='https://www.tripit.com/"
+"developer/create'>create one now</a>. Make sure you set it to being a 'Web "
+"application or widget', and other than that the settings are all up to you."
+msgstr ""
+
+#: includes/services/extended/tripit.php:41
+msgid ""
+"Once you've created your app, you will see a yellow box at the top of the "
+"page, where you can get your <strong>API Key</strong> and <strong>API "
+"Secret</strong>, to enter below (you don't need an App ID value for TripIt)."
+msgstr ""
+
+#: includes/services/extended/tumblr.php:37
+msgid ""
+"To get started, <a href='http://www.tumblr.com/oauth/register'>register an "
+"application with Tumblr</a>. The <strong>Default callback URL</strong> "
+"should be set to <code>%s</code>, and you can enter whatever you like in the "
+"other fields."
+msgstr ""
+
+#: includes/services/extended/tumblr.php:38
+msgid ""
+"Once you've created your app, copy the <strong>OAuth Consumer Key</strong> "
+"into the <strong>API Key</strong> field below. Click the <strong>Show secret "
+"key</strong> link, and then copy the <strong>Secret Key</strong> value into "
+"the <strong>API Secret</strong> field below. You don't need an App ID value "
+"for Tumblr."
+msgstr ""
+
+#: includes/services/extended/twitter.php:40
+msgid ""
+"If you haven't already, you'll need to <a href='https://dev.twitter.com/apps/"
+"new'>create an app on Twitter</a> (log in using your normal Twitter "
+"account). Make sure you enter something for the <strong>Callback URL</"
+"strong>, even though Keyring will override it with the correct value. Just "
+"enter your homepage, e.g. <code>%s</code>."
+msgstr ""
+
+#: includes/services/extended/twitter.php:41
+msgid ""
+"Once you've created an app, copy and paste your <strong>Consumer key</"
+"strong> and <strong>Consumer secret</strong> (from under the <strong>OAuth "
+"settings</strong> section of your app's details) into the boxes below. You "
+"don't need an App ID for Twitter."
+msgstr ""
+
+#: includes/services/extended/yahoo.php:34
+msgid ""
+"To connect to Yahoo!, you need to <a href='https://developer.apps.yahoo.com/"
+"dashboard/createKey.html'>Create a new project</a>. Make sure you set the "
+"<strong>Access Scope</strong> to <strong>This app requires access to private "
+"user data</strong>. When you select that, you will be asked for an "
+"<strong>Application Domain</strong>, which should probably be set to "
+"<code>http://%s</code>. Which APIs you request access for will depend on how "
+"Keyring will be used on this site. Common ones will be <strong>Contacts</"
+"strong>, <strong>Social Directory</strong>, <strong>Status</strong>, and "
+"<strong>Updates</strong>."
+msgstr ""
+
+#: includes/services/extended/yahoo.php:35
+msgid ""
+"Once you've created your project, copy and paste your <strong>Consumer key</"
+"strong> and <strong>Consumer secret</strong> (from under the "
+"<strong>Authentication Information: OAuth</strong> section of your app's "
+"details) into the boxes below. You don't need an App ID for Yahoo!."
+msgstr ""
+
+#: includes/stores/singlestore.php:18
+msgid "Keyring Request Token"
+msgstr ""
+
+#: includes/stores/singlestore.php:19
+msgid ""
+"Token or authentication details stored by Keyring. Request tokens are used "
+"during the authorization flow."
+msgstr ""
+
+#: includes/stores/singlestore.php:24
+msgid "Keyring Access Token"
+msgstr ""
+
+#: includes/stores/singlestore.php:25
+msgid ""
+"Token or authentication details stored by Keyring. Access tokens are used to "
+"make secure requests."
+msgstr ""
+
+#: keyring.php:86
+msgid ""
+"Invalid <code>KEYRING__TOKEN_STORE</code> specified. Please make sure "
+"<code>KEYRING__TOKEN_STORE</code> is set to a valid classname for handling "
+"token storage in <code>%s</code> (or <code>wp-config.php</code>)"
+msgstr ""
+
+#: keyring.php:136
+msgid ""
+"Invalid/missing Keyring core nonce. All core actions require a valid nonce."
+msgstr ""
+
+#: keyring.php:195
+msgid "Keyring Error"
+msgstr ""
+
+#: keyring.php:287
+msgid "Create a new connection&hellip;"
+msgstr ""
+
+#: service.php:178
+msgid "App ID"
+msgstr ""
+
+#: service.php:180
+msgid "API Key"
+msgstr ""
+
+#: service.php:182
+msgid "API Secret"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "http://dentedreality.com.au/projects/wp-keyring/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Keyring helps you manage your keys. It provides a generic, very hookable "
+"framework for connecting to remote systems and managing your access tokens, "
+"username/password combos etc for those services. On its own it doesn't do "
+"much, but it enables other plugins to do things that require authorization "
+"to act on your behalf."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Beau Lebens"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://dentedreality.com.au"
+msgstr ""
