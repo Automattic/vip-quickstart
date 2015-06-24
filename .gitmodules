@@ -28,3 +28,6 @@
 [submodule "puppet/modules/ssh"]
 	path = puppet/modules/ssh
 	url = https://github.com/attachmentgenie/attachmentgenie-ssh.git
+[submodule "www/wp-content/lib/eventbrite-services"]
+	path = www/wp-content/lib/eventbrite-services
+	url = git@github.com:voceconnect/eventbrite-services
