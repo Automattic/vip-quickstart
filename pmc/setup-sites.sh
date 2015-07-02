@@ -56,9 +56,9 @@ if [ ! -e /srv/www/wp-content/themes/twentyfourteen ]; then
 	ln -s /srv/www/wp-content/themes/pub/twentyfourteen/ /srv/www/wp-content/themes/twentyfourteen
 fi
 
-# eventbrite theme required for pmc-conference
-if [ ! -e /srv/www/wp-content/themes/eventbrite ]; then
-	svn co https://wpcom-themes.svn.automattic.com/eventbrite/ /srv/www/wp-content/themes/eventbrite
+# eventbrite-venue theme required for pmc-conference
+if [ ! -e /srv/www/wp-content/themes/eventbrite-venue ]; then
+	svn co https://wpcom-themes.svn.automattic.com/eventbrite-venue/ /srv/www/wp-content/themes/eventbrite-venue
 fi
 
 if [ ! -f ~/.ssh/bitbucket.org_id_rsa ]; then
