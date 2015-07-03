@@ -130,6 +130,12 @@ vcsrepo { '/srv/www/wp-tests':
   provider => svn,
 }
 
+cron { '/srv/www/wp-tests':
+  command => '/usr/bin/svn up /srv/www/wp-tests > /dev/null 2>&1',
+  minute  => '0',
+  hour    => '*',
+}
+
 if 'physical' == $::virtual {
   # Create a local config
   file { 'local-config.php':
