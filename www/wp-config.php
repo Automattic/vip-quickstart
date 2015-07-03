@@ -74,7 +74,7 @@ if ( ! defined( 'SUBDOMAIN_INSTALL' ) ) {
 }
 
 if ( ! defined( 'WP_DEFAULT_THEME' ) ) {
-	define( 'WP_DEFAULT_THEME', 'pub/twentyfourteen' );
+	define( 'WP_DEFAULT_THEME', 'pub/twentyfifteen' );
 }
 
 define( 'WP_MEMORY_LIMIT', '64M' );
