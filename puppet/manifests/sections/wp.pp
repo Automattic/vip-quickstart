@@ -118,9 +118,9 @@ cron { '/srv/www/wp-content/themes/vip/plugins':
   hour    => '*',
 }
 
-vcsrepo { '/srv/www/wp-content/themes/pub/twentyfourteen':
+vcsrepo { '/srv/www/wp-content/themes/pub/twentyfifteen':
   ensure   => latest,
-  source   => 'https://wpcom-themes.svn.automattic.com/twentyfourteen',
+  source   => 'https://wpcom-themes.svn.automattic.com/twentyfifteen',
   provider => svn,
 }
 
