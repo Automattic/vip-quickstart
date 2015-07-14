@@ -79,6 +79,7 @@ class { 'wp::cli': ensure  => installed }
 
 # Make sure the wp-content directories exists
 $wp_content_dirs = [
+  '/srv/www/wp-content',
   '/srv/www/wp-content/themes',
   '/srv/www/wp-content/plugins',
   '/srv/www/wp-content/upgrade',
