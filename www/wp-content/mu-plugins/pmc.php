@@ -1,5 +1,7 @@
 <?php
 
+add_filter( 'jetpack_photon_skip_for_url', '__return_true' );
+
 // remove emoji js support as it is causing major issue with site stability
 add_action('wp_enqueue_scripts', function() {
 	global $wp_scripts;
