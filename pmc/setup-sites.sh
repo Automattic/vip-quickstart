@@ -172,6 +172,7 @@ if [ ! -d /srv/www/htdocs/pmc-wwd-uls ]; then
 	mysql -uroot -e 'create database uls_wwd_local;'
 	cd /srv/www/htdocs/pmc-wwd-uls
 	composer install
+	php artisan migrate --package=krafthaus/bauhaususer
 	php artisan migrate
 	# email password first last
 	php artisan  bauhaus:user:register pmc@pmc.com pmc pmc pmc
