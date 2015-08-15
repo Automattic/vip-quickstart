@@ -98,8 +98,9 @@ if ( defined('PMC_BRANCH_SWITCH') && PMC_BRANCH_SWITCH ) {
 				if ( empty( $this->_host_prefix ) ) {
 					return $url;
 				}
+				$host = !empty( $this->_request_host ) ? $this->_request_host : ( $this->_host_prefix . '.' . $_SERVER['HTTP_HOST'] ) ;
 				$url_parts = wp_parse_args( parse_url( $url ), array('path'=>'', 'scheme' => 'http', 'host' => $_SERVER['HTTP_HOST'] ) );
-				$url = $url_parts['scheme'] . '://' . $this->_host_prefix . '.' . $_SERVER['HTTP_HOST'] . $url_parts['path'];
+				$url = $url_parts['scheme'] . '://' . $host . $url_parts['path'];
 				if ( !empty( $url_parts['query'] ) ) {
 					$url .= '?'. $url_parts['query'];
 				}
