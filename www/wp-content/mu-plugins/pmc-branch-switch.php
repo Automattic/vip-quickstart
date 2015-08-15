@@ -23,6 +23,7 @@ if ( defined('PMC_BRANCH_SWITCH') && PMC_BRANCH_SWITCH ) {
 			private static $_instance = false;
 			private $_host_prefix     = false;
 			private $_request_host    = false;
+			private $_blog_id         = false;
 
 			public static function get_instance() {
 				if ( empty( self::$_instance ) ) {
@@ -44,6 +45,8 @@ if ( defined('PMC_BRANCH_SWITCH') && PMC_BRANCH_SWITCH ) {
 					$this->_request_host = $_SERVER['REQUEST_HOST'];
 					$_SERVER['SERVER_NAME']  = $_SERVER['HTTP_HOST'] = $_SERVER['REQUEST_HOST'];
 				}
+
+				$this->_blog_id = get_current_blog_id();
 
 			}
 
@@ -95,7 +98,7 @@ if ( defined('PMC_BRANCH_SWITCH') && PMC_BRANCH_SWITCH ) {
 			}
 
 			public function filter_url( $url ) {
-				if ( empty( $this->_host_prefix ) ) {
+				if ( empty( $this->_host_prefix ) || $this->_blog_id != get_current_blog_id() ) {
 					return $url;
 				}
 				$host = !empty( $this->_request_host ) ? $this->_request_host : ( $this->_host_prefix . '.' . $_SERVER['HTTP_HOST'] ) ;
