@@ -28,6 +28,7 @@ if ( ! function_exists( 'add_action' ) ) {
 		$prefix            = '';
 		$is_network_domain = false;
 		$redirect_to       = false;
+		$is_vip_local      = false;
 
 		if ( $network_domain == $_SERVER['HTTP_HOST'] ) {
 			return;
@@ -41,19 +42,31 @@ if ( ! function_exists( 'add_action' ) ) {
 		elseif ( preg_match( '/(?:(.+)\.)?qa\.([^.]+)\.com$/si',$_SERVER['HTTP_HOST'], $matches ) ) {
 			$site_slug = $matches[2];
 			$prefix    = $matches[1];
+		} else {
+			// vip.local development
+			if ( 'vip.local' == $_SERVER['HTTP_HOST'] ) {
+				return;
+			}
+			if ( preg_match( '/(?:(.+)\.)?([^.]+)\.vip.local$/si',$_SERVER['HTTP_HOST'], $matches ) ) {
+				$network_domain    = 'vip.local';
+				$site_slug         = $matches[2];
+				$prefix            = $matches[1];
+				$is_network_domain = true;
+				$is_vip_local      = true;
+			}
 		}
 
 		if ( !empty( $site_slug ) ) {
 			if ( preg_match('/^\/wp-admin/', $_SERVER['REQUEST_URI'] ) ) {
 				if ( preg_match('/^\/wp-admin\/network/', $_SERVER['REQUEST_URI'] ) ) {
-					if ( $network_domain != $_SERVER['REQUEST_URI'] ) {
+					if ( $network_domain != $_SERVER['HTTP_HOST'] ) {
 						$redirect_to = 'http' . ( !empty( $_SERVER['HTTPS'] ) ? 's' : '') .'://'. $network_domain;
 					}
 				} elseif ( ! $is_network_domain ) {
 					$redirect_to = 'http' . ( !empty( $_SERVER['HTTPS'] ) ? 's' : '') .'://'. ( $prefix ? $prefix .'.' : '' ) ."{$site_slug}.{$network_domain}";
 				}
 			} else {
-				if ( $is_network_domain ) {
+				if ( $is_network_domain && ! $is_vip_local ) {
 					$redirect_to = 'http' . ( !empty( $_SERVER['HTTPS'] ) ? 's' : '') .'://'. ( $prefix ? $prefix .'.' : '' ) ."qa.{$site_slug}.com";
 				}
 			}
@@ -64,7 +77,11 @@ if ( ! function_exists( 'add_action' ) ) {
 				die();
 			}
 
-			$_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'] = "{$site_slug}.{$network_domain}";
+			// save the original host name to be restore later
+			$_SERVER['REQUEST_HOST'] = $_SERVER['HTTP_HOST'];
+			// force subdomain to allow wp lookup blog correctly
+			// We can use sunrise.php to look up the host, but we need to define WP_CONTENT_DIR before wp default constant does
+			$_SERVER['SERVER_NAME']  = $_SERVER['HTTP_HOST'] = "{$site_slug}.{$network_domain}";
 		}
 
 		if ( ! empty( $prefix ) ) {
@@ -93,8 +110,8 @@ elseif ( defined('PMC_THEME_SWITCH') && PMC_THEME_SWITCH ) {
 
 		final class PMC_Theme_Switch {
 			private static $_instance = false;
-			private $_theme_directory = false;
-			private $_host_prefix = false;
+			private $_host_prefix     = false;
+			private $_request_host    = false;
 
 			public static function get_instance() {
 				if ( empty( self::$_instance ) ) {
@@ -110,6 +127,12 @@ elseif ( defined('PMC_THEME_SWITCH') && PMC_THEME_SWITCH ) {
 			private function _init() {
 
 				add_action( 'init', array( $this, 'action_init' ) );
+
+				// by this time, wp already know found the blog, we can restore the original request host name here
+				if ( !empty( $_SERVER['REQUEST_HOST'] ) ) {
+					$this->_request_host = $_SERVER['REQUEST_HOST'];
+					$_SERVER['SERVER_NAME']  = $_SERVER['HTTP_HOST'] = $_SERVER['REQUEST_HOST'];
+				}
 
 			}
 
