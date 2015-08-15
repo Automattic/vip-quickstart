@@ -51,11 +51,12 @@ if ( defined('PMC_BRANCH_SWITCH') && PMC_BRANCH_SWITCH ) {
 				remove_all_filters( 'intermediate_image_sizes' );
 				remove_all_filters( 'send_headers' );
 
+				// quickstart mu plugins not playing nice in function wpcom_vip_quickstart_fix_domain
+				remove_all_filters( 'site_url' );
+				remove_all_filters( 'home_url' );
+
 				if ( !empty( $_SERVER['HTTP_HOST_PREFIX'] ) ) {
 					$this->_host_prefix = $_SERVER['HTTP_HOST_PREFIX'];
-					// quickstart mu plugins not playing nice in function wpcom_vip_quickstart_fix_domain
-					remove_all_filters( 'site_url' );
-					remove_all_filters( 'home_url' );
 					add_filter( 'home_url', array( $this, 'filter_url' ) );
 					add_filter( 'site_url', array( $this, 'filter_url' ) );
 					add_filter( 'theme_root_uri', array( $this, 'filter_url' ) );

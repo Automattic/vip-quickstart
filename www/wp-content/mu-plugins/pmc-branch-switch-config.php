@@ -52,7 +52,7 @@ if ( ! function_exists( 'add_action' ) ) {
 		define( 'COOKIEHASH', md5( $network_domain ) );
 
 		if ( !empty( $site_slug ) ) {
-			if ( preg_match('/^\/wp-admin|^/wp-login\.php/', $_SERVER['REQUEST_URI'] ) ) {
+			if ( preg_match('/^\/(wp-admin|wp-login)/', $_SERVER['REQUEST_URI'] ) ) {
 				if ( preg_match('/^\/wp-admin\/network/', $_SERVER['REQUEST_URI'] ) ) {
 					if ( $network_domain != $_SERVER['HTTP_HOST'] ) {
 						$redirect_to = 'http' . ( !empty( $_SERVER['HTTPS'] ) ? 's' : '') .'://'. $network_domain;
@@ -66,10 +66,13 @@ if ( ! function_exists( 'add_action' ) ) {
 				}
 			}
 
-			if ( $redirect_to && ! ( defined('WP_CLI') && WP_CLI ) ) {
+			if ( ( empty( $_SERVER['REQUEST_METHOD'] ) || 'POST' != $_SERVER['REQUEST_METHOD'] )
+				&& $redirect_to && ! ( defined('WP_CLI') && WP_CLI ) ) {
+
 				$redirect_to .= $_SERVER['REQUEST_URI'];
 				header('Location: '. $redirect_to, true, 302);
 				die();
+
 			}
 
 			// save the original host name to be restore later
@@ -99,7 +102,7 @@ if ( ! function_exists( 'add_action' ) ) {
 	});
 
 	// Override wp_validate_auth_cookie function to bypass auth verification to allow cross domain authentication
-	if ( false !== strpos( $_SERVER['HTTP_HOST'], 'vip.local' ) &&  ! function_exists( 'wp_validate_auth_cookie' ) ) {
+	if ( ! function_exists( 'wp_validate_auth_cookie' ) ) {
 
 		// @see wp-includes/pluggable.php
 		function wp_validate_auth_cookie($cookie = '', $scheme = '') {
