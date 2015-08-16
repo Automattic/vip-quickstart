@@ -75,7 +75,14 @@ if ( defined('PMC_BRANCH_SWITCH') && PMC_BRANCH_SWITCH ) {
 				}
 
 				add_filter('site_url', array( $this, 'filter_wp_login' ) );
+				add_filter('login_redirect', array( $this,'filter_login_redirect' ), 10, 3 );
+			}
 
+			public function filter_login_redirect($redirect_to, $requested_redirect_to, $user) {
+				if ( empty( $requested_redirect_to ) ) {
+					$redirect_to = '/';
+				}
+				return $redirect_to;
 			}
 
 			public function filter_wp_login( $url ) {
