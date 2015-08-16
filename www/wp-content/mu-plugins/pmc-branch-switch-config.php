@@ -12,15 +12,16 @@ if ( ! function_exists( 'add_action' ) ) {
 	// use anonymous function to create a local scope to avoid global variables conflict
 	call_user_func(function(){
 		$network_domain    = 'qa.pmc.com';
+		$cookie_domain     = 'qa.pmc.com';
 		$site_slug         = '';
 		$prefix            = '';
 		$is_network_domain = false;
-		$redirect_to       = false;
+		$redirect_to_host  = false;
 		$is_vip_local      = false;
 
 		if ( $network_domain == $_SERVER['HTTP_HOST'] ) {
-			define( 'COOKIE_DOMAIN', $network_domain );
-			define( 'COOKIEHASH', md5( $network_domain ) );
+			define( 'COOKIE_DOMAIN', $cookie_domain );
+			define( 'COOKIEHASH', md5( $cookie_domain ) );
 			return;
 		}
 
@@ -30,8 +31,9 @@ if ( ! function_exists( 'add_action' ) ) {
 			$is_network_domain = true;
 		}
 		elseif ( preg_match( '/(?:(.+)\.)?qa\.([^.]+)\.com$/si',$_SERVER['HTTP_HOST'], $matches ) ) {
-			$site_slug = $matches[2];
-			$prefix    = $matches[1];
+			$site_slug     = $matches[2];
+			$prefix        = $matches[1];
+			$cookie_domain = "qa.{$site_slug}.com";
 		} else {
 			// vip.local development
 			if ( 'vip.local' == $_SERVER['HTTP_HOST'] ) {
@@ -41,6 +43,7 @@ if ( ! function_exists( 'add_action' ) ) {
 			}
 			if ( preg_match( '/(?:(.+)\.)?([^.]+)\.vip.local$/si',$_SERVER['HTTP_HOST'], $matches ) ) {
 				$network_domain    = 'vip.local';
+				$cookie_domain     = 'vip.local';
 				$site_slug         = $matches[2];
 				$prefix            = $matches[1];
 				$is_network_domain = true;
@@ -48,30 +51,30 @@ if ( ! function_exists( 'add_action' ) ) {
 			}
 		}
 
-		define( 'COOKIE_DOMAIN', $network_domain );
-		define( 'COOKIEHASH', md5( $network_domain ) );
-
 		if ( !empty( $site_slug ) ) {
-			if ( preg_match('/^\/(wp-admin|wp-login)/', $_SERVER['REQUEST_URI'] ) ) {
-				if ( preg_match('/^\/wp-admin\/network/', $_SERVER['REQUEST_URI'] ) ) {
-					if ( $network_domain != $_SERVER['HTTP_HOST'] ) {
-						$redirect_to = 'http' . ( !empty( $_SERVER['HTTPS'] ) ? 's' : '') .'://'. $network_domain;
+			if ( ! preg_match('!wp-login!',$_SERVER['REQUEST_URI']) ) {
+				if ( preg_match('/^\/(wp-admin)/', $_SERVER['REQUEST_URI'] ) ) {
+					if ( preg_match('/^\/wp-admin\/network/', $_SERVER['REQUEST_URI'] ) ) {
+						if ( $network_domain != $_SERVER['HTTP_HOST'] ) {
+							$redirect_to_host = $network_domain;
+						}
+					} elseif ( ! $is_network_domain ) {
+						$redirect_to_host = ( $prefix ? $prefix .'.' : '' ) ."{$site_slug}.{$network_domain}";
 					}
-				} elseif ( ! $is_network_domain ) {
-					$redirect_to = 'http' . ( !empty( $_SERVER['HTTPS'] ) ? 's' : '') .'://'. ( $prefix ? $prefix .'.' : '' ) ."{$site_slug}.{$network_domain}";
+				} else {
+					if ( $is_network_domain && ! $is_vip_local ) {
+						$redirect_to_host = ( $prefix ? $prefix .'.' : '' ) ."qa.{$site_slug}.com";
+					}
 				}
-			} else {
-				if ( $is_network_domain && ! $is_vip_local ) {
-					$redirect_to = 'http' . ( !empty( $_SERVER['HTTPS'] ) ? 's' : '') .'://'. ( $prefix ? $prefix .'.' : '' ) ."qa.{$site_slug}.com";
+				$_SERVER['REDIRECT_TO_HOST'] = $redirect_to_host;
+
+				if ( ( empty( $_SERVER['REQUEST_METHOD'] ) || 'POST' != $_SERVER['REQUEST_METHOD'] )
+						&& $redirect_to_host && ! ( defined('WP_CLI') && WP_CLI )
+					) {
+					$redirect_to = 'http' . ( !empty( $_SERVER['HTTPS'] ) ? 's' : '') .'://'. $redirect_to_host . $_SERVER['REQUEST_URI'];
+					header('Location: '. $redirect_to, true, 302);
+					die();
 				}
-			}
-
-			if ( ( empty( $_SERVER['REQUEST_METHOD'] ) || 'POST' != $_SERVER['REQUEST_METHOD'] )
-				&& $redirect_to && ! ( defined('WP_CLI') && WP_CLI ) ) {
-
-				$redirect_to .= $_SERVER['REQUEST_URI'];
-				header('Location: '. $redirect_to, true, 302);
-				die();
 
 			}
 
@@ -81,6 +84,9 @@ if ( ! function_exists( 'add_action' ) ) {
 			// We can use sunrise.php to look up the host, but we need to define WP_CONTENT_DIR before wp default constant does
 			$_SERVER['SERVER_NAME']  = $_SERVER['HTTP_HOST'] = "{$site_slug}.{$network_domain}";
 		}
+
+		define( 'COOKIE_DOMAIN', $cookie_domain );
+		define( 'COOKIEHASH', md5( $cookie_domain ) );
 
 		if ( ! empty( $prefix ) ) {
 			$_SERVER['HTTP_HOST_PREFIX'] = $prefix;
@@ -157,7 +163,7 @@ if ( ! function_exists( 'add_action' ) ) {
 				return false;
 			}
 
-			$pass_frag = substr($user->user_pass, 8, 4);
+			$pass_frag = $user->ID;
 
 			$key = wp_hash( $username . '|' . $pass_frag . '|' . $expiration . '|' . $token, $scheme );
 
@@ -193,6 +199,50 @@ if ( ! function_exists( 'add_action' ) ) {
 			do_action( 'auth_cookie_valid', $cookie_elements, $user );
 
 			return $user->ID;
+		}
+	} // if ! function exists
+
+	// @see wp-includes/pluggable.php
+	if ( !function_exists('wp_generate_auth_cookie') ) {
+		/**
+		 * Generate authentication cookie contents.
+		 *
+		 * @since 2.5.0
+		 *
+		 * @param int    $user_id    User ID
+		 * @param int    $expiration Cookie expiration in seconds
+		 * @param string $scheme     Optional. The cookie scheme to use: auth, secure_auth, or logged_in
+		 * @param string $token      User's session token to use for this cookie
+		 * @return string Authentication cookie contents. Empty string if user does not exist.
+		 */
+		function wp_generate_auth_cookie( $user_id, $expiration, $scheme = 'auth', $token = '' ) {
+			$user = get_userdata($user_id);
+			if ( ! $user ) {
+				return '';
+			}
+
+			$pass_frag = $user->ID;
+
+			$key = wp_hash( $user->user_login . '|' . $pass_frag . '|' . $expiration . '|' . $token, $scheme );
+
+			// If ext/hash is not present, compat.php's hash_hmac() does not support sha256.
+			$algo = function_exists( 'hash' ) ? 'sha256' : 'sha1';
+			$hash = hash_hmac( $algo, $user->user_login . '|' . $expiration . '|' . $token, $key );
+
+			$cookie = $user->user_login . '|' . $expiration . '|' . $token . '|' . $hash;
+
+			/**
+			 * Filter the authentication cookie.
+			 *
+			 * @since 2.5.0
+			 *
+			 * @param string $cookie     Authentication cookie.
+			 * @param int    $user_id    User ID.
+			 * @param int    $expiration Authentication cookie expiration in seconds.
+			 * @param string $scheme     Cookie scheme used. Accepts 'auth', 'secure_auth', or 'logged_in'.
+			 * @param string $token      User's session token used.
+			 */
+			return apply_filters( 'auth_cookie', $cookie, $user_id, $expiration, $scheme, $token );
 		}
 	} // if ! function exists
 

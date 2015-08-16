@@ -1,4 +1,5 @@
 <?php
+
 /*
 add following line of code to local-config.php to activate:
 require_once( __DIR__ . '/wp-content/mu-plugins/pmc-branch-switch-config.php');
@@ -38,6 +39,10 @@ if ( defined('PMC_BRANCH_SWITCH') && PMC_BRANCH_SWITCH ) {
 
 			private function _init() {
 
+				if ( empty( $_SERVER['REQUEST_URI'] ) ) {
+					return;
+				}
+
 				add_action( 'init', array( $this, 'action_init' ) );
 
 				// by this time, wp already know found the blog, we can restore the original request host name here
@@ -59,6 +64,7 @@ if ( defined('PMC_BRANCH_SWITCH') && PMC_BRANCH_SWITCH ) {
 				remove_all_filters( 'home_url' );
 
 				if ( !empty( $_SERVER['HTTP_HOST_PREFIX'] ) ) {
+
 					$this->_host_prefix = $_SERVER['HTTP_HOST_PREFIX'];
 					add_filter( 'home_url', array( $this, 'filter_url' ) );
 					add_filter( 'site_url', array( $this, 'filter_url' ) );
@@ -68,6 +74,21 @@ if ( defined('PMC_BRANCH_SWITCH') && PMC_BRANCH_SWITCH ) {
 					add_filter( 'login_url', array( $this, 'filter_login_url' ), 10, 2 );
 				}
 
+				add_filter('site_url', array( $this, 'filter_wp_login' ) );
+
+			}
+
+			public function filter_wp_login( $url ) {
+
+				$path = parse_url( $url, PHP_URL_PATH );
+				if ( '/wp-login.php' == $path ) {
+					$host = parse_url( $url, PHP_URL_HOST );
+					if ( $host != $_SERVER['HTTP_HOST'] ) {
+						$url = str_replace( $host, $_SERVER['HTTP_HOST'], $url );
+					}
+				}
+
+				return $url;
 			}
 
 			public function filter_login_url( $login_url, $redirect ) {
