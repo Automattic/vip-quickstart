@@ -52,7 +52,7 @@ if ( ! function_exists( 'add_action' ) ) {
 		}
 
 		if ( !empty( $site_slug ) ) {
-			if ( ! preg_match('!wp-login!',$_SERVER['REQUEST_URI']) ) {
+			if ( ! preg_match('/(wp-login|admin-ajax)/',$_SERVER['REQUEST_URI']) ) {
 				if ( preg_match('/^\/(wp-admin)/', $_SERVER['REQUEST_URI'] ) ) {
 					if ( preg_match('/^\/wp-admin\/network/', $_SERVER['REQUEST_URI'] ) ) {
 						if ( $network_domain != $_SERVER['HTTP_HOST'] ) {
@@ -66,7 +66,6 @@ if ( ! function_exists( 'add_action' ) ) {
 						$redirect_to_host = ( $prefix ? $prefix .'.' : '' ) ."qa.{$site_slug}.com";
 					}
 				}
-				$_SERVER['REDIRECT_TO_HOST'] = $redirect_to_host;
 
 				if ( ( empty( $_SERVER['REQUEST_METHOD'] ) || 'POST' != $_SERVER['REQUEST_METHOD'] )
 						&& $redirect_to_host && ! ( defined('WP_CLI') && WP_CLI )
