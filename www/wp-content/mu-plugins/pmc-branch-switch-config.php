@@ -106,10 +106,18 @@ if ( ! function_exists( 'add_action' ) ) {
 
 	});
 
-	// Override wp_validate_auth_cookie function to bypass auth verification to allow cross domain authentication
 	if ( ! function_exists( 'wp_validate_auth_cookie' ) ) {
 
-		// @see wp-includes/pluggable.php
+		/**
+		 * Override wp_validate_auth_cookie function to bypass auth verification to allow cross domain authentication
+		 * @see wp-includes/pluggable.php
+		 *
+		 * @global int $login_grace_period
+		 *
+		 * @param string $cookie Optional. If used, will validate contents instead of cookie's
+		 * @param string $scheme Optional. The cookie scheme to use: auth, secure_auth, or logged_in
+		 * @return false|int False if invalid cookie, User ID if valid.
+		 */
 		function wp_validate_auth_cookie($cookie = '', $scheme = '') {
 			if ( ! $cookie_elements = wp_parse_auth_cookie($cookie, $scheme) ) {
 				/**
@@ -201,10 +209,10 @@ if ( ! function_exists( 'add_action' ) ) {
 		}
 	} // if ! function exists
 
-	// @see wp-includes/pluggable.php
 	if ( !function_exists('wp_generate_auth_cookie') ) {
 		/**
-		 * Generate authentication cookie contents.
+		 * Override wp_generate_auth_cookie to to work in conjunction with wp_validate_auth_cookie
+		 * @see wp-includes/pluggable.php
 		 *
 		 * @since 2.5.0
 		 *
