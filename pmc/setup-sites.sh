@@ -67,7 +67,7 @@ if [ ! -f ~/.ssh/bitbucket.org_id_rsa ]; then
 fi
 
 sed -e '$a\' -e "define('SUBDOMAIN_INSTALL', true );" -e "/define\s*(\s*'SUBDOMAIN_INSTALL'/d" -i /srv/www/local-config.php
-sed -e '$a\' -e "define('AUTOMATIC_UPDATER_DISABLED', true );" -e "/define\s*(\s*'AUTOMATIC_UPDATER_DISABLED'/d" -i /srv/www/local-config.php
+sed -e '$a\' -e "define('AUTOMATIC_UPDATER_DISABLED', false );" -e "/define\s*(\s*'AUTOMATIC_UPDATER_DISABLED'/d" -i /srv/www/local-config.php
 sed -e '$a\' -e "define('WP_CACHE_KEY_SALT', \$_SERVER['HTTP_HOST'] );" -e "/define\s*(\s*'WP_CACHE_KEY_SALT'/d" -i /srv/www/local-config.php
 
 if [ "0" == "`/usr/bin/wp --path=/srv/www/wp network meta get 1 subdomain_install`" ]; then
