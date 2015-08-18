@@ -84,10 +84,10 @@ if ( defined('WP_CLI') && WP_CLI ) {
 		*/
 		public function setup( $args, $assoc_args ) {
 
-			$domain = $assoc_args['domain'];
+			$domain = strtolower( $assoc_args['domain'] );
 			$title  = $assoc_args['title'];
 			$theme  = $assoc_args['theme'];
-			$home   = $assoc_args['home'];
+			$home   = strtolower( $assoc_args['home'] );
 
 			$details = get_blog_details( array( 'domain' => $domain, 'path' => '/' ) );
 
@@ -104,7 +104,7 @@ if ( defined('WP_CLI') && WP_CLI ) {
 			}
 
 			if ( empty( $blog_id ) ) {
-				WP_CLI::error();
+				WP_CLI::error('Invalid blog_id');
 			}
 
 			switch_to_blog( $blog_id );
@@ -124,6 +124,8 @@ if ( defined('WP_CLI') && WP_CLI ) {
 			$blog_address = esc_url_raw( $blog_data['siteurl'] );
 			if ( empty( $home ) ) {
 				$home = $blog_address;
+			} elseif ( 'http' != substr($home,0,4) ) {
+				$home = "http://" . $home;
 			}
 
 			if ( get_option( 'siteurl' ) != $blog_address ) {
@@ -140,10 +142,8 @@ if ( defined('WP_CLI') && WP_CLI ) {
 
 			$users = get_users( array( 'blog_id' => 1 ) );
 			foreach ( $users as $user ) {
-				foreach($blogs as $blog) {
-					add_user_to_blog( $user->ID, $blog_id, $user->role );
-					printf("add user %s to %s\n",$user->user_login,$blog->domain);
-				}
+				add_user_to_blog( $user->ID, $blog_id, $user->role );
+				printf("add user %s to %s\n",$user->user_login,$blog->domain);
 			}
 
 			restore_current_blog();
