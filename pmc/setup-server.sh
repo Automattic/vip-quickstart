@@ -12,6 +12,7 @@ sudo service nginx start
 /usr/bin/wp --path=/srv/www/wp core multisite-install --subdomains --url=qa.pmc.com --title='PMC QA' --admin_email='dist.dev@pmc.com' --admin_name=wordpress --admin_password=wordpress
 
 sudo sed -e '$a\' -e "if ( empty( \$_SERVER['HTTP_HOST'] ) ) { \$_SERVER['HTTP_HOST'] = 'qa.pmc.com'; }" -e "/if ( empty( \$_SERVER['HTTP_HOST'] ) )/d" -i /srv/www/local-config.php
+sudo sed -e '$a\' -e "if ( empty( \$_SERVER['REQUEST_URI'] ) ) { \$_SERVER['REQUEST_URI'] = '/'; }" -e "/if ( empty( \$_SERVER['REQUEST_URI'] ) )/d" -i /srv/www/local-config.php
 sudo sed -e '$a\' -e "define('SUBDOMAIN_INSTALL', true );" -e "/define\s*(\s*'SUBDOMAIN_INSTALL'/d" -i /srv/www/local-config.php
 sudo sed -e '$a\' -e "define('WP_ALLOW_MULTISITE', true );" -e "/define\s*(\s*'WP_ALLOW_MULTISITE'/d" -i /srv/www/local-config.php
 sudo sed -e '$a\' -e "define('DOMAIN_CURRENT_SITE', 'qa.pmc.com' );" -e "/define\s*(\s*'DOMAIN_CURRENT_SITE'/d" -i /srv/www/local-config.php
