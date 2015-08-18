@@ -23,6 +23,9 @@ if ( defined('WP_CLI') && WP_CLI ) {
 			$users = array();
 			if ( $headers = fgetcsv($fh) ) {
 				while( $row = fgetcsv($fh) ) {
+					if ( count( $headers ) != count( $row ) ) {
+						continue;
+					}
 					$users[] = array_combine( $headers, $row );
 				}
 			}
@@ -71,7 +74,13 @@ if ( defined('WP_CLI') && WP_CLI ) {
 			$users = get_users( array( 'blog_id' => 1 ) );
 			$blogs = $wpdb->get_results( "SELECT * FROM $wpdb->blogs");
 			foreach ( $users as $user ) {
+				if ( empty( $user ) ) {
+					continue;
+				}
 				foreach($blogs as $blog) {
+					if ( empty( $blog ) ) {
+						continue;
+					}
 					add_user_to_blog( $user->ID, $blog->blog_id, $user->role );
 					printf("add user %s to %s\n",$user->user_login,$blog->domain);
 				}
