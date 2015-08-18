@@ -143,7 +143,7 @@ if ( defined('WP_CLI') && WP_CLI ) {
 			$users = get_users( array( 'blog_id' => 1 ) );
 			foreach ( $users as $user ) {
 				add_user_to_blog( $user->ID, $blog_id, $user->role );
-				printf("add user %s to %s\n",$user->user_login,$blog->domain);
+				printf("add user %s to %s\n",$user->user_login,$domain);
 			}
 
 			restore_current_blog();
