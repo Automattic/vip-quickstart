@@ -72,7 +72,7 @@ if ( defined('WP_CLI') && WP_CLI ) {
 		public function add_network_users() {
 			global $wpdb;
 			$users = get_users( array( 'blog_id' => 1 ) );
-			$blogs = $wpdb->get_results( "SELECT * FROM $wpdb->blogs");
+			$blogs = $wpdb->get_results( "SELECT * FROM $wpdb->blogs where blog_id <> 1");
 			foreach ( $users as $user ) {
 				if ( empty( $user ) ) {
 					continue;
@@ -81,7 +81,9 @@ if ( defined('WP_CLI') && WP_CLI ) {
 					if ( empty( $blog ) ) {
 						continue;
 					}
-					add_user_to_blog( $blog->blog_id, $user->ID, $user->role );
+					foreach ( $user->roles as $role ) {
+						add_user_to_blog( $blog->blog_id, $user->ID, $role );
+					}
 					printf("add user %s to %s\n",$user->user_login,$blog->domain);
 				}
 			}
@@ -151,7 +153,9 @@ if ( defined('WP_CLI') && WP_CLI ) {
 
 			$users = get_users( array( 'blog_id' => 1 ) );
 			foreach ( $users as $user ) {
-				add_user_to_blog( $blog_id, $user->ID, $user->role );
+				foreach ( $user->roles as $role ) {
+					add_user_to_blog( $blog->blog_id, $user->ID, $role );
+				}
 				printf("add user %s to %s\n",$user->user_login,$domain);
 			}
 
