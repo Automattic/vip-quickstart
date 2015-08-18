@@ -129,4 +129,35 @@ $wp_user_roles = array (
       'delete_posts' => true,
     ),
   ),
+  
+	'pmc-editorial-manager' => array(
+		'type' => 'manager',
+		'label' => 'PMC Editorial Manager',
+		'base_role' => 'editor',
+		'additional_capabilities' => array(
+			'list_users' => true,
+			'edit_themes' => true, /* Allow Appearance menu */
+			'edit_posts' => true, /* Polldaddy v2.0.23 is_author() */
+			'delete_others_pages' => true /* Polldaddy v2.0.23 is_editor() */
+		),
+	),
+	'pmc-adops-manager' => array(
+		'type' => 'manager',
+		'label' => 'PMC AdOps Manager',
+		'base_role' => 'editor',
+		'additional_capabilities' => array(
+			'upload_files' => true /* Specifically allow access to media tab */
+		),
+	),
+	'pmc-reporter' => array(
+		'type' => 'reporter',
+		'label' => 'PMC Reporter',
+		'base_role' => 'editor',
+		'additional_capabilities' => array(),
+	),
+  
 );
+
+
+
+
