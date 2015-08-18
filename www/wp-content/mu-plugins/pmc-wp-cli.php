@@ -82,6 +82,7 @@ if ( defined('WP_CLI') && WP_CLI ) {
 						continue;
 					}
 					foreach ( $user->roles as $role ) {
+						remove_user_from_blog( $user->ID, $blog->blog_id, 1);
 						add_user_to_blog( $blog->blog_id, $user->ID, $role );
 					}
 					printf("add user %s to %s\n",$user->user_login,$blog->domain);
@@ -154,7 +155,7 @@ if ( defined('WP_CLI') && WP_CLI ) {
 			$users = get_users( array( 'blog_id' => 1 ) );
 			foreach ( $users as $user ) {
 				foreach ( $user->roles as $role ) {
-					add_user_to_blog( $blog->blog_id, $user->ID, $role );
+					add_user_to_blog( $blog_id, $user->ID, $role );
 				}
 				printf("add user %s to %s\n",$user->user_login,$domain);
 			}

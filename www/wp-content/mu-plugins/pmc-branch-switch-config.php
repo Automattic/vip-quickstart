@@ -4,7 +4,7 @@
 */
 
 // execute this code in local-config before anything else
-if ( ! function_exists( 'add_action' ) ) {
+if ( ! function_exists( 'add_action' ) && !defined('PMC_BRANCH_SWITCH') ) {
 
 	// set flag to indicate code has been run
 	define('PMC_BRANCH_SWITCH',true);
