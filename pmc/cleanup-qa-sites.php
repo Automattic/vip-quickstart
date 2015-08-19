@@ -1,6 +1,6 @@
 <?php
 if ( empty($argv[1]) ) {
-	die("Syntax: php {$argv[0]} <csv-file> [content-path]\n");
+	die("Syntax: php {$argv[0]} <csv-file>\n");
 } 
 $csv_file = $argv[1];
 
