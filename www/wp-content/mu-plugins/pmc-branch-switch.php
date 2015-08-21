@@ -76,6 +76,15 @@ if ( defined('PMC_BRANCH_SWITCH') && PMC_BRANCH_SWITCH ) {
 
 				add_filter('site_url', array( $this, 'filter_wp_login' ) );
 				add_filter('login_redirect', array( $this,'filter_login_redirect' ), 10, 3 );
+				add_filter('theme_root_uri', array( $this,'filter_theme_root_uri' ) );
+			}
+
+			public function filter_theme_root_uri( $url ) {
+				$host = parse_url( $url, PHP_URL_HOST );
+				if ( $host != $_SERVER['HTTP_HOST'] ) {
+					$url = str_replace( $host, $_SERVER['HTTP_HOST'], $url );
+				}
+				return $url;
 			}
 
 			public function filter_login_redirect($redirect_to, $requested_redirect_to, $user) {

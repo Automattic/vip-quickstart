@@ -92,7 +92,7 @@ if ( defined('WP_CLI') && WP_CLI ) {
 
 		/**
 		 * @subcommand setup
-		 * @synopsis --domain=<domain> --theme=<theme> --title=<title> --home=<home>
+		 * @synopsis --domain=<domain> --theme=<theme> --title=<title> [--home=<home>]
 		*/
 		public function setup( $args, $assoc_args ) {
 
@@ -167,12 +167,13 @@ if ( defined('WP_CLI') && WP_CLI ) {
 
 		/**
 		 * @subcommand fix
-		 * @synopsis <domain> [--title=<title>]
+		 * @synopsis <domain> [--title=<title>]  [--home=<home>]
 		*/
 		public function fix( $args, $assoc_args ) {
 			list( $domain ) = $args;
 			$domain = strtolower( $domain );
 			$title = !empty( $assoc_args['title'] ) ? ucfirst( $assoc_args['title'] ) : '';
+			$home   = strtolower( $assoc_args['home'] );
 			$details = get_blog_details( array( 'domain' => $domain, 'path' => '/' ) );
 
 			if ( empty( $details ) ) {
@@ -191,13 +192,18 @@ if ( defined('WP_CLI') && WP_CLI ) {
 			update_blog_details( $blog_id, $blog_data );
 
 			$blog_address = esc_url_raw( $blog_data['siteurl'] );
+			if ( empty( $home ) ) {
+				$home = $blog_address;
+			} elseif ( 'http' != substr($home,0,4) ) {
+				$home = "http://" . $home;
+			}
 
 			if ( get_option( 'siteurl' ) != $blog_address ) {
 				update_option( 'siteurl', $blog_address );
 			}
 
-			if ( get_option( 'home' ) != $blog_address ) {
-				update_option( 'home', $blog_address );
+			if ( get_option( 'home' ) != $home ) {
+				update_option( 'home', $home );
 			}
 
 			if ( !empty( $title ) && get_option( 'blogname' ) != $title )  {
