@@ -122,6 +122,17 @@ do
 
 done < ./sites
 
+######################
+# Additional plugins #
+######################
+
+if [ -d /srv/www/wp-content/plugins/pmc-theme-unit-test ]; then
+	pushd /srv/www/wp-content/plugins/pmc-theme-unit-test && git pull && popd
+else
+	git clone https://github.com/Penske-Media-Corp/pmc-theme-unit-test.git /srv/www/wp-content/plugins/pmc-theme-unit-test
+	/usr/bin/wp --path=/srv/www/wp plugin activate pmc-theme-unit-test --network
+fi
+
 ###############
 # Local hosts #
 ###############
