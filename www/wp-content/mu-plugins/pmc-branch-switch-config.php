@@ -102,6 +102,11 @@ if ( ! function_exists( 'add_action' ) && !defined('PMC_BRANCH_SWITCH') ) {
 				echo 'Error: Site content folder not found for qa branch '. $_SERVER['HTTP_HOST_PREFIX'];
 				die();
 			}
+
+			if ( file_exists( WP_CONTENT_DIR . '/config.php' ) ) {
+				require_once( WP_CONTENT_DIR . '/config.php' );
+			}
+
 		}
 
 	});
