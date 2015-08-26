@@ -4,7 +4,7 @@ if ( empty($argv[1]) ) {
 } 
 $csv_file = $argv[1];
 
-$excludes = array( 'live' );
+$excludes = array( 'live', 'adops', 'adops1', 'adops2', 'adops3', 'adops4', 'adops5' );
 $content_path = '/srv/www/wp-content-sites';
 
 $branches = parse_csv( $csv_file );
