@@ -7,3 +7,4 @@ sudo -u www-data wp --path=/srv/www/wp pmc-site setup --domain=wwd.qa.pmc.com --
 sudo -u www-data wp --path=/srv/www/wp pmc-site setup --domain=hollywoodlife.qa.pmc.com --title="QA HollywoodLife" --home=http://qa.hollywoodlife.com --theme=vip/pmc-hollywoodlife
 sudo -u www-data wp --path=/srv/www/wp pmc-site setup --domain=deadline.qa.pmc.com --title="QA Deadline" --home=http://qa.deadline.com --theme=vip/pmc-deadline
 sudo -u www-data wp --path=/srv/www/wp pmc-site setup --domain=tvline.qa.pmc.com --title="QA TvLine" --home=http://qa.tvline.com --theme=vip/pmc-tvline-2014
+sudo -u www-data wp --path=/srv/www/wp pmc-site setup --domain=bgr.qa.pmc.com --title="QA BGR" --home=http://qa.bgr.com --theme=vip/bgr
