@@ -23,7 +23,7 @@ then
 	echo "Importing ${sql_file} into ${site_slug} site id ${site_id}"
 	sed -e "s/CREATE TABLE IF NOT EXISTS \`wp_/CREATE TABLE IF NOT EXISTS \`wp_${site_id}_/g" -e "s/ INTO \`wp_/ INTO \`wp_${site_id}_/g" -e "s/ TABLE \`wp_/ TABLE \`wp_${site_id}_/g" -e "s/table \`wp_/table \`wp_${site_id}_/g" -e "s/LOCK TABLES \`wp_/LOCK TABLES \`wp_${site_id}_/g" -e "s/DROP TABLE IF EXISTS \`wp_/DROP TABLE IF EXISTS \`wp_${site_id}_/g" ${sql_file} | mysql -uroot wordpress
 	sudo service memcached restart
-	/usr/bin/wp --path=/srv/www/wp pmc-site fix "${site_slug}.${DOMAIN}" --title="${site_slug}" --home="http://qa.${site_slug}.com"
+	/usr/bin/wp --path=/srv/www/wp pmc-site fix "${site_slug}.${DOMAIN}" --title="QA ${site_slug}" --home="http://qa.${site_slug}.com"
 	sudo service memcached restart
 	/usr/bin/wp --path=/srv/www/wp --url=${site_slug}.${DOMAIN} theme activate ${site_theme}
 	sudo service memcached restart
