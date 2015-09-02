@@ -179,7 +179,7 @@ if [ ! -d /srv/www/htdocs/pmc-wwd-uls ]; then
 	echo "Setting up uls.vip.local"
 	git clone git@bitbucket.org:penskemediacorp/pmc-wwd-uls.git /srv/www/htdocs/pmc-wwd-uls
 	cp /srv/pmc/uls.env.local.php /srv/www/htdocs/pmc-wwd-uls/.env.local.php
-	ln -s /srv/www/htdocs/pmc-wwd-uls/.env.local.php /srv/www/htdocs/pmc-wwd-uls/.env.php
+	cp /srv/pmc/uls.env.local.php /srv/www/htdocs/pmc-wwd-uls/.env.php
 	mysql -uroot -e 'create database uls_wwd_local;'
 	cd /srv/www/htdocs/pmc-wwd-uls
 	composer install
