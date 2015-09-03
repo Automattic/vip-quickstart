@@ -56,6 +56,28 @@ if [[ -z "`dpkg -s php5-mcrypt | grep "Status: install ok installed"`" ]]; then
 	service php5-fpm restart
 fi;
 
+# PHPUnit
+# added this because VIP Quickstart tries to install PHPUnit from PEAR
+# which doesn't work reliably & because PHP PEAR is now defunct & shouldn't
+# be relied upon.
+
+is_program_installed phpunit
+
+if [ $? -eq 0 ]; then
+	echo_fail 'Big surprise, PHPUnit was not installed'
+
+	echo 'Downloading PHPUnit.....'
+
+	wget https://phar.phpunit.de/phpunit.phar -O phpunit.phar
+
+	echo 'Moving PHPUnit to local scope.....'
+
+	mv phpunit.phar /usr/local/bin/phpunit
+	chmod +x /usr/local/bin/phpunit
+
+	echo_pass 'PHPUnit installed'
+fi
+
 # composer
 
 is_program_installed composer
@@ -65,11 +87,9 @@ if [ $? -eq 0 ]; then
 	curl -sS https://getcomposer.org/installer | php
 	php composer.phar install
 
-	if [ ! /usr/local/bin/composer ]; then
-		echo 'Moving Composer to local scope.....'
-		mv composer.phar /usr/local/bin/composer
-		chmod +x /usr/local/bin/composer
-	fi
+	echo 'Moving Composer to local scope.....'
+	mv composer.phar /usr/local/bin/composer
+	chmod +x /usr/local/bin/composer
 
 	echo_pass 'Composer installed'
 fi;
@@ -233,7 +253,7 @@ if [ ! -d /srv/www/htdocs/pmc-wwd-uls ]; then
 	echo "Setting up uls.vip.local"
 	git clone git@bitbucket.org:penskemediacorp/pmc-wwd-uls.git /srv/www/htdocs/pmc-wwd-uls
 	cp /srv/pmc/uls.env.local.php /srv/www/htdocs/pmc-wwd-uls/.env.local.php
-	ln -s /srv/www/htdocs/pmc-wwd-uls/.env.local.php /srv/www/htdocs/pmc-wwd-uls/.env.php
+	cp /srv/pmc/uls.env.local.php /srv/www/htdocs/pmc-wwd-uls/.env.php
 	mysql -uroot -e 'create database uls_wwd_local;'
 	cd /srv/www/htdocs/pmc-wwd-uls
 	composer install
