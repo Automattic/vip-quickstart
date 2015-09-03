@@ -1,5 +1,42 @@
 #!/bin/bash
 
+##################################
+########  FUNCTIONS  #############
+##################################
+
+function is_program_installed {
+	# set to 1 initially
+	local return_=1
+
+	# set to 0 if not found
+	type $1 >/dev/null 2>&1 || { local return_=0; }
+
+	# return value
+	return $return_
+}
+
+function echo_fail {
+	# start red colour output
+	printf "\n\e[31m"
+
+	# echo out first argument
+	printf " ✘   ${1}  "
+
+	# reset colours back to normal
+	printf "\e[0m\n"
+}
+
+function echo_pass {
+	# start green colour output
+	printf "\n\e[32m"
+
+	# echo out first argument
+	printf " ✔   ${1}  "
+	
+	# reset colours back to normal
+	printf "\e[0m\n"
+}
+
 DOMAIN='vip.local'
 export HTTP_USER_AGENT="WP_CLI"
 export HTTP_HOST="${DOMAIN}"
@@ -20,24 +57,40 @@ if [[ -z "`dpkg -s php5-mcrypt | grep "Status: install ok installed"`" ]]; then
 fi;
 
 # composer
-if [ ! -f /usr/local/bin/composer ]; then
+
+is_program_installed composer
+
+if [ $? -eq 0 ]; then
+	echo 'Downloading Composer.....'
 	curl -sS https://getcomposer.org/installer | php
 	php composer.phar install
+
 	if [ ! /usr/local/bin/composer ]; then
+		echo 'Moving Composer to local scope.....'
 		mv composer.phar /usr/local/bin/composer
 		chmod +x /usr/local/bin/composer
 	fi
+
+	echo_pass 'Composer installed'
 fi;
 
 # nodejs
-if [ -z "`which npm`" ]; then
-	curl -sL https://deb.nodesource.com/setup | sudo bash -
+
+is_program_installed node
+
+if [ $? -eq 0 ]; then
+	echo 'Installing NodeJS.....'
+
+	sudo apt-get update
 	sudo apt-get install -y nodejs
+
+	echo_pass 'NodeJS installed'
 fi
 
 # mobify client
 if [ -z "`mobify`" ]; then
 	sudo npm -g install mobify-client
+	echo_pass 'Mobify client installed'
 fi
 
 # compass
@@ -45,13 +98,14 @@ if [ -z "`which compass`" ]; then
 	sudo apt-get install rubygems -y
 	sudo apt-get install ruby -y
 	sudo gem install sass compass compass-rgbapng compass-photoshop-drop-shadow sassy-strings compass-import-once
+	echo_pass 'Compass installed'
 fi
 
 ######################
-# Wordpress Projects #
+# WordPress Projects #
 ######################
 
-# workaround pmc_analystics required this theme to be at this location.
+# workaround pmc_analytics required this theme to be at this location.
 if [ ! -e /srv/www/wp-content/themes/twentyfourteen ]; then
 	ln -s /srv/www/wp-content/themes/pub/twentyfourteen/ /srv/www/wp-content/themes/twentyfourteen
 fi
@@ -179,7 +233,7 @@ if [ ! -d /srv/www/htdocs/pmc-wwd-uls ]; then
 	echo "Setting up uls.vip.local"
 	git clone git@bitbucket.org:penskemediacorp/pmc-wwd-uls.git /srv/www/htdocs/pmc-wwd-uls
 	cp /srv/pmc/uls.env.local.php /srv/www/htdocs/pmc-wwd-uls/.env.local.php
-	cp /srv/pmc/uls.env.local.php /srv/www/htdocs/pmc-wwd-uls/.env.php
+	ln -s /srv/www/htdocs/pmc-wwd-uls/.env.local.php /srv/www/htdocs/pmc-wwd-uls/.env.php
 	mysql -uroot -e 'create database uls_wwd_local;'
 	cd /srv/www/htdocs/pmc-wwd-uls
 	composer install
@@ -215,4 +269,4 @@ fi
 sudo service nginx reload
 sudo service php5-fpm restart
 
-echo "Site setup finished."
+echo_pass "Site setup finished."
