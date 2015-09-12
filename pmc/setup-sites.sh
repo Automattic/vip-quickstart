@@ -1,5 +1,42 @@
 #!/bin/bash
 
+##################################
+########  FUNCTIONS  #############
+##################################
+
+function is_program_installed {
+	# set to 1 initially
+	local return_=1
+
+	# set to 0 if not found
+	type $1 >/dev/null 2>&1 || { local return_=0; }
+
+	# return value
+	return $return_
+}
+
+function echo_fail {
+	# start red colour output
+	printf "\n\e[31m"
+
+	# echo out first argument
+	printf " ✘   ${1}  "
+
+	# reset colours back to normal
+	printf "\e[0m\n"
+}
+
+function echo_pass {
+	# start green colour output
+	printf "\n\e[32m"
+
+	# echo out first argument
+	printf " ✔   ${1}  "
+	
+	# reset colours back to normal
+	printf "\e[0m\n"
+}
+
 DOMAIN='vip.local'
 export HTTP_USER_AGENT="WP_CLI"
 export HTTP_HOST="${DOMAIN}"
@@ -19,25 +56,61 @@ if [[ -z "`dpkg -s php5-mcrypt | grep "Status: install ok installed"`" ]]; then
 	service php5-fpm restart
 fi;
 
+# PHPUnit
+# added this because VIP Quickstart tries to install PHPUnit from PEAR
+# which doesn't work reliably & because PHP PEAR is now defunct & shouldn't
+# be relied upon.
+
+is_program_installed phpunit
+
+if [ $? -eq 0 ]; then
+	echo_fail 'Big surprise, PHPUnit was not installed'
+
+	echo 'Downloading PHPUnit.....'
+
+	wget https://phar.phpunit.de/phpunit.phar -O phpunit.phar
+
+	echo 'Moving PHPUnit to local scope.....'
+
+	mv phpunit.phar /usr/local/bin/phpunit
+	chmod +x /usr/local/bin/phpunit
+
+	echo_pass 'PHPUnit installed'
+fi
+
 # composer
-if [ ! -f /usr/local/bin/composer ]; then
+
+is_program_installed composer
+
+if [ $? -eq 0 ]; then
+	echo 'Downloading Composer.....'
 	curl -sS https://getcomposer.org/installer | php
 	php composer.phar install
-	if [ ! /usr/local/bin/composer ]; then
-		mv composer.phar /usr/local/bin/composer
-		chmod +x /usr/local/bin/composer
-	fi
+
+	echo 'Moving Composer to local scope.....'
+	mv composer.phar /usr/local/bin/composer
+	chmod +x /usr/local/bin/composer
+
+	echo_pass 'Composer installed'
 fi;
 
 # nodejs
-if [ -z "`which npm`" ]; then
-	curl -sL https://deb.nodesource.com/setup | sudo bash -
+
+is_program_installed node
+
+if [ $? -eq 0 ]; then
+	echo 'Installing NodeJS.....'
+
+	sudo apt-get update
 	sudo apt-get install -y nodejs
+
+	echo_pass 'NodeJS installed'
 fi
 
 # mobify client
 if [ -z "`mobify`" ]; then
 	sudo npm -g install mobify-client
+	echo_pass 'Mobify client installed'
 fi
 
 # compass
@@ -45,13 +118,14 @@ if [ -z "`which compass`" ]; then
 	sudo apt-get install rubygems -y
 	sudo apt-get install ruby -y
 	sudo gem install sass compass compass-rgbapng compass-photoshop-drop-shadow sassy-strings compass-import-once
+	echo_pass 'Compass installed'
 fi
 
 ######################
-# Wordpress Projects #
+# WordPress Projects #
 ######################
 
-# workaround pmc_analystics required this theme to be at this location.
+# workaround pmc_analytics required this theme to be at this location.
 if [ ! -e /srv/www/wp-content/themes/twentyfourteen ]; then
 	ln -s /srv/www/wp-content/themes/pub/twentyfourteen/ /srv/www/wp-content/themes/twentyfourteen
 fi
@@ -215,4 +289,4 @@ fi
 sudo service nginx reload
 sudo service php5-fpm restart
 
-echo "Site setup finished."
+echo_pass "Site setup finished."
