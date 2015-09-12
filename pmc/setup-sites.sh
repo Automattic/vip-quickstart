@@ -186,7 +186,7 @@ if [ ! -d /srv/www/htdocs/pmc-wwd-uls ]; then
 	php artisan migrate --package=krafthaus/bauhaususer
 	php artisan migrate
 	# email password first last
-	php artisan  bauhaus:user:register pmc@pmc.com pmc pmc pmc
+	php artisan bauhaus:user:register pmc@pmc.com pmc pmc pmc 
 fi
 
 # dd-wwd.vip.local (wwd digital daily)

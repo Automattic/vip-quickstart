@@ -24,6 +24,15 @@ sudo sed -e '$a\' -e "define('WP_CACHE_KEY_SALT', \$_SERVER['HTTP_HOST'] );" -e 
 sudo sed -e '$a\' -e "require_once( __DIR__ . '/wp-content/mu-plugins/pmc-branch-switch-config.php');" -e "/require_once.*\/pmc-branch-switch-config/d" -i /srv/www/local-config.php
 sudo sed -e '$a\' -e "\$base = '/';" -e "/\$base = /d" -i /srv/www/local-config.php
 
+#############
+# nginx ssl #
+#############
+if [ -f /etc/ssl/qa-san-domain/qa-san-domain-chained.crt ]; then
+	sudo sed -e "/http {/a\ \ ssl_certificate     /etc/ssl/qa-san-domain/qa-san-domain-chained.crt;\n\ \ ssl_certificate_key /etc/ssl/qa-san-domain/qa-san-domain.key;" -e '/ssl_certificate/d' -i /etc/nginx/nginx.conf
+	sudo sed -e "/listen 80;/a\ \ listen 443 ssl;" -e "/listen 443/d" -i /etc/nginx/sites-available/50-_.conf
+	sudo sed -e "/listen 80;/a\ \ listen 443 ssl;" -e "/listen 443/d" -i /etc/nginx/sites-enabled/50-_.conf
+fi
+
 ######################
 # Additional plugins #
 ######################
