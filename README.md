@@ -4,7 +4,7 @@ For full documentation, see [http://vip.wordpress.com/documentation/quickstart/]
 
 ## Overview
 
-VIP Quickstart is a local development environment for WordPress.com VIP developers. The goal is to provide developers with an environment that closely mirrors WordPress.com along with all the tools we recommend developers use.
+VIP Quickstart is a local development environment for WordPress.com VIP developers. It provides developers with an environment that closely mirrors WordPress.com along with all the tools we recommend developers use. VIP Quickstart should not be used to run a production site.
 
 ## What You Get
 
