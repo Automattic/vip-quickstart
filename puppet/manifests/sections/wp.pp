@@ -96,7 +96,7 @@ file { $wp_content_dirs:
 # VCS Checkout
 vcsrepo { '/srv/www/wp':
   ensure   => latest,
-  source   => 'http://core.svn.wordpress.org/trunk/',
+  source   => 'https://core.svn.wordpress.org/trunk/',
   provider => svn,
 }
 
@@ -126,7 +126,7 @@ vcsrepo { '/srv/www/wp-content/themes/pub/twentyfifteen':
 
 vcsrepo { '/srv/www/wp-tests':
   ensure   => latest,
-  source   => 'http://develop.svn.wordpress.org/trunk/',
+  source   => 'https://develop.svn.wordpress.org/trunk/',
   provider => svn,
 }
 
