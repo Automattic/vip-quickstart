@@ -1,9 +1,9 @@
-# PHP 5.4 + extensions
+# PHP 5.6 + extensions
 include php
 include apt
 
-apt::source { 'php54':
-  location    => 'http://ppa.launchpad.net/ondrej/php5-oldstable/ubuntu',
+apt::source { 'php56':
+  location    => 'http://ppa.launchpad.net/ondrej/php5-5.6/ubuntu',
   release     => 'precise',
   repos       => 'main',
   key         => '14aa40ec0831756756d7f66c4f4ea0aae5267a6c',
@@ -14,11 +14,11 @@ apt::source { 'php54':
 class {
   'php::cli':
     ensure  => latest,
-    require => Apt::Source['php54'];
+    require => Apt::Source['php56'];
   'php::composer':;
   'php::dev':
     ensure  => latest,
-    require => Apt::Source['php54'];
+    require => Apt::Source['php56'];
   'php::fpm':;
   'php::pear':;
   'php::phpunit':;
