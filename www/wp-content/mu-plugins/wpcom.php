@@ -47,3 +47,18 @@ function global_css() {
 	if ( is_rtl() )
 		wp_enqueue_style( 'h4-global-rtl', 'http://s0.wp.com/wp-content/themes/h4/global-rtl.css', array() );
 }
+
+function wpcom_force_ssl_home_urls_in_content_when_secure( $content ) {
+	if ( is_admin() ) {
+		return $content;
+	}
+
+	if ( is_ssl() ) {
+		return str_replace( home_url( '/', 'http' ), home_url( '/', 'https' ), $content );
+	}
+
+	return str_replace( home_url( '/', 'https' ), home_url( '/', 'http' ), $content );
+}
+add_filter( 'the_content', 'wpcom_force_ssl_home_urls_in_content_when_secure' );
+add_filter( 'comment_text', 'wpcom_force_ssl_home_urls_in_content_when_secure' );
+add_filter( 'widget_text', 'wpcom_force_ssl_home_urls_in_content_when_secure' );
