@@ -62,3 +62,9 @@ function wpcom_force_ssl_home_urls_in_content_when_secure( $content ) {
 add_filter( 'the_content', 'wpcom_force_ssl_home_urls_in_content_when_secure' );
 add_filter( 'comment_text', 'wpcom_force_ssl_home_urls_in_content_when_secure' );
 add_filter( 'widget_text', 'wpcom_force_ssl_home_urls_in_content_when_secure' );
+
+wp_oembed_add_provider(
+	'#https?://[^.]+\.(wistia\.com|wi\.st)/(medias|embed)/.*#',
+	'https://fast.wistia.com/oembed',
+	true
+);
