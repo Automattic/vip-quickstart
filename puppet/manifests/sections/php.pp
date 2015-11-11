@@ -31,6 +31,7 @@ class {
   'php::extension::memcache':;
   'php::extension::mysql':;
   'php::extension::xdebug':
+    inifile => false,
     settings => [
         'set .anon/xdebug.idekey QUICKSTART',
         'set .anon/xdebug.remote_enable 1',
