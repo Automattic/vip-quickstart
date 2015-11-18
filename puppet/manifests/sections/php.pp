@@ -20,7 +20,9 @@ class {
     ensure  => latest,
     require => Apt::Source['php56'];
   'php::fpm':;
-  'php::pear':;
+  'php::pear':
+    ensure  => latest,
+    require => Apt::Source['php56'];
   'php::phpunit':;
 
   # Extensions
