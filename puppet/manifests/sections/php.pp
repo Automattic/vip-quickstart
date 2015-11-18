@@ -55,6 +55,14 @@ vcsrepo { '/usr/share/php/PHP/CodeSniffer/Standards/WordPress':
   require  => Package['pear.php.net/PHP_CodeSniffer'],
 }
 
+# Add WordPress coding standards to PHP_CodeSniffer config
+exec { 'add wordpress cs to phpcs':
+  command => 'phpcs --config-set installed_paths /usr/share/php/PHP/CodeSniffer/Standards/WordPress',
+  unless  => 'phpcs -i | grep "WordPress"',
+  user    => root,
+  require => Vcsrepo['/usr/share/php/PHP/CodeSniffer/Standards/WordPress']
+}
+
 # Turn on html_errors
 exec { 'html_errors = On':
   command => 'sed -i "s/html_errors = Off/html_errors = On/g" /etc/php5/fpm/php.ini',
