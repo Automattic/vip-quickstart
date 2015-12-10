@@ -55,6 +55,9 @@ if ( ! defined( 'JETPACK_DEV_DEBUG' ) ) {
 	define( 'JETPACK_DEV_DEBUG', true );
 }
 
+// Put Keyring into headless mode
+define( 'KEYRING__HEADLESS_MODE', true );
+
 /* Content Directory */
 define( 'WP_CONTENT_DIR', dirname( __FILE__ ) . '/wp-content' );
 define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/wp-content' );
