@@ -20,6 +20,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provider "virtualbox" do |v|
     # Use 1GB of memory
     v.memory = 1024
+
+    # Use 2 CPUs
+    v.cpus = 2
+
+    v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    v.customize ["modifyvm", :id, "--ioapic", "on"]
+    v.customize ["modifyvm", :id, "--nictype1", "Am79C973"]
   end
 
   # VMWare Fusion overrides
