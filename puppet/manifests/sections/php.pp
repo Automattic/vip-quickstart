@@ -72,3 +72,27 @@ exec { 'html_errors = On':
   user    => root,
   notify  => Service['php5-fpm']
 }
+
+# Enable PHP-FPM error_log Override
+exec { 'Enable PHP-FPM error_log Override':
+  command => 'sed -i "s/php_admin_value\[error_log\]/php_value\[error_log\]/g" /etc/php5/fpm/pool.d/www.conf',
+  unless  => 'cat /etc/php5/fpm/pool.d/www.conf | grep "php_value[error_log]"',
+  user    => root,
+  require  => Class['php::fpm']
+}
+
+# Enable PHP-FPM log_errors Override
+exec { 'Enable PHP-FPM log_errors Override':
+  command => 'sed -i "s/php_admin_flag\[log_errors\]/php_flag\[log_errors\]/g" /etc/php5/fpm/pool.d/www.conf',
+  unless  => 'cat /etc/php5/fpm/pool.d/www.conf | grep "php_value[log_errors]"',
+  user    => root,
+  require  => Class['php::fpm']
+}
+
+# Set PHP-FPM log ownership
+exec { 'Set PHP-FPM log ownership':
+  command => 'touch /var/log/php-fpm-www-error.log && chown www-data:www-data /var/log/php-fpm-www-error.log',
+  creates  => '/var/log/php-fpm-www-error.log',
+  user    => root,
+  require  => Class['php::fpm']
+}
