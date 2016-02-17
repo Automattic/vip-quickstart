@@ -23,5 +23,6 @@ mysql::grant { 'wptests':
 
 mysql::augeas {
   'mysqld/log_slow_queries':
-    value => '/var/log/mysql/mysql-slow.log';
+    value => '/var/log/mysql/mysql-slow.log',
+    require => Package['mysql'];
 }
