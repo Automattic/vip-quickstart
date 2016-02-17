@@ -19,27 +19,35 @@ class {
   'php::dev':
     ensure  => latest,
     require => Apt::Source['php56'];
-  'php::fpm':;
+  'php::fpm':
+    require => Apt::Source['php56'];
   'php::pear':
     ensure  => latest,
     require => Apt::Source['php56'];
   'php::phpunit':;
 
   # Extensions
-  'php::extension::curl':;
-  'php::extension::gd':;
-  'php::extension::imagick':;
-  'php::extension::mcrypt':;
-  'php::extension::memcache':;
-  'php::extension::mysql':;
+  'php::extension::curl':
+    require => Package['php5-common'];
+  'php::extension::gd':
+    require => Package['php5-common'];
+  'php::extension::imagick':
+    require => Package['php5-common'];
+  'php::extension::mcrypt':
+    require => Package['php5-common'];
+  'php::extension::memcache':
+    require => Package['php5-common'];
+  'php::extension::mysql':
+    require => Package['php5-common'];
   'php::extension::xdebug':
-    inifile => false,
     settings => [
+        "set .anon/zend_extension '/usr/lib/php5/20131226/xdebug.so'",
         'set .anon/xdebug.idekey QUICKSTART',
         'set .anon/xdebug.remote_enable 1',
         'set .anon/xdebug.remote_connect_back 1',
         'set .anon/profiler_enable_trigger 1',
-    ];
+    ],
+    require => Package['php5-common'];
 }
 
 php::fpm::pool { 'www': user => 'www-data' }
@@ -70,7 +78,8 @@ exec { 'html_errors = On':
   command => 'sed -i "s/html_errors = Off/html_errors = On/g" /etc/php5/fpm/php.ini',
   unless  => 'cat /etc/php5/fpm/php.ini | grep "html_errors = On"',
   user    => root,
-  notify  => Service['php5-fpm']
+  notify  => Service['php5-fpm'],
+  require => Class['php::fpm']
 }
 
 # Enable PHP-FPM error_log Override
