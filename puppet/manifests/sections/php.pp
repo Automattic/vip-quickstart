@@ -52,22 +52,22 @@ class {
 
 php::fpm::pool {
   'www':
-    user => 'www-data',
+    user       => 'www-data',
     log_errors => false,
-    php_value => {
+    php_value  => {
       'error_log' => '/var/log/php-fpm/www-error.log'
     },
-    php_flag => {
+    php_flag   => {
       'log_errors' => 'on'
     },
-    require  => Class['php::fpm']
+    require    => Class['php::fpm']
 }
 
 php::fpm::config {
   'html_errors':
     setting => 'html_errors',
     value   => 'On',
-    require  => Class['php::fpm']
+    require => Class['php::fpm']
 }
 
 # Install PHP_CodeSniffer and the WordPress coding standard
@@ -94,7 +94,7 @@ exec { 'add wordpress cs to phpcs':
 # Set PHP-FPM log ownership
 exec { 'Set PHP-FPM log ownership':
   command => 'touch /var/log/php-fpm-www-error.log && chown www-data:www-data /var/log/php-fpm-www-error.log',
-  creates  => '/var/log/php-fpm-www-error.log',
+  creates => '/var/log/php-fpm-www-error.log',
   user    => root,
-  require  => Class['php::fpm']
+  require => Class['php::fpm']
 }
