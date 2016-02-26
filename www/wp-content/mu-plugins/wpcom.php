@@ -42,10 +42,10 @@ add_action( 'wp_head', 'global_css', 5 );
 
 function global_css() {
 	// wp_head action + echo are used instead of wp_enqueue_style, because these stylesheets must be loaded before the others
-	wp_enqueue_style( 'h4-global', 'http://s0.wp.com/wp-content/themes/h4/global.css', array() );
+	wp_enqueue_style( 'h4-global', 'https://s0.wp.com/wp-content/themes/h4/global.css', array() );
 
 	if ( is_rtl() )
-		wp_enqueue_style( 'h4-global-rtl', 'http://s0.wp.com/wp-content/themes/h4/global-rtl.css', array() );
+		wp_enqueue_style( 'h4-global-rtl', 'https://s0.wp.com/wp-content/themes/h4/global-rtl.css', array() );
 }
 
 function wpcom_force_ssl_home_urls_in_content_when_secure( $content ) {
