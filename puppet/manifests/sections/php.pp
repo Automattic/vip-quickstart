@@ -50,7 +50,25 @@ class {
     require => Package['php5-common'];
 }
 
-php::fpm::pool { 'www': user => 'www-data' }
+php::fpm::pool {
+  'www':
+    user       => 'www-data',
+    log_errors => false,
+    php_value  => {
+      'error_log' => '/var/log/php-fpm/www-error.log'
+    },
+    php_flag   => {
+      'log_errors' => 'on'
+    },
+    require    => Class['php::fpm']
+}
+
+php::fpm::config {
+  'html_errors':
+    setting => 'html_errors',
+    value   => 'On',
+    require => Class['php::fpm']
+}
 
 # Install PHP_CodeSniffer and the WordPress coding standard
 package { 'pear.php.net/PHP_CodeSniffer':
@@ -73,35 +91,10 @@ exec { 'add wordpress cs to phpcs':
   require => Vcsrepo['/usr/share/php/PHP/CodeSniffer/Standards/WordPress']
 }
 
-# Turn on html_errors
-exec { 'html_errors = On':
-  command => 'sed -i "s/html_errors = Off/html_errors = On/g" /etc/php5/fpm/php.ini',
-  unless  => 'cat /etc/php5/fpm/php.ini | grep "html_errors = On"',
-  user    => root,
-  notify  => Service['php5-fpm'],
-  require => Class['php::fpm']
-}
-
-# Enable PHP-FPM error_log Override
-exec { 'Enable PHP-FPM error_log Override':
-  command => 'sed -i "s/php_admin_value\[error_log\]/php_value\[error_log\]/g" /etc/php5/fpm/pool.d/www.conf',
-  unless  => 'cat /etc/php5/fpm/pool.d/www.conf | grep "php_value[error_log]"',
-  user    => root,
-  require  => Class['php::fpm']
-}
-
-# Enable PHP-FPM log_errors Override
-exec { 'Enable PHP-FPM log_errors Override':
-  command => 'sed -i "s/php_admin_flag\[log_errors\]/php_flag\[log_errors\]/g" /etc/php5/fpm/pool.d/www.conf',
-  unless  => 'cat /etc/php5/fpm/pool.d/www.conf | grep "php_value[log_errors]"',
-  user    => root,
-  require  => Class['php::fpm']
-}
-
 # Set PHP-FPM log ownership
 exec { 'Set PHP-FPM log ownership':
   command => 'touch /var/log/php-fpm-www-error.log && chown www-data:www-data /var/log/php-fpm-www-error.log',
-  creates  => '/var/log/php-fpm-www-error.log',
+  creates => '/var/log/php-fpm-www-error.log',
   user    => root,
-  require  => Class['php::fpm']
+  require => Class['php::fpm']
 }

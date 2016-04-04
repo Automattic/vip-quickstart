@@ -28,3 +28,6 @@
 [submodule "puppet/modules/ssh"]
 	path = puppet/modules/ssh
 	url = https://github.com/attachmentgenie/attachmentgenie-ssh.git
+[submodule "puppet/modules/inifile"]
+	path = puppet/modules/inifile
+	url = https://github.com/puppetlabs/puppetlabs-inifile.git
