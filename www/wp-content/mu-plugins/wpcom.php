@@ -104,3 +104,52 @@ function wpcom_load_theme_compat_file() {
 add_action( 'after_setup_theme', 'wpcom_load_theme_compat_file', 0 );
 
 
+/**
+ * Some slugs shouldn't be used on WordPress.com, as they conflict with actual resources
+ */
+
+add_filter( 'wp_unique_post_slug_is_bad_hierarchical_slug', 'wpcom_reserved_page_slugs', 10, 5 );
+
+function wpcom_reserved_page_slugs( $is_reserved, $slug, $post_type ) {
+	$reserved_page_slugs = array(
+		'admin',
+		'async-jobs',
+		'bin',
+		'blog-search',
+		'botd',
+		'conf',
+		'ejabberd_',
+		'error-docs',
+		'forums-plugins',
+		'forums-theme',
+		'gadgets',
+		'i',
+		'imgpress',
+		'login',
+		'public-charts',
+		'wlw',
+		'wp-admin',
+		'wp-content',
+		'wp-includes'
+	);
+
+	$available_custom_post_types = get_post_types( array( 'public' => true, '_builtin' => false ) );
+
+	if ( ! empty( $available_custom_post_types ) ) {
+		foreach( $available_custom_post_types as $acpt ) {
+			$cpt_obj = get_post_type_object( $acpt );
+
+			if ( ! empty( $cpt_obj ) && isset( $cpt_obj->rewrite ) && isset( $cpt_obj->rewrite['slug'] ) ) {
+				$reserved_page_slugs[] = $cpt_obj->rewrite['slug'];
+			}
+		}
+	}
+
+	if ( 'page' == $post_type && in_array( $slug, $reserved_page_slugs ) ) {
+		$is_reserved = true;
+	}
+
+	return $is_reserved;
+}
+
+
