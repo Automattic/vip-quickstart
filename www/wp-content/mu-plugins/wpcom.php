@@ -152,4 +152,9 @@ function wpcom_reserved_page_slugs( $is_reserved, $slug, $post_type ) {
 	return $is_reserved;
 }
 
-
+// Allow hassle-free Liveblog testing in QS
+if ( ! function_exists( 'wpcom_vip_is_liveblog_enabled' ) ) {
+	function wpcom_vip_is_liveblog_enabled() {
+		return true;
+	}
+}
