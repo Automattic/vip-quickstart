@@ -70,17 +70,27 @@ php::fpm::config {
     require => Class['php::fpm']
 }
 
-# Install PHP_CodeSniffer and the WordPress coding standard
-package { 'pear.php.net/PHP_CodeSniffer':
-  ensure   => 'installed',
-  provider => 'pear',
+# Install PHP_CodeSniffer
+exec { 'download phpcs':
+  command => 'wget https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar -O /usr/local/bin/phpcs',
+  creates => '/usr/local/bin/phpcs',
+  user    => root,
+  path    => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ],
+  require => Package['php5-common']
+}
+
+file { '/usr/local/bin/phpcs':
+  mode    => '0555',
+  owner   => root,
+  group   => root,
+  require => Exec['download phpcs'],
 }
 
 vcsrepo { '/usr/share/php/PHP/CodeSniffer/Standards/WordPress':
   ensure   => 'present',
   source   => 'https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards',
   provider => 'git',
-  require  => Package['pear.php.net/PHP_CodeSniffer'],
+  require  => File['/usr/local/bin/phpcs']
 }
 
 # Add WordPress coding standards to PHP_CodeSniffer config
