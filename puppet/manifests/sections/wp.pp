@@ -105,8 +105,8 @@ file { $wp_content_dirs:
 
 # VCS Checkout
 vcsrepo { '/srv/www/wp':
-  ensure   => latest,
-  source   => 'https://core.svn.wordpress.org/trunk/',
+  ensure   => present,
+  source   => 'https://core.svn.wordpress.org/tags/4.6/',
   provider => svn,
 }
 
