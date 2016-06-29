@@ -158,3 +158,8 @@ if ( ! function_exists( 'wpcom_vip_is_liveblog_enabled' ) ) {
 		return true;
 	}
 }
+
+// Force loading of Jetpack's YouTube shortcode to match wpcom behaviour, even if VideoPress isn't enabled
+if ( ! function_exists( 'wpcom_youtube_embed_crazy_url_init' ) ) {
+	require( WP_CONTENT_DIR . '/plugins/jetpack/modules/shortcodes/youtube.php' );
+}
