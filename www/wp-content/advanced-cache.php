@@ -1,4 +1,7 @@
 <?php
+
+require __DIR__ . '/config/batcache-config.php';
+
 if ( is_readable( dirname( __FILE__ ) . '/batcache-stats.php' ) )
 	require_once dirname( __FILE__ ) . '/batcache-stats.php';
 
