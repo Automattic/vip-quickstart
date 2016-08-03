@@ -39,3 +39,16 @@ remove_action( 'wp_version_check', 'wp_version_check' );
 remove_action( 'admin_init', '_maybe_update_core' );
 add_filter( 'pre_transient_update_core', '__return_null' );
 add_filter( 'pre_site_transient_update_core', '__return_null' );
+
+/**
+ * Catch instances of https://core.trac.wordpress.org/ticket/25239
+ */
+add_filter( 'wp_mail_from', function( $from ) {
+	// exit early if the issue isn't present
+	if ( '_' != $_SERVER['SERVER_NAME'] ) {
+		return $from;
+	}
+    global $current_blog;
+    $sitename = $current_blog->domain;
+    return 'wordpress@'.$current_blog->domain;
+} );
