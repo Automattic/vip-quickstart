@@ -21,7 +21,8 @@ add_action( 'admin_menu', function() {
 });
 
 // Turn on global terms
-add_filter( 'global_terms_enabled', '__return_true' );
+// https://github.com/Automattic/vip-quickstart/issues/345
+//add_filter( 'global_terms_enabled', '__return_true' );
 
 // Disable automatic creation of intermediate images
 add_filter( 'intermediate_image_sizes', 'wpcom_intermediate_sizes' );
