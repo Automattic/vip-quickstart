@@ -48,11 +48,11 @@ server {
     include fastcgi_params;
     fastcgi_index index.php;
     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-    fastcgi_pass 127.0.0.1:9000;
+    fastcgi_pass unix:/run/php/php7.0-fpm.sock;
   }
 
   location /_static/ {
-    fastcgi_pass 127.0.0.1:9000;
+    fastcgi_pass unix:/run/php/php7.0-fpm.sock;
     include /etc/nginx/fastcgi_params;
     fastcgi_param SCRIPT_FILENAME $document_root/wp-content/mu-plugins/http-concat/ngx-http-concat.php;
   }
