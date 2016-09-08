@@ -16,6 +16,7 @@ package { [
 		'php7.0-mcrypt',
 		'php7.0-mysql',
 		'php7.0-gd',
+		'php7.0-xml',
 	]:
 	ensure  => present,
 	require => Apt::Ppa['ppa:ondrej/php']
