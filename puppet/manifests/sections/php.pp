@@ -13,10 +13,16 @@ package { [
 		'php-imagick',
 
 		'php7.0-curl',
+		'php7.0-mbstring',
 		'php7.0-mcrypt',
 		'php7.0-mysql',
+		'php7.0-imap',
+		'php7.0-json',
+		'php7.0-soap',
+		'php7.0-ssh2',
 		'php7.0-gd',
 		'php7.0-xml',
+		'php7.0-zip',
 	]:
 	ensure  => present,
 	require => Apt::Ppa['ppa:ondrej/php']
