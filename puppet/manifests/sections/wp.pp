@@ -97,8 +97,8 @@ file { '/srv/www/wp-content':
 
 file { $wp_content_dirs:
     ensure  => directory,
-    recurse => true,
-    mode    => 0664,
+    recurse => false,
+    mode    => 0775,
     owner   => 'www-data',
     group   => 'www-data',
 }
@@ -144,6 +144,12 @@ cron { '/srv/www/wp-tests':
   command => '/usr/bin/svn up /srv/www/wp-tests > /dev/null 2>&1',
   minute  => '0',
   hour    => '*',
+}
+
+cron { 'check perms on content dirs ':
+  command => 'for path in /srv/www/wp-content/themes /srv/www/wp-content/plugins /srv/www/wp-content/upgrade /srv/www/wp-content/uploads; find $path -type d -exec chmod 775 {} \;; find $path -type f -exec chmod 664 {} \;; chown -R www-data:www-data $path; done',
+  minute => '0',
+  hour = '2',
 }
 
 if 'physical' == $::virtual {
