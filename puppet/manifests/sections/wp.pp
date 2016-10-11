@@ -149,7 +149,7 @@ cron { '/srv/www/wp-tests':
 cron { 'check perms on content dirs ':
   command => 'for path in /srv/www/wp-content/themes /srv/www/wp-content/plugins /srv/www/wp-content/upgrade /srv/www/wp-content/uploads; find $path -type d -exec chmod 775 {} \;; find $path -type f -exec chmod 664 {} \;; chown -R www-data:www-data $path; done',
   minute => '0',
-  hour = '2',
+  hour => '2',
 }
 
 if 'physical' == $::virtual {
