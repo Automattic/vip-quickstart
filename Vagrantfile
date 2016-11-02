@@ -15,6 +15,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box_url = "http://files.vagrantup.com/precise32.box"
   config.vm.hostname = 'vip.local'
   config.vm.network :private_network, ip: "10.86.73.80"
+  config.ssh.insert_key = false #see https://github.com/Automattic/vip-quickstart/issues/502
+  config.ssh.username = "vagrant"
+  config.ssh.password = "vagrant"
+
 
   # Virtualbox overrides
   config.vm.provider "virtualbox" do |v|

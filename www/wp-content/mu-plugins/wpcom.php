@@ -21,15 +21,20 @@ add_action( 'admin_menu', function() {
 });
 
 // Turn on global terms
-add_filter( 'global_terms_enabled', '__return_true' );
+// https://github.com/Automattic/vip-quickstart/issues/345
+//add_filter( 'global_terms_enabled', '__return_true' );
+add_filter( 'wpcom_is_globalized_taxonomy', '__return_false' );
+add_filter( 'global_terms_enabled', '__return_false' );
 
 // Disable automatic creation of intermediate images
-add_filter( 'intermediate_image_sizes', function( $sizes ) {
-    if ( ! defined( 'JETPACK_DEV_DEBUG' ) || ! JETPACK_DEV_DEBUG )
-	return array();
+add_filter( 'intermediate_image_sizes', 'wpcom_intermediate_sizes' );
+function wpcom_intermediate_sizes ( $sizes ) {
+    if ( ! defined( 'JETPACK_DEV_DEBUG' ) || ! JETPACK_DEV_DEBUG ) {
+	    return array();
+    }
 
     return $sizes;
-});
+}
 
 // Check alloptions on every pageload
 add_action( 'init', function() {
@@ -41,11 +46,13 @@ add_action( 'init', function() {
 add_action( 'wp_head', 'global_css', 5 );
 
 function global_css() {
+	$scheme = is_ssl() ? 'https' : 'http';
+
 	// wp_head action + echo are used instead of wp_enqueue_style, because these stylesheets must be loaded before the others
-	wp_enqueue_style( 'h4-global', 'http://s0.wp.com/wp-content/themes/h4/global.css', array() );
+	wp_enqueue_style( 'h4-global', esc_url( $scheme . '://s0.wp.com/wp-content/themes/h4/global.css' ), array() );
 
 	if ( is_rtl() )
-		wp_enqueue_style( 'h4-global-rtl', 'http://s0.wp.com/wp-content/themes/h4/global-rtl.css', array() );
+		wp_enqueue_style( 'h4-global-rtl', esc_url( $scheme . '://s0.wp.com/wp-content/themes/h4/global-rtl.css' ), array() );
 }
 
 function wpcom_force_ssl_home_urls_in_content_when_secure( $content ) {
@@ -100,3 +107,57 @@ function wpcom_load_theme_compat_file() {
 add_action( 'after_setup_theme', 'wpcom_load_theme_compat_file', 0 );
 
 
+/**
+ * Some slugs shouldn't be used on WordPress.com, as they conflict with actual resources
+ */
+
+add_filter( 'wp_unique_post_slug_is_bad_hierarchical_slug', 'wpcom_reserved_page_slugs', 10, 5 );
+
+function wpcom_reserved_page_slugs( $is_reserved, $slug, $post_type ) {
+	$reserved_page_slugs = array(
+		'admin',
+		'async-jobs',
+		'bin',
+		'blog-search',
+		'botd',
+		'conf',
+		'ejabberd_',
+		'error-docs',
+		'forums-plugins',
+		'forums-theme',
+		'gadgets',
+		'i',
+		'imgpress',
+		'login',
+		'public-charts',
+		'wlw',
+		'wp-admin',
+		'wp-content',
+		'wp-includes'
+	);
+
+	$available_custom_post_types = get_post_types( array( 'public' => true, '_builtin' => false ) );
+
+	if ( ! empty( $available_custom_post_types ) ) {
+		foreach( $available_custom_post_types as $acpt ) {
+			$cpt_obj = get_post_type_object( $acpt );
+
+			if ( ! empty( $cpt_obj ) && isset( $cpt_obj->rewrite ) && isset( $cpt_obj->rewrite['slug'] ) ) {
+				$reserved_page_slugs[] = $cpt_obj->rewrite['slug'];
+			}
+		}
+	}
+
+	if ( 'page' == $post_type && in_array( $slug, $reserved_page_slugs ) ) {
+		$is_reserved = true;
+	}
+
+	return $is_reserved;
+}
+
+// Allow hassle-free Liveblog testing in QS
+if ( ! function_exists( 'wpcom_vip_is_liveblog_enabled' ) ) {
+	function wpcom_vip_is_liveblog_enabled() {
+		return true;
+	}
+}

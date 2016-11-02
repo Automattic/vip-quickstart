@@ -11,7 +11,7 @@ Author URI: http://automattic.com/
 if ( ! defined( 'ALLOW_GZIP_COMPRESSION' ) )
 	define( 'ALLOW_GZIP_COMPRESSION', true );
 
-class WPcom_JS_Concat extends WP_scripts {
+class WPcom_JS_Concat extends WP_Scripts {
 	private $old_scripts;
 	public $allow_gzip_compression;
 

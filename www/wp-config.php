@@ -85,14 +85,6 @@ define( 'WP_MAX_MEMORY_LIMIT', '256M' );
 
 /* That's all, stop editing! Happy blogging. */
 
-// Use the latest Jetpack user-agent detection if we have it
-if ( file_exists( __DIR__ . '/wp-content/plugins/jetpack/class.jetpack-user-agent.php' ) ) {
-	require_once( __DIR__ . '/wp-content/plugins/jetpack/class.jetpack-user-agent.php' );
-} else {
-	require __DIR__ . '/config/is-mobile.php';
-}
-
-require __DIR__ . '/config/batcache-config.php';
 require __DIR__ . '/config/roles.php';
 require __DIR__ . '/config/vip-config.php';
 
