@@ -1,7 +1,5 @@
 <?php
 
-define( 'WP_CACHE', true );
-
 // utility variables that are use a bunch of times
 $_batcache_script_name = basename( $_SERVER['SCRIPT_NAME'] );
 
@@ -84,33 +82,37 @@ if ( !isset( $_SERVER[ 'argv' ] ) ) {
 
 
 	// Mobile batcache
-	if( jetpack_is_mobile() && isset( $_COOKIE['akm_mobile'] ) )
-		$batcache['unique']['mobile-force'] = $_COOKIE['akm_mobile'] == 'true' ? 'true' : 'false'; // the akm_mobile cookie is used to force the desktop version of the site when on a mobile device
+	if (  function_exists( 'jetpack_is_mobile' ) ) {
+		if ( jetpack_is_mobile() && isset( $_COOKIE['akm_mobile'] ) ) {
+			$batcache['unique']['mobile-force'] = $_COOKIE['akm_mobile'] == 'true' ? 'true' : 'false';
+		} // the akm_mobile cookie is used to force the desktop version of the site when on a mobile device
 
-	if ( Jetpack_User_Agent_Info::is_blackbeberry() ) {
-		$batcache['unique']['mobile'] = 'blackberry';
-	} elseif ( Jetpack_User_Agent_Info::is_WindowsPhone7() ) {
+		if ( Jetpack_User_Agent_Info::is_blackbeberry() ) {
+			$batcache['unique']['mobile'] = 'blackberry';
+		} elseif ( Jetpack_User_Agent_Info::is_WindowsPhone7() ) {
 			$batcache['unique']['mobile'] = 'windows-phone7';
-	} elseif ( Jetpack_User_Agent_Info::is_S60_OSSBrowser() ) {
-		$batcache['unique']['mobile'] = 'dumb';
-	} elseif ( in_array( jetpack_is_mobile( 'smart', true ), array( 'iphone', 'ipod' ) ) ) {
-		$batcache['unique']['mobile'] = 'iphone';
-	} elseif ( jetpack_is_mobile( 'smart' ) ) {
-		$batcache['unique']['mobile'] = 'smart';
-	} elseif ( jetpack_is_mobile( 'dumb' ) ) {
-		$batcache['unique']['mobile'] = 'dumb';
-	}
+		} elseif ( Jetpack_User_Agent_Info::is_S60_OSSBrowser() ) {
+			$batcache['unique']['mobile'] = 'dumb';
+		} elseif ( in_array( jetpack_is_mobile( 'smart', true ), array( 'iphone', 'ipod' ) ) ) {
+			$batcache['unique']['mobile'] = 'iphone';
+		} elseif ( jetpack_is_mobile( 'smart' ) ) {
+			$batcache['unique']['mobile'] = 'smart';
+		} elseif ( jetpack_is_mobile( 'dumb' ) ) {
+			$batcache['unique']['mobile'] = 'dumb';
+		}
 
-	// iPad
-	if ( Jetpack_User_Agent_Info::is_ipad() ) {
-		if ( false !== strpos( strtolower( $_SERVER['HTTP_USER_AGENT'] ), 'safari' ) )
-			$batcache['unique']['ipad'] = 'ipad-safari';
-		else
-			$batcache['unique']['ipad'] = 'ipad';
-	} elseif ( Jetpack_User_Agent_Info::is_tablet() ) {
-		// Tablets
-		// Should be treated differently from mobile and iPad
-		$batcache['unique']['tablet'] = 'tablet';
+		// iPad
+		if ( Jetpack_User_Agent_Info::is_ipad() ) {
+			if ( false !== strpos( strtolower( $_SERVER['HTTP_USER_AGENT'] ), 'safari' ) ) {
+				$batcache['unique']['ipad'] = 'ipad-safari';
+			} else {
+				$batcache['unique']['ipad'] = 'ipad';
+			}
+		} elseif ( Jetpack_User_Agent_Info::is_tablet() ) {
+			// Tablets
+			// Should be treated differently from mobile and iPad
+			$batcache['unique']['tablet'] = 'tablet';
+		}
 	}
 
 	// UppSite / MySiteApp
