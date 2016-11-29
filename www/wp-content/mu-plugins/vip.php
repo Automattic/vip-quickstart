@@ -26,3 +26,15 @@ function vip_scanner_email_to() {
   // Disabled email submission.
   // return 'vip-support@wordpress.com';
 }
+
+/**
+ * Wrap core WordPress embeds in a div to allow easier targeting via CSS. Replicates WP.com behaviour
+ */
+add_filter( 'oembed_dataparse', 'wpcom_wrap_embeds_in_a_div', 5, 3 );
+function wpcom_wrap_embeds_in_a_div( $html, $data, $url ) {
+	if ( ! empty( $data->provider_name ) && ( 'video' == $data->type || 'rich' == $data->type ) ) {
+		$html = '<div class="embed-' . esc_attr( strtolower( sanitize_html_class( $data->provider_name ) ) ) . '">' . $html . '</div>';
+	}
+
+	return $html;
+}
