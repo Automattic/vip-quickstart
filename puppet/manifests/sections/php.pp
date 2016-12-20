@@ -32,4 +32,5 @@ file_line { 'php error_log':
 	path  => '/etc/php/7.0/fpm/php.ini',
 	line  => 'error_log = /tmp/php-errors',
 	match => '^error_log',
+	require => Package['php7.0-fpm']
 }
