@@ -34,3 +34,11 @@ file_line { 'php error_log':
 	match => '^error_log',
 	require => Package['php7.0-fpm']
 }
+
+# Bump max_input_vars to match WordPress.com
+file_line { 'max_input_vars = 6144':
+	path  => '/etc/php/7.0/fpm/php.ini',
+	line  => 'max_input_vars = 6144',
+	match => '^(; max_input_vars|max_input_vars)',
+	require => Package['php7.0-fpm']
+}
