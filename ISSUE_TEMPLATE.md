@@ -1,0 +1,1 @@
+VIP Quickstart is deprecated as of March 13, 2017. Support for Quickstart will continue through April 21, 2017. For new environments, we recommend using Chassis or VVV as detailed in the [Local Environment documentation](https://vip.wordpress.com/documentation/vip/dev-environment/).
