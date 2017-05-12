@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+echo "Note: VIP Quickstart is deprecated as of March 13, 2017. Please see https://vip.wordpress.com/documentation/vip/dev-environment/"
+exit 1
+
 # =====================================
 # Set cwd to vip-quickstart
 # =====================================
