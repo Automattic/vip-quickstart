@@ -1,6 +1,6 @@
 <?php
 
-require '../config/batcache-config.php';
+require '/srv/www/config/batcache-config.php';
 
 if ( is_readable( dirname( __FILE__ ) . '/batcache-stats.php' ) )
 	require_once dirname( __FILE__ ) . '/batcache-stats.php';
@@ -77,7 +77,7 @@ class batcache {
 	var $genlock = false;
 	var $do = false;
 
-	function batcache( $settings ) {
+	function __construct( $settings ) {
 		if ( is_array( $settings ) ) foreach ( $settings as $k => $v )
 			$this->$k = $v;
 	}
@@ -328,12 +328,12 @@ if ( ! defined( 'WP_CONTENT_DIR' ) )
 
 // Never batcache interactive scripts or API endpoints.
 if ( in_array(
-		basename( $_SERVER['SCRIPT_FILENAME'] ),
-		array(
-			'wp-app.php',
-			'xmlrpc.php',
-			'wp-cron.php',
-		) ) )
+	basename( $_SERVER['SCRIPT_FILENAME'] ),
+	array(
+		'wp-app.php',
+		'xmlrpc.php',
+		'wp-cron.php',
+	) ) )
 	return;
 
 // Never batcache WP javascript generators
@@ -341,8 +341,8 @@ if ( strstr( $_SERVER['SCRIPT_FILENAME'], 'wp-includes/js' ) )
 	return;
 
 // Never batcache a POST request.
-if ( ! empty( $GLOBALS['HTTP_RAW_POST_DATA'] ) || ! empty( $_POST ) ||
-	( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) )
+if ( ! empty( file_get_contents("php://input") ) || ! empty( $_POST ) ||
+     ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) )
 {
 	return;
 }
@@ -423,7 +423,7 @@ $batcache->generate_keys();
 // Get the batcache
 $batcache->cache = wp_cache_get($batcache->key, $batcache->group);
 
-if ( isset( $batcache->cache['version'] ) && $batcache->cache['version'] < $batcache->url_version ) {
+if ( isset( $batcache->cache['version'] ) && $batcache->cache['version'] != $batcache->url_version ) {
 	// Always refresh the cache if a newer version is available.
 	$batcache->do = true;
 } else if ( $batcache->seconds < 1 || $batcache->times < 2 ) {
@@ -436,7 +436,7 @@ if ( isset( $batcache->cache['version'] ) && $batcache->cache['version'] < $batc
 		$batcache->requests = wp_cache_incr($batcache->req_key, 1, $batcache->group);
 
 		if ( $batcache->requests >= $batcache->times &&
-			time() >= $batcache->cache['time'] + $batcache->cache['max_age']
+		     time() >= $batcache->cache['time'] + $batcache->cache['max_age']
 		) {
 			wp_cache_delete( $batcache->req_key, $batcache->group );
 			$batcache->do = true;
@@ -451,11 +451,11 @@ if ( $batcache->do )
 	$batcache->genlock = wp_cache_add("{$batcache->url_key}_genlock", 1, $batcache->group, 10);
 
 if ( isset( $batcache->cache['time'] ) && // We have cache
-	! $batcache->genlock &&            // We have not obtained cache regeneration lock
-	(
-		time() < $batcache->cache['time'] + $batcache->cache['max_age'] || // Batcached page that hasn't expired ||
-		( $batcache->do && $batcache->use_stale )                          // Regenerating it in another request and can use stale cache
-	)
+     ! $batcache->genlock &&            // We have not obtained cache regeneration lock
+     (
+	     time() < $batcache->cache['time'] + $batcache->cache['max_age'] || // Batcached page that hasn't expired ||
+	     ( $batcache->do && $batcache->use_stale )                          // Regenerating it in another request and can use stale cache
+     )
 ) {
 	// Issue redirect if cached and enabled
 	if ( $batcache->cache['redirect_status'] && $batcache->cache['redirect_location'] && $batcache->cache_redirects ) {
@@ -530,6 +530,8 @@ if ( isset( $batcache->cache['time'] ) && // We have cache
 	if ( !empty($batcache->cache['status_header']) )
 		header($batcache->cache['status_header'], true);
 
+	batcache_stats( 'batcache', 'total_cached_views' );
+
 	// Have you ever heard a death rattle before?
 	die($batcache->cache['output']);
 }
@@ -538,10 +540,16 @@ if ( isset( $batcache->cache['time'] ) && // We have cache
 if ( ! $batcache->do || ! $batcache->genlock )
 	return;
 
-$wp_filter['status_header'][10]['batcache'] = array( 'function' => array(&$batcache, 'status_header'), 'accepted_args' => 2 );
-$wp_filter['wp_redirect_status'][10]['batcache'] = array( 'function' => array(&$batcache, 'redirect_status'), 'accepted_args' => 2 );
+//WordPress 4.7 changes how filters are hooked. Since WordPress 4.6 add_filter can be used in advanced-cache.php. Previous behaviour is kept for backwards compatability with WP < 4.6
+if ( function_exists( 'add_filter' ) ) {
+	add_filter( 'status_header', array( &$batcache, 'status_header' ), 10, 2 );
+	add_filter( 'wp_redirect_status', array( &$batcache, 'redirect_status' ), 10, 2 );
+} else {
+	$wp_filter['status_header'][10]['batcache'] = array( 'function' => array(&$batcache, 'status_header'), 'accepted_args' => 2 );
+	$wp_filter['wp_redirect_status'][10]['batcache'] = array( 'function' => array(&$batcache, 'redirect_status'), 'accepted_args' => 2 );
+}
+
 
 ob_start(array(&$batcache, 'ob'));
 
 // It is safer to omit the final PHP closing tag.
-
