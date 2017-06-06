@@ -97,8 +97,8 @@ file { '/srv/www/wp-content':
 
 file { $wp_content_dirs:
     ensure  => directory,
-    recurse => true,
-    mode    => 0664,
+    recurse => false,
+    mode    => 0775,
     owner   => 'www-data',
     group   => 'www-data',
 }
